@@ -1,0 +1,9 @@
+
+.handle {
+  cursor: ew-resize;
+}
+
+.timestamps {
+  display: flex;
+  justify-content: space-between;
+}
