@@ -15,8 +15,9 @@ export const Splat = ({ loading,
   onScrub,
   segment,
   setSegment,
+  text
 }) => {
-  const [text, setText] = useState("")
+  const [textt, setText] = useState(text)
 
   
   // useEffect(() => {
@@ -87,7 +88,7 @@ export const Splat = ({ loading,
         width: 200,
         height: 60,
         backgroundColor: "#ffff88"
-      }}onChange={e => setText(e.target.value)}> text</textarea>
+      }}onChange={e => setText(e.target.value)}>{textt}</textarea>
       </View>
     </View>
   )

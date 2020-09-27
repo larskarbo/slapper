@@ -11,30 +11,23 @@ import { Splat } from "./Splat";
 export default function Croaker({ spotify }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
   const [input, setInput] = useState(
-    "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
+    // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
+    ""
   );
   const [spotifies, setSpotifies] = useState([]);
   const [youtubes, setYoutubes] = useState([
-    { videoId: "W9WnR9xavv4", state: "paused", from: 0, to: 130121 },
+    { videoId: "W9WnR9xavv4", state: "paused", from: 0, to: 130121,
+  text: "The sound in the beginning!" },
     {
       videoId: "4oEQ8Nj1zmw",
       from: 40000,
       to: 239000,
       state: "paused",
       duration: 239000,
+      text: "Energy"
     },
-    { videoId: "tIhaZV9hgWw", state: "paused", from: 105625, to: 127563 },
-    { videoId: "FxYw0XPEoKE", state: "paused", from: 221000, to: 255283 },
-
-    // {
-    //   videoId: "XUQiSBRgX7M",
-    //   state: "paused",
-    //   to: 6000
-    // },
-    // {
-    //   videoId: "Oso6dYXw5lc",
-    //   state: "paused",
-    // }
+    { videoId: "tIhaZV9hgWw", state: "paused", from: 105625, to: 127563, text:"" },
+    { videoId: "FxYw0XPEoKE", state: "paused", from: 221000, to: 255283, text:"This modulation ❤️❤️" },
   ]);
   console.log("youtubes: ", JSON.stringify(youtubes));
 
@@ -275,6 +268,8 @@ const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment }) => {
           player.pauseVideo();
         }
         setLoading(false);
+
+        // youtubeElement.target.playVideo()
       }
     }
   }, [youtubeElement]);
@@ -321,6 +316,7 @@ const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment }) => {
         to: s.to ? s.to : duration,
       }}
       setSegment={setSegment}
+      text={s.text}
     >
       <YouTube
         videoId={s.videoId}
