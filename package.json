@@ -1,17 +1,19 @@
 {
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
+    "fstart": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "postinstall": "netlify-lambda install"
   },
   "dependencies": {
     "@react-hook/hover": "^4.0.0",
     "expo": "~39.0.2",
     "expo-status-bar": "~1.0.2",
     "js-video-url-parser": "^0.4.2",
+    "netlify-identity-widget": "^1.9.1",
     "nice-ticks": "^1.0.1",
     "query-string": "^6.13.2",
     "react": "16.13.1",
@@ -19,6 +21,7 @@
     "react-keyboard-event-handler": "^1.5.4",
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.2.tar.gz",
     "react-native-web": "~0.13.12",
+    "react-player-controls": "^2.0.0-beta.0",
     "react-select": "^3.1.0",
     "react-youtube": "^7.12.0",
     "spotify-web-api-js": "https://github.com/larskarbo/spotify-web-api-js"
@@ -28,6 +31,7 @@
     "@types/react-dom": "~16.9.8",
     "@types/react-native": "~0.63.2",
     "expo-cli": "^3.27.10",
+    "netlify-lambda": "^2.0.1",
     "react-native-web": "~0.13.7",
     "typescript": "~3.9.5"
   },

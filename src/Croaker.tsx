@@ -6,42 +6,47 @@ import YouTube from "react-youtube";
 import urlParser, { YouTubeParseResult } from "js-video-url-parser";
 import Players from "./Players";
 import useHover from "@react-hook/hover";
-import { Splat } from "./Splat";
+import { SlapItem } from "./SlapItem";
 
-export default function Croaker({ spotify }) {
+export default function Croaker({ spotify, slap, setItems }) {
+  const {items, name, description} = slap
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
   const [input, setInput] = useState(
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
   );
-  const [spotifies, setSpotifies] = useState([]);
-  const [youtubes, setYoutubes] = useState([
-    { videoId: "W9WnR9xavv4", state: "paused", from: 0, to: 130121,
-  text: "The sound in the beginning!" },
-    {
-      videoId: "4oEQ8Nj1zmw",
-      from: 40000,
-      to: 239000,
-      state: "paused",
-      duration: 239000,
-      text: "Energy"
-    },
-    { videoId: "tIhaZV9hgWw", state: "paused", from: 105625, to: 127563, text:"" },
-    { videoId: "FxYw0XPEoKE", state: "paused", from: 221000, to: 255283, text:"This modulation ❤️❤️" },
-  ]);
-  console.log("youtubes: ", JSON.stringify(youtubes));
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     setYoutubes(["https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"])
-  //   }, 500)
-  // }, [])
+  const youtubes = items
+  const [spotifies, setSpotifies] = useState([]);
+  // const [youtubes, setYoutubes] = useState([
+  //   { videoId: "W9WnR9xavv4", state: "paused", from: 0, to: 130121,
+  // text: "The sound in the beginning!" },
+  //   {
+  //     videoId: "4oEQ8Nj1zmw",
+  //     from: 40000,
+  //     to: 239000,
+  //     state: "paused",
+  //     duration: 239000,
+  //     text: "Energy"
+  //   },
+  //   { videoId: "tIhaZV9hgWw", state: "paused", from: 105625, to: 127563, text:"" },
+  //   { videoId: "FxYw0XPEoKE", state: "paused", from: 221000, to: 255283, text:"This modulation ❤️❤️" },
+  // ]);
+  // console.log("youtubes: ", JSON.stringify(youtubes));
+
+  useEffect(() => {
+    fetch("/.netlify/functions/fauna-crud/asdf/hur").then(a => a.json()).then(a => {
+      console.log("asdf", a)
+    })
+  }, [])
 
   const go = () => {
     let trackid;
     let parsed = urlParser.parse(input);
 
     if (input.split(":").length == 3) {
+      alert("Spotify not supported yet")
+      return
       trackid = input.split(":")[2];
       setSpotifies([
         ...spotifies,
@@ -50,6 +55,8 @@ export default function Croaker({ spotify }) {
         },
       ]);
     } else if (input.includes("https://open.spotify.com")) {
+      alert("Spotify not supported yet")
+      return
       trackid = input.split("track/")[1].split("?")[0];
       setSpotifies([
         ...spotifies,
@@ -58,7 +65,7 @@ export default function Croaker({ spotify }) {
         },
       ]);
     } else if (parsed) {
-      setYoutubes([
+      setItems([
         ...youtubes,
         {
           videoId: parsed.id,
@@ -74,7 +81,7 @@ export default function Croaker({ spotify }) {
   };
 
   const play = (s) => {
-    setYoutubes(
+    setItems(
       youtubes.map((y) => {
         if (y.videoId == s.videoId) {
           return {
@@ -91,7 +98,7 @@ export default function Croaker({ spotify }) {
   };
 
   const pause = (s) => {
-    setYoutubes(
+    setItems(
       youtubes.map((y) => {
         if (y.videoId == s.videoId) {
           return {
@@ -105,7 +112,7 @@ export default function Croaker({ spotify }) {
   };
 
   const setSegment = (s, segment) => {
-    setYoutubes(
+    setItems(
       youtubes.map((y) => {
         if (y.videoId == s.videoId) {
           return {
@@ -119,35 +126,57 @@ export default function Croaker({ spotify }) {
     );
   };
 
+  const onSetText = (s, text) => {
+    setItems(
+      youtubes.map((y) => {
+        if (y.videoId == s.videoId) {
+          return {
+            ...y,
+            text: text,
+          };
+        }
+        return y;
+      })
+    );
+  };
+
   return (
     <View
       style={{
-        paddingLeft: 200,
       }}
     >
+      
+
       <Text
         style={{
-          paddingVertical: 100,
-          fontSize: 45,
-          fontWeight: 200,
+          paddingBottom: 20,
+          paddingTop: 100,
+          fontSize: 20,
+          // fontWeight: 200,
         }}
       >
-        <span
-          style={{
-            fontWeight: 700,
-          }}
-        >
-          Slapper
-        </span>
-        .io
+        {name}
       </Text>
-      {youtubes.map((s) => (
+      <Text
+        style={{
+          paddingBottom: 80,
+          paddingTop: 0,
+          fontSize: 13,
+          maxWidth: 400
+          // fontWeight: 200,
+        }}
+      >
+        {description}
+      </Text>
+      {youtubes.map((s, i) => (
         <YoutubeFucker
+          // autoplay={i == 0}
           key={s.videoId}
           s={s}
           onPause={() => pause(s)}
           onPlay={() => play(s)}
           setSegment={(segment) => setSegment(s, segment)}
+          onSetText={(text) => onSetText(s, text)}
         />
       ))}
       {spotifies.map((s) => (
@@ -175,7 +204,7 @@ export default function Croaker({ spotify }) {
             fontSize: input.length ? 12 : 25,
           }}
           type="text"
-          placeholder="Paste youtube link here"
+          placeholder="Paste youtube or spotify link here"
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
@@ -215,7 +244,7 @@ const SpotifyFucker = ({ spotify, s }) => {
               width: 64,
             }}
           />
-          {track.name}
+          spotify {track.name} spotify
           <SegmentView
             track={track}
             spotify={spotify.s}
@@ -229,7 +258,7 @@ const SpotifyFucker = ({ spotify, s }) => {
   );
 };
 
-const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment }) => {
+const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment, onSetText, autoplay }) => {
   const [youtubeElement, setYoutubeElement] = useState(null);
   const [title, setTitle] = useState(null);
   const [duration, setDuration] = useState(s.duration || null);
@@ -268,7 +297,9 @@ const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment }) => {
           player.pauseVideo();
         }
         setLoading(false);
-
+        if(autoplay){
+          onPlay()
+        }
         // youtubeElement.target.playVideo()
       }
     }
@@ -302,7 +333,7 @@ const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment }) => {
   //
 
   return (
-    <Splat
+    <SlapItem
       loading={loading}
       title={title}
       duration={duration}
@@ -317,6 +348,7 @@ const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment }) => {
       }}
       setSegment={setSegment}
       text={s.text}
+      onSetText={onSetText}
     >
       <YouTube
         videoId={s.videoId}
@@ -327,6 +359,6 @@ const YoutubeFucker = ({ spotify, s, onPlay, onPause, setSegment }) => {
         onReady={setYoutubeElement}
         // onStateChange={func}
       />
-    </Splat>
+    </SlapItem>
   );
 };

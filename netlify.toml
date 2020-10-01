@@ -1,6 +1,7 @@
 # The following redirect is intended for use with most SPAs that handle
 # routing internally.
-[[redirects]]
-  from = "/*"
-  to = "https://forms.gle/vNQ4V2cbb5nuMvG19"
-  status = 200
+
+[build]
+  command = "#"
+  functions = "functions"
+  publish = "public"
