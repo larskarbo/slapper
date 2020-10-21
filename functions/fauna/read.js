@@ -11,7 +11,7 @@ exports.handler = async (event, context) => {
   const id = event.id
   console.log(`Function 'read' invoked. Read id: ${id}`)
   return client
-    .query(q.Get(q.Ref(`classes/items/${id}`)))
+    .query(q.Get(q.Ref(q.Collection('slapCollections'), id)))
     .then(response => {
       console.log('success', response)
       return {

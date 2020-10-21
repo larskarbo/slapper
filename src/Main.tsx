@@ -2,29 +2,44 @@ import Authorize from "./Authorize";
 import DeviceSelector from "./DeviceSelector";
 import Spotify from "./Spotify";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Croaker from "./Croaker";
 import { Text, View } from "react-native";
 import defSlaps from "./slaps";
-
+import request from "./utils/request";
+import "./index.css";
+import { SpotifyFucker } from "./SpotifyFucker";
+import { SpotifyBox } from "./SpotifyBox";
 export const PARSE_SERVER_BASE = "http://localhost:1337";
 // export const PARSE_SERVER_BASE = "https://server.focusmonkey.io";
 
-export default function Main (){
-  // const [spotify, setSpotify] = useState(new Spotify());
-  const [activeSlap, setActiveSlap] = useState("Modulations 🚀");
-	const [slaps, setSlaps] = useState(defSlaps.map(s => ({
-		...s,
-		items: s.items.map(item => ({
-			...item,
-			state: "paused"
-		}))
-  })));
-  
-  // console.log('slaps: ', JSON.stringify(slaps));
-  
+export default function Main() {
+  const spotify = useMemo(() => new Spotify(), []);
+  const [activeSlap, setActiveSlap] = useState(null);
+  const [slaps, setSlaps] = useState([]);
 
-  // const s = spotify.s;
+  useEffect(() => {
+    request("GET", "fauna").then((res) => {
+      console.log("res: ", res);
+      setSlaps(
+        res.map((r) => ({
+          ...r.data,
+          id: r.ref["@ref"].id,
+        }))
+      );
+      setActiveSlap(279439751993360901);
+    });
+  }, []);
+
+  const newSlapCollection = () => {
+    request("POST", "fauna/newSlapCollection", {
+      title: "",
+      description: "",
+      items: [],
+    }).then((res) => {
+      console.log("res: ", res);
+    });
+  };
 
   // s.setOnError((error) => {
   //   console.log(error);
@@ -38,11 +53,12 @@ export default function Main (){
   //   }
   // });
 
-  // spotify.onUpdateState = () => {
-  //   // this.setState({
-  //   // 	spotify: this.state.spotify,
-  //   // });
-  // };
+  spotify.onUpdateState = () => {
+    console.log('update')
+    // this.setState({
+    // 	spotify: this.state.spotify,
+    // });
+  };
 
   return (
     <div
@@ -53,13 +69,8 @@ export default function Main (){
         flexDirection: "row",
       }}
     >
-      {/* <Authorize spotify={this.state.spotify} /> */}
-
-      {/* {this.state.spotify.credentials &&
-					<DeviceSelector spotify={this.state.spotify} />
-				} */}
-
       <div
+        // className="reveal"
         style={{
           width: 200,
           height: "100vh",
@@ -68,24 +79,22 @@ export default function Main (){
           paddingTop: 100,
         }}
       >
-        <div>
-          <Text
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 200,
+            paddingLeft: 20,
+          }}
+        >
+          <span
             style={{
-              fontSize: 20,
-              fontWeight: 200,
-              paddingLeft: 20,
+              fontWeight: 700,
             }}
           >
-            <span
-              style={{
-                fontWeight: 700,
-              }}
-            >
-              Slapper
-            </span>
-            .io
-          </Text>
-        </div>
+            Slapper
+          </span>
+          .io
+        </Text>
 
         <div
           style={{
@@ -107,15 +116,18 @@ export default function Main (){
             paddingTop: 10,
           }}
         >
+          <button onClick={newSlapCollection}>New slapcollection</button>
           {slaps.map((slap) => {
-            const active = slap.name == activeSlap;
+            const active = slap.id == activeSlap;
+
             return (
               <View
+                key={slap.id}
                 style={{
                   paddingVertical: 6,
                   backgroundColor: active && "#dddddd",
-								}}
-								onClick={() => setActiveSlap(slap.name)}
+                }}
+                onClick={() => setActiveSlap(slap.id)}
               >
                 <Text
                   style={{
@@ -124,28 +136,38 @@ export default function Main (){
                     fontWeight: active ? 700 : 400,
                   }}
                 >
-                  {slap.name}
+                  {slap.title.length ? slap.title : "Untitled"}
                 </Text>
               </View>
             );
           })}
         </div>
       </div>
-      <Croaker
-			// spotify={spotify}
-			slap={slaps.find(s => s.name == activeSlap)}
-			setItems={(items) => {
-				setSlaps(slaps.map((es) => {
-					if(es.name==activeSlap){
-						return {
-							...es,
-							items
-						}
-					}
-					return es
-				}))
-			}}
-			/>
+
+      <div>
+        
+        <SpotifyBox spotify={spotify} />
+
+        {activeSlap && (
+          <Croaker
+            spotify={spotify}
+            slap={slaps.find((s) => s.id == activeSlap)}
+            setItems={(items) => {
+              setSlaps(
+                slaps.map((es) => {
+                  if (es.title == activeSlap) {
+                    return {
+                      ...es,
+                      items,
+                    };
+                  }
+                  return es;
+                })
+              );
+            }}
+          />
+        )}
+      </div>
     </div>
   );
-};
+}

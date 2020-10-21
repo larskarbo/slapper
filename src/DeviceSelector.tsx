@@ -1,6 +1,6 @@
 
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 import Select from 'react-select';
 
@@ -51,14 +51,20 @@ const NoDeviceSelectValue = props => (
 )
 
 export default ({ spotify }) => {
-	const { devices } = spotify
+	const [devices, setDevices] = useState(spotify.devices)
 	const devicesPlus = devices.map(d => ({
 		...d,
-		label: d.name == "FocusMonkey" ? d.name + " (browser)" : d.name,
+		label: d.name == "Slapper.io" ? d.name + " (browser)" : d.name,
 		value: d.id
 	}))
 
 	const activeDevice = devicesPlus.find(d => d.is_active) || {}
+
+	useEffect(() => {
+		spotify.onUpdateDevices = (devices) => {
+			setDevices(devices)
+		}
+	}, [])
 	return (
 		<div style={{
 			marginTop: 20
@@ -69,7 +75,7 @@ export default ({ spotify }) => {
 				isSearchable={false}
 				onChange={(a) => {
 					console.log(a)
-					spotify.s.transferMyPlayback([a.id])
+					spotify.api.transferMyPlayback([a.id])
 				}}
 				options={devicesPlus}
 

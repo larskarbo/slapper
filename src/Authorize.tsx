@@ -10,7 +10,7 @@ const Authorize = ({ spotify }) => {
 
 	if (!spotify.credentials) {
 		content = <div>
-			<div style={{ fontSize: 14, marginBottom: 6 }}>Hello 👋<br/>Please connect to Spotify in order to get started. <br />PS: Spotify Premium required </div>
+			{/* <div style={{ fontSize: 14, marginBottom: 6 }}>Hello 👋<br/>Please connect to Spotify in order to get started. <br />PS: Spotify Premium required </div> */}
 			<img
 				width="200px"
 				onClick={a => {
@@ -26,9 +26,9 @@ const Authorize = ({ spotify }) => {
 	}
 	return (
 		<div className="Authorize" style={{
-			marginBottom: 30,
-			backgroundColor: "#333333",
-			padding: 24
+			// marginBottom: 30,
+			// backgroundColor: "#333333",
+			// padding: 24
 		}}>
 			{/* {spotify.loading &&
 				<div>Loading</div>

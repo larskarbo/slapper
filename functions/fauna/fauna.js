@@ -41,7 +41,7 @@ exports.handler = async (event, context) => {
       } else {
         return {
           statusCode: 500,
-          body: 'invalid segments in POST request, must be /.netlify/functions/fauna-crud/123456',
+          body: 'invalid segments in PUT request, must be /.netlify/functions/fauna-crud/123456',
         }
       }
     case 'DELETE':

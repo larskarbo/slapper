@@ -32,10 +32,10 @@ export const SlapItem = ({
       style={{
         width: 500 + 200,
         height: 60,
-        borderWidth: 2,
+        borderWidth: 1,
         boxSizing: "content-box",
         borderColor: "black",
-        backgroundColor: "#e6e6e6",
+        backgroundColor: "white",
         display: "flex",
         flexDirection: "row",
         marginBottom: 10,

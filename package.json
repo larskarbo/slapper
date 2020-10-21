@@ -12,7 +12,9 @@
     "@react-hook/hover": "^4.0.0",
     "expo": "~39.0.2",
     "expo-status-bar": "~1.0.2",
+    "js-deep-equals": "^2.1.1",
     "js-video-url-parser": "^0.4.2",
+    "ky": "^0.24.0",
     "netlify-identity-widget": "^1.9.1",
     "nice-ticks": "^1.0.1",
     "query-string": "^6.13.2",
@@ -24,7 +26,9 @@
     "react-player-controls": "^2.0.0-beta.0",
     "react-select": "^3.1.0",
     "react-youtube": "^7.12.0",
-    "spotify-web-api-js": "https://github.com/larskarbo/spotify-web-api-js"
+    "spotify-web-api-js": "https://github.com/larskarbo/spotify-web-api-js",
+    "use-why-did-you-update": "^0.1.0",
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
     "@types/react": "~16.9.35",

@@ -4,16 +4,12 @@ import { StyleSheet, Text, View } from 'react-native';
 import Login from './RoutingAndAuth';
 import Main from './src/Main';
 
-if(!location.href.includes("#")){
-  location.assign("https://forms.gle/vNQ4V2cbb5nuMvG19");
-}
-
 export default function App() {
   return (
     <View style={styles.container}>
-      {/* <Main /> */}
+      <Main />
       <StatusBar style="auto" />
-      <Login />
+      {/* <Login /> */}
     </View>
   );
 }

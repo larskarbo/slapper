@@ -75,6 +75,21 @@ export default [
       },
     ],
   },
+
+  {
+    name: "Learn music production",
+    items: [
+      {
+        videoId: "oygrmJFKYZY",
+        from: 167000,
+        to: 182000,
+        state: "paused",
+        duration: 182000,
+        text: "Energy",
+      },
+      { videoId: "PYdm_Z1wnQ0", state: "paused", from: 78671, to: 123483 },
+    ],
+  },
   {
     name: "Sigrid songs",
     items: [

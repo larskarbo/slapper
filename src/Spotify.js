@@ -4,6 +4,7 @@ import SpotifyApi from "spotify-web-api-js";
 import qs from "query-string";
 
 import { PARSE_SERVER_BASE } from "./Main"
+import { compare } from "js-deep-equals";
 
 
 
@@ -11,7 +12,7 @@ import { PARSE_SERVER_BASE } from "./Main"
 export default class Spotify {
 
 	constructor(opts = {}) {
-		this.s = new SpotifyApi()
+		this.api = new SpotifyApi()
 		this.credentials = false
 		this.parseLocation()
 		this.ready = false
@@ -21,14 +22,15 @@ export default class Spotify {
 		this.playerId = null
 		this.accessToken = localStorage.getItem("access_token");
 		this.refreshToken = localStorage.getItem("refresh_token");
+		this.isPlaying = false
+		this.currentTrack = null
 
 		console.log('this.accessToken: ', this.accessToken);
 		console.log('this.refreshToken: ', this.refreshToken);
 
-		this.s.setAccessToken(this.accessToken);
+		this.api.setAccessToken(this.accessToken);
 
-		console.log('this.s: ', this.s);
-		this.s.setOnRenew(this.renewToken)
+		this.api.setOnRenew(this.renewToken)
 		// this.renewToken()
 		if (this.accessToken && this.refreshToken) {
 			this.initMe()
@@ -38,7 +40,8 @@ export default class Spotify {
 				})
 		}
 
-		this.onUpdateState = () => { }
+		this.onUpdatePlaybackState = () => { }
+		this.onUpdateDevices = () => { }
 		this.onGood = () => { }
 	}
 
@@ -47,7 +50,7 @@ export default class Spotify {
 	// }
 
 	initMe = async () => {
-		const me = await this.s.getMe();
+		const me = await this.api.getMe();
 		console.log("me: ", me);
 		if (me.product != "premium") {
 			window.alert("Sorry, you'll need spotify premium to use FocusMonkey")
@@ -65,7 +68,7 @@ export default class Spotify {
 		localStorage.setItem("access_token", accessToken);
 		console.log("👌", localStorage.getItem("access_token"))
 		this.accessToken = accessToken
-		this.s.setAccessToken(this.accessToken);
+		this.api.setAccessToken(this.accessToken);
 	}
 
 	setRefreshToken = (refreshToken) => {
@@ -93,7 +96,7 @@ export default class Spotify {
 			window.onSpotifyWebPlaybackSDKReady = () => {
 				const token = this.accessToken;
 				const player = new window.Spotify.Player({
-					name: 'FocusMonkey',
+					name: 'Slapper.io',
 					getOAuthToken: async cb => {
 						cb(await this.renewToken());
 					}
@@ -134,23 +137,25 @@ export default class Spotify {
 		}
 
 		const poll = async () => {
-			await this.s
+			await this.api
 				.getMyCurrentPlaybackState()
 				.catch(e => {
 					console.error("e: ", e.response);
 				})
-				.then(playbackstate => {
-					this.playbackstate = playbackstate
-					this.loading = false
-					this.ready = true
-					this.onUpdateState()
-				});
+				.then(playbackState => {
+					this.playbackState = playbackState
+					this.isPlaying = playbackState.is_playing
+					this.currentTrack = playbackState?.item?.id
+					this.onUpdatePlaybackState(playbackState)
+				})
 
-			await this.s
+			await this.api
 				.getMyDevices()
 				.then(({ devices }) => {
-					this.devices = devices
-					this.onUpdateState()
+					if (!compare(devices, this.devices)) {
+						this.devices = devices
+						this.onUpdateDevices(devices)
+					}
 				});
 
 
@@ -158,10 +163,59 @@ export default class Spotify {
 
 		initPlayer()
 		await poll()
-		setInterval(poll, 1000)
+		setInterval(poll, 1500)
+		this.ready = true
 		this.onGood()
 
 	};
+
+	playPauseWhatever = (allItems) => {
+		if (!this.ready) {
+			return
+		}
+		const items = allItems.filter(i => i.trackId) // ← only get spotify items
+
+		if (items.every(i => i.state == "paused")) {
+
+			if (this.playbackState.is_playing) {
+				console.log('need to pause')
+				this.api.pause()
+			}
+			return
+		}
+
+
+		if (items.filter(i => i.state == "playing").length > 1) {
+			throw new Error("You can only play one at the time!")
+		}
+
+		const playingItem = items.find(i => i.state == "playing")
+
+		if (!this.isPlaying) {
+			// no playback, start song!
+			this.api.play({
+				uris: ["spotify:track:" + playingItem.trackId],
+				position_ms: playingItem.position
+			});
+			this.isPlaying = true
+			this.currentTrack = playingItem.trackId
+		}
+
+		if (this.isPlaying) {
+			// is it the same song?
+			if (this.currentTrack == playingItem.trackId) {
+			} else {
+				this.api.play({
+					uris: ["spotify:track:" + playingItem.trackId],
+					position_ms: playingItem.position
+				});
+				this.isPlaying = false
+				this.currentTrack = playingItem.trackId
+			}
+		}
+
+	}
+
 
 
 	renewToken = async () => {
