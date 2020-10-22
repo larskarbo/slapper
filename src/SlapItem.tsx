@@ -6,6 +6,7 @@ import { Entypo } from "@expo/vector-icons";
 
 import styled from "styled-components/native";
 import Play from "./comp/Play";
+import { Item, Clip } from "./Croaker"
 
 const StyledView = styled.View`
   width: 500 + 200;
@@ -29,8 +30,8 @@ const Block = styled.View`
 export const SlapItem = ({
   loading,
   children,
+  duration,
   title = "...",
-  duration = 0,
   pointerAt = 0,
   playing = true,
   onPause,
@@ -44,6 +45,9 @@ export const SlapItem = ({
   onUpdateClip,
   onAddClip,
   item,
+}: {
+  item:Item
+  [key: string]: any
 }) => {
   const [open, setOpen] = useState(false);
   const clips = item.clips || [];
@@ -150,8 +154,7 @@ export const SlapItem = ({
         {!loading && (
           <SegmentView
             clips={clips}
-            duration={duration}
-            onUpdateSegment={onSetSegment}
+            duration={duration || 0}
             pointerAt={pointerAt}
             playing={playing}
             onScrub={onScrub}

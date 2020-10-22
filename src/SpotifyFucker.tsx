@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useWhyDidYouUpdate } from "use-why-did-you-update";
 import { SlapItem } from "./SlapItem";
+import { Item, Clip } from "./Croaker"
 
 export const SpotifyFucker = ({
   spotify,
@@ -8,6 +9,9 @@ export const SpotifyFucker = ({
   onPause,
   onSetPosition,
   ...props
+}: {
+  item:Item
+  [key: string]: any
 }) => {
   const [track, setTrack] = useState(null);
   const [pointerAt, setPointerAt] = useState(item.position);
@@ -80,21 +84,16 @@ export const SpotifyFucker = ({
     return null
   }
 
-  const duration = track?.duration_ms
   return (
     <SlapItem
       loading={!track}
       title={track.name}
+      duration={track?.duration_ms}
       item={item}
-      duration={duration}
       pointerAt={pointerAt}
       playing={playing}
       onScrub={scrub}
       onPause={onPause}
-      segment={{
-        from: item.from || 0,
-        to: item.to ? item.to : duration,
-      }}
       text={item.text}
       {...props}
     >

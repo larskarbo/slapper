@@ -9,7 +9,7 @@ import defSlaps from "./slaps";
 import request from "./utils/request";
 import "./index.css";
 import { SpotifyFucker } from "./SpotifyFucker";
-import { SpotifyBox } from "./SpotifyBox";
+import { SpotifyBox } from "./players/SpotifyBox";
 import useLocalStorage from "react-use-localstorage";
 // export const PARSE_SERVER_BASE = "https://server.focusmonkey.io";
 
@@ -147,7 +147,6 @@ export default function Main() {
 
       <div>
         
-        <SpotifyBox spotify={spotify} />
 
         {(activeSlap && slaps.find((s) => s.id == activeSlap)) && (
           <Croaker

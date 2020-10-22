@@ -6,6 +6,7 @@ import request from "./utils/request";
 import { SpotifyFucker } from "./SpotifyFucker";
 import { YoutubeFucker } from "./YoutubeFucker";
 import { v4 as uuidv4 } from "uuid";
+import Players from "./Players";
 
 const itemsForServer = (items) => {
   const forServer = JSON.parse(JSON.stringify(items));
@@ -17,6 +18,28 @@ const itemsForServer = (items) => {
   });
 };
 
+export interface Clip {
+  from: number;
+  to: number;
+  title: string;
+  id: string;
+  color: string;
+}
+
+export interface Item {
+  videoId?: string;
+  trackId?: string;
+  position: number;
+  state: "paused" | "playing";
+  id: string;
+  clips: Clip[];
+  text: string;
+  metaInfo: {
+    duration: number;
+    title: string;
+  };
+}
+
 export default function Croaker({ spotify, slap }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
   const [input, setInput] = useState(
@@ -26,7 +49,7 @@ export default function Croaker({ spotify, slap }) {
 
   const [saveCount, setSaveCount] = useState(0);
 
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<Item[]>([]);
   const [title, setTitle] = useState([]);
   const [description, setDescription] = useState([]);
 
@@ -37,12 +60,29 @@ export default function Croaker({ spotify, slap }) {
 
       setItems(
         res.data.items.map((i) => {
-          return {
-            ...i,
+          const newItem: Item = {
+            videoId: i.videoId,
+            trackId: i.trackId,
+            position: 0,
             state: "paused",
-            position: i.from ? i.from : 0,
-            id: uuidv4(),
+            id: i.id,
+            clips: (i.clips || []).map(clip => {
+              const newClip: Clip = {
+                from: clip.from,
+                to: clip.to,
+                title: clip.title,
+                id: clip.id,
+                color: clip.color,
+              }
+              return newClip
+            }),
+            text: i.text,
+            metaInfo: {
+              duration: i.metaInfo?.duration,
+              title: i.metaInfo?.title,
+            },
           };
+          return newItem;
         })
       );
       setDescription(res.data.description);
@@ -63,8 +103,6 @@ export default function Croaker({ spotify, slap }) {
       console.log("res: ", res);
     });
   }, [saveCount]);
-
-  useEffect(() => spotify.playPauseWhatever(items), [items]);
 
   const go = () => {
     let trackId;
@@ -141,10 +179,10 @@ export default function Croaker({ spotify, slap }) {
   };
 
   const addClip = (item) => {
-    setItems((items) =>
+    setItems((items: Item[]) =>
       items.map((y) => {
         if (y.id == item.id) {
-          const previousClips = y.clips || []
+          const previousClips = y.clips || [];
           return {
             ...y,
             clips: [
@@ -154,9 +192,9 @@ export default function Croaker({ spotify, slap }) {
                 title: "Clip",
                 color: "#B3EBE7",
                 from: 10000,
-                to: 20000
-              }
-            ]
+                to: 20000,
+              },
+            ],
           };
         }
         return y;
@@ -178,23 +216,22 @@ export default function Croaker({ spotify, slap }) {
     );
   };
 
-
   const updateClip = (item, clip, object) => {
-    console.log(' (item, clip, object) : ',  item, clip, object );
+    console.log(" (item, clip, object) : ", item, clip, object);
     setItems((items) =>
       items.map((y) => {
         if (y.id == item.id) {
           return {
             ...y,
-            clips: y.clips.map(clipOld => {
-              if(clipOld.id = clip.id){
+            clips: y.clips.map((clipOld) => {
+              if ((clipOld.id = clip.id)) {
                 return {
                   ...clipOld,
-                  ...object
-                }
+                  ...object,
+                };
               }
-              return clipOld
-            })
+              return clipOld;
+            }),
           };
         }
         return y;
@@ -247,10 +284,10 @@ export default function Croaker({ spotify, slap }) {
           onSetText: (text) => updateItem(item, { text: text }),
           onSetTitle: (title) => updateItem(item, { title: title }),
           onAddClip: () => addClip(item),
-          onUpdateClip: (clip, whatever) => updateClip(item, clip, whatever)
-        }
-        
-        if(item.videoId){
+          onUpdateClip: (clip, whatever) => updateClip(item, clip, whatever),
+        };
+
+        if (item.videoId) {
           return (
             <YoutubeFucker
               autoplay={false}
@@ -269,7 +306,6 @@ export default function Croaker({ spotify, slap }) {
           );
         }
       })}
-
 
       {/* <Splat
         title="test song"
@@ -295,7 +331,13 @@ export default function Croaker({ spotify, slap }) {
         />
       </KeyboardEventHandler>
 
-      {/* <Players /> */}
+      <Players
+        spotify={spotify}
+        items={items}
+        onSetMetaInfo={(item, metaInfo) =>
+          updateItem(item, { metaInfo: metaInfo })
+        }
+      />
     </View>
   );
 }

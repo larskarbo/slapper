@@ -1,48 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { View } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { View } from "react-native";
+import { SpotifyBox } from "./players/SpotifyBox";
+import { YoutubeBox } from "./players/YoutubeBox";
+import { Item, Clip } from "./Croaker"
 
-
-export default class Players extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
-
-  render() {
-
-    return (
-      <View style={{
-        paddingTop: 200
-      }}>
-        <div>Players:</div>
-        <div style={{ display: 'flex' }}>
-          <Spotify />
-          <Youtube />
-        </div>
-
-      </View>
-    );
-  }
-
-}
-
-
-const Spotify = ({ }) => {
-
+export default function Players(
+  { spotify, items, ...props } : {
+    items:Item[]
+    [key: string]: any
+  }) {
   return (
-    <div>
-
-      spotify
-    </div>
-  )
-}
-
-const Youtube = ({ }) => {
-
-  return (
-    <div>
-
-      youtube
-    </div>
-  )
+    <View
+      style={{
+        // paddingTop: 200,
+      }}
+    >
+      <div>Players:</div>
+      <div style={{ display: "flex" }}>
+        <SpotifyBox items={items} spotify={spotify} {...props} />
+        <YoutubeBox items={items} {...props} />
+      </div>
+    </View>
+  );
 }

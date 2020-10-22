@@ -16,7 +16,6 @@ export default function SegmentView({
   playing = true,
   pointerAt,
   duration,
-  onUpdateSegment,
   onScrub,
   onUpdateClip,
   clips
