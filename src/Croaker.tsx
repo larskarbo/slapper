@@ -5,18 +5,17 @@ import urlParser from "js-video-url-parser";
 import request from "./utils/request";
 import { SpotifyFucker } from "./SpotifyFucker";
 import { YoutubeFucker } from "./YoutubeFucker";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 const itemsForServer = (items) => {
-  const forServer = JSON.parse(JSON.stringify(items))
+  const forServer = JSON.parse(JSON.stringify(items));
 
-  
-  return forServer.map(i => {
-    delete i.state
-    delete i.position
-    return i
-  })
-}
+  return forServer.map((i) => {
+    delete i.state;
+    delete i.position;
+    return i;
+  });
+};
 
 export default function Croaker({ spotify, slap }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
@@ -36,14 +35,16 @@ export default function Croaker({ spotify, slap }) {
     request("GET", "fauna/" + slap.id).then((res) => {
       console.log("res: ", res);
 
-      setItems(res.data.items.map(i => {
-        return {
-          ...i,
-          state: "paused",
-          position: i.from ? i.from : 0,
-          id: uuidv4()
-        }
-      }));
+      setItems(
+        res.data.items.map((i) => {
+          return {
+            ...i,
+            state: "paused",
+            position: i.from ? i.from : 0,
+            id: uuidv4(),
+          };
+        })
+      );
       setDescription(res.data.description);
       setTitle(res.data.title);
     });
@@ -63,12 +64,12 @@ export default function Croaker({ spotify, slap }) {
     });
   }, [saveCount]);
 
-  useEffect(() => spotify.playPauseWhatever(items), [items])
+  useEffect(() => spotify.playPauseWhatever(items), [items]);
 
   const go = () => {
     let trackId;
     let parsed = urlParser.parse(input);
-    const id = uuidv4()
+    const id = uuidv4();
 
     if (input.split(":").length == 3) {
       trackId = input.split(":")[2];
@@ -77,7 +78,7 @@ export default function Croaker({ spotify, slap }) {
         {
           trackId,
           state: "paused",
-          id
+          id,
         },
       ]);
     } else if (input.includes("https://open.spotify.com")) {
@@ -88,7 +89,7 @@ export default function Croaker({ spotify, slap }) {
         {
           trackId,
           state: "paused",
-          id
+          id,
         },
       ]);
     } else if (parsed) {
@@ -97,7 +98,7 @@ export default function Croaker({ spotify, slap }) {
         {
           videoId: parsed.id,
           state: "paused",
-          id
+          id,
         },
       ]);
     } else {
@@ -109,7 +110,7 @@ export default function Croaker({ spotify, slap }) {
   };
 
   const play = (s) => {
-    setItems(items =>
+    setItems((items) =>
       items.map((y) => {
         if (y.id == s.id) {
           return {
@@ -126,7 +127,7 @@ export default function Croaker({ spotify, slap }) {
   };
 
   const pause = (s) => {
-    setItems(items =>
+    setItems((items) =>
       items.map((y) => {
         if (y.id == s.id) {
           return {
@@ -139,14 +140,23 @@ export default function Croaker({ spotify, slap }) {
     );
   };
 
-  const setSegment = (s, segment) => {
-    setItems(items =>
+  const addClip = (item) => {
+    setItems((items) =>
       items.map((y) => {
-        if (y.id == s.id) {
+        if (y.id == item.id) {
+          const previousClips = y.clips || []
           return {
             ...y,
-            from: segment.from,
-            to: segment.to,
+            clips: [
+              ...previousClips,
+              {
+                id: uuidv4(),
+                title: "Clip",
+                color: "#B3EBE7",
+                from: 10000,
+                to: 20000
+              }
+            ]
           };
         }
         return y;
@@ -154,13 +164,13 @@ export default function Croaker({ spotify, slap }) {
     );
   };
 
-  const setPosition = (s, position) => {
-    setItems(items =>
+  const updateItem = (item, object) => {
+    setItems((items) =>
       items.map((y) => {
-        if (y.id == s.id) {
+        if (y.id == item.id) {
           return {
             ...y,
-            position
+            ...object,
           };
         }
         return y;
@@ -168,13 +178,23 @@ export default function Croaker({ spotify, slap }) {
     );
   };
 
-  const onSetText = (s, text) => {
-    setItems(items =>
+
+  const updateClip = (item, clip, object) => {
+    console.log(' (item, clip, object) : ',  item, clip, object );
+    setItems((items) =>
       items.map((y) => {
-        if (y.id == s.id) {
+        if (y.id == item.id) {
           return {
             ...y,
-            text: text,
+            clips: y.clips.map(clipOld => {
+              if(clipOld.id = clip.id){
+                return {
+                  ...clipOld,
+                  ...object
+                }
+              }
+              return clipOld
+            })
           };
         }
         return y;
@@ -183,7 +203,7 @@ export default function Croaker({ spotify, slap }) {
   };
 
   return (
-    <View style={{paddingTop:20}}>
+    <View style={{ paddingTop: 20 }}>
       <button
         onClick={() => {
           setSaveCount(saveCount + 1);
@@ -212,34 +232,44 @@ export default function Croaker({ spotify, slap }) {
       >
         {description}
       </Text>
-      {items
-        .filter((i) => i.videoId)
-        .map((s, i) => (
-          <YoutubeFucker
-            autoplay={false}
-            key={s.videoId}
-            s={s}
-            onPause={() => pause(s)}
-            onPlay={() => play(s)}
-            setSegment={(segment) => setSegment(s, segment)}
-            onSetText={(text) => onSetText(s, text)}
-          />
-        ))}
-      {items
-        .filter((i) => i.trackId)
-        .map((s) => (
-          <SpotifyFucker
-            autoplay={false}
-            spotify={spotify}
-            key={s.trackId}
-            s={s}
-            onPause={() => pause(s)}
-            onPlay={() => play(s)}
-            setPosition={(position) => setPosition(s, position)}
-            setSegment={(segment) => setSegment(s, segment)}
-            onSetText={(text) => onSetText(s, text)}
-          />
-        ))}
+
+      {items.map((item, i) => {
+        const commonProps = {
+          item: item,
+          onPause: () => pause(item),
+          onPlay: () => play(item),
+          onSetPosition: (position) => updateItem(item, { position: position }),
+          onSetSegment: (segment) =>
+            updateItem(item, {
+              from: segment.from,
+              to: segment.to,
+            }),
+          onSetText: (text) => updateItem(item, { text: text }),
+          onSetTitle: (title) => updateItem(item, { title: title }),
+          onAddClip: () => addClip(item),
+          onUpdateClip: (clip, whatever) => updateClip(item, clip, whatever)
+        }
+        
+        if(item.videoId){
+          return (
+            <YoutubeFucker
+              autoplay={false}
+              key={item.videoId}
+              {...commonProps}
+            />
+          );
+        } else {
+          return (
+            <SpotifyFucker
+              autoplay={false}
+              spotify={spotify}
+              key={item.trackId}
+              {...commonProps}
+            />
+          );
+        }
+      })}
+
 
       {/* <Splat
         title="test song"

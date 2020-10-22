@@ -3,30 +3,30 @@ import YouTube from "react-youtube";
 import { SlapItem } from "./SlapItem";
 
 export const YoutubeFucker = ({
-  s,
+  item,
   onPlay,
   onPause,
-  setSegment,
-  onSetText,
+  onSetSegment,
+  onSetTitle,
   autoplay,
+  ...props
 }) => {
   const [youtubeElement, setYoutubeElement] = useState(null);
-  const [title, setTitle] = useState(null);
-  const [duration, setDuration] = useState(s.duration || null);
+  const [duration, setDuration] = useState(item.duration || null);
   const [loading, setLoading] = useState(true);
   const [playing, setPlaying] = useState(false);
-  const [pointerAt, setPointerAt] = useState(s.position);
+  const [pointerAt, setPointerAt] = useState(item.position);
 
   useEffect(() => {
     if (!youtubeElement) return;
-    if (s.state == "playing") {
+    if (item.state == "playing") {
       youtubeElement.target.playVideo();
       setPlaying(true);
     } else {
       youtubeElement.target.pauseVideo();
       setPlaying(false);
     }
-  }, [s.state, youtubeElement]);
+  }, [item.state, youtubeElement]);
 
   useEffect(() => {
     if (youtubeElement) {
@@ -37,14 +37,14 @@ export const YoutubeFucker = ({
         const data = player.getVideoData();
 
         setDuration(player.getDuration() * 1000);
-        setSegment({
-          from: s.from ? s.from : 0,
-          to: s.to ? s.to : player.getDuration() * 1000,
+        onSetSegment({
+          from: item.from ? item.from : 0,
+          to: item.to ? item.to : player.getDuration() * 1000,
         });
-        setTitle(player.getVideoData().title);
-        if (s.from) {
-          youtubeElement.target.seekTo(s.from / 1000);
-          setPointerAt(s.from);
+        onSetTitle(player.getVideoData().title);
+        if (item.from) {
+          youtubeElement.target.seekTo(item.from / 1000);
+          setPointerAt(item.from);
           player.pauseVideo();
         }
         setLoading(false);
@@ -62,8 +62,8 @@ export const YoutubeFucker = ({
       if (pointerAt) {
         setPointerAt(pointerAt);
 
-        if (s.state == "playing") {
-          const timeUntilStop = s.to - pointerAt;
+        if (item.state == "playing") {
+          const timeUntilStop = item.to - pointerAt;
           console.log("timeUntilStop: ", timeUntilStop);
           const timeout = setTimeout(() => {
             onPause();
@@ -72,7 +72,7 @@ export const YoutubeFucker = ({
         }
       }
     }
-  }, [s.state, youtubeElement]);
+  }, [item.state, youtubeElement]);
 
   const scrub = (to) => {
     console.log("scrubbing to: ", to);
@@ -86,7 +86,8 @@ export const YoutubeFucker = ({
   return (
     <SlapItem
       loading={loading}
-      title={title}
+      item={item}
+      title={item.title}
       duration={duration}
       pointerAt={pointerAt}
       onPause={onPause}
@@ -94,15 +95,14 @@ export const YoutubeFucker = ({
       playing={playing}
       onScrub={scrub}
       segment={{
-        from: s.from || 0,
-        to: s.to ? s.to : duration,
+        from: item.from || 0,
+        to: item.to ? item.to : duration,
       }}
-      setSegment={setSegment}
-      text={s.text}
-      onSetText={onSetText}
+      text={item.text}
+      {...props}
     >
       <YouTube
-        videoId={s.videoId}
+        videoId={item.videoId}
         opts={{
           height: "60",
           width: "60",

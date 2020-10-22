@@ -2,7 +2,6 @@ import React, { Component } from "react";
 
 import connect from "./connect.png";
 import qs from "qs";
-import { PARSE_SERVER_BASE } from "./Main"
 
 
 const Authorize = ({ spotify }) => {
@@ -14,7 +13,7 @@ const Authorize = ({ spotify }) => {
 			<img
 				width="200px"
 				onClick={a => {
-					window.open(PARSE_SERVER_BASE + "/login","_self");
+					window.open("/.netlify/functions/spotify-auth/login","_self");
 				}}
 				src={connect}
 			></img>

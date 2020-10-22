@@ -74,7 +74,37 @@ class Handle extends Component {
 
     const handlePos = PADDING_SV + (this.props.value / this.props.duration) * w
 
-    const handle_width = this.props.isHovering ? HANDLE_WIDTH : 1
+    // const handle_width = this.props.isHovering ? HANDLE_WIDTH : 1
+    const handle_width = 10
+    if(!this.props.isHovering){
+      return null
+    }
+    return (
+      <>
+        <div className="handle" style={{
+          height: 10,
+          width: 10 + "px",
+          background: this.props.color || "#898989",
+          position: 'absolute',
+          left: handlePos - handle_width / 2 + "px",
+          top: 20,
+          borderRadius: 5
+        }}
+          onMouseDown={(e) => {
+            this.down(e, "start")
+          }}
+        />
+        {/* <div style={{
+          height: 80,
+          width: endHandlePos - startHandlePos + "px",
+          background: "rgba(245, 9, 9, 0.48)",
+          position: 'absolute',
+          left: startHandlePos + "px",
+        }}
+        /> */}
+      </>
+    )
+    
     return (
       <>
         <div className="handle" style={{

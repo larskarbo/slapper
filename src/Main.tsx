@@ -10,12 +10,13 @@ import request from "./utils/request";
 import "./index.css";
 import { SpotifyFucker } from "./SpotifyFucker";
 import { SpotifyBox } from "./SpotifyBox";
-export const PARSE_SERVER_BASE = "http://localhost:1337";
+import useLocalStorage from "react-use-localstorage";
 // export const PARSE_SERVER_BASE = "https://server.focusmonkey.io";
 
 export default function Main() {
   const spotify = useMemo(() => new Spotify(), []);
-  const [activeSlap, setActiveSlap] = useState(null);
+  const [activeSlap, setActiveSlap] = useLocalStorage('activeSlap', null);
+
   const [slaps, setSlaps] = useState([]);
 
   useEffect(() => {
@@ -27,7 +28,7 @@ export default function Main() {
           id: r.ref["@ref"].id,
         }))
       );
-      setActiveSlap(279439751993360901);
+      // setActiveSlap(279439751993360901);
     });
   }, []);
 
@@ -148,7 +149,7 @@ export default function Main() {
         
         <SpotifyBox spotify={spotify} />
 
-        {activeSlap && (
+        {(activeSlap && slaps.find((s) => s.id == activeSlap)) && (
           <Croaker
             spotify={spotify}
             slap={slaps.find((s) => s.id == activeSlap)}

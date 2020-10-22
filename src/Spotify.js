@@ -224,7 +224,7 @@ export default class Spotify {
 			refresh_token: localStorage.getItem("refresh_token")
 		});
 		const res = await window
-			.fetch(PARSE_SERVER_BASE + "/refresh_token?" + query)
+			.fetch("/.netlify/functions/spotify-auth/refresh_token?" + query)
 			.then(a => a.json())
 			.catch(a => {
 				console.log('Errror', a)

@@ -4,41 +4,38 @@ import { SlapItem } from "./SlapItem";
 
 export const SpotifyFucker = ({
   spotify,
-  s,
-  onPlay,
+  item,
   onPause,
-  setSegment,
-  setPosition,
-  onSetText,
-  autoplay,
+  onSetPosition,
+  ...props
 }) => {
   const [track, setTrack] = useState(null);
-  const [pointerAt, setPointerAt] = useState(s.from ? s.from : 0);
+  const [pointerAt, setPointerAt] = useState(item.position);
   const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
-    spotify.api.getTrack(s.trackId).then((track) => {
+    spotify.api.getTrack(item.trackId).then((track) => {
       console.log("track: ", track);
       setTrack(track);
     });
-  }, [s.trackId]);
+  }, [item.trackId]);
 
   useEffect(() => {
-    if(s.state == "playing"){
+    if(item.state == "playing"){
       spotify.onUpdatePlaybackState = playbackState => {
-        if(playbackState?.item?.id == s.trackId){
-          setPosition(playbackState.progress_ms)
+        if(playbackState?.item?.id == item.trackId){
+          onSetPosition(playbackState.progress_ms)
           setPointerAt(playbackState.progress_ms)
         }
       }
     }
-  }, [s.state]);
+  }, [item.state]);
 
 
   useEffect(() => {
     console.log('track: ', track);
     if (!track) return;
-    if (s.state == "playing") {
+    if (item.state == "playing") {
       // spotify.target.playVideo();
      
       console.log("start")
@@ -47,7 +44,7 @@ export const SpotifyFucker = ({
       console.log("stop")
       setPlaying(false);
     }
-  }, [s.state, track]);
+  }, [item.state, track]);
 
   // useEffect(() => {
   //   if (track) {
@@ -55,8 +52,8 @@ export const SpotifyFucker = ({
   //     if (pointerAt) {
   //       setPointerAt(pointerAt);
 
-  //       if (s.state == "playing") {
-  //         const timeUntilStop = s.to - pointerAt;
+  //       if (item.state == "playing") {
+  //         const timeUntilStop = item.to - pointerAt;
   // console.log("timeUntilStop: ", timeUntilStop);
   //         const timeout = setTimeout(() => {
   //           onPause();
@@ -65,7 +62,7 @@ export const SpotifyFucker = ({
   //       }
   //     }
   //   }
-  // }, [s.state, track]);
+  // }, [item.state, track]);
 
   const scrub = (to) => {
     console.log("scrubbing to: ", to);
@@ -75,7 +72,7 @@ export const SpotifyFucker = ({
   };
 
   const pause = () => {
-    setPosition(pointerAt)
+    onSetPosition(pointerAt)
     onPause()
   };
 
@@ -88,19 +85,18 @@ export const SpotifyFucker = ({
     <SlapItem
       loading={!track}
       title={track.name}
+      item={item}
       duration={duration}
       pointerAt={pointerAt}
-      onPause={pause}
-      onPlay={onPlay}
       playing={playing}
       onScrub={scrub}
+      onPause={onPause}
       segment={{
-        from: s.from || 0,
-        to: s.to ? s.to : duration,
+        from: item.from || 0,
+        to: item.to ? item.to : duration,
       }}
-      setSegment={setSegment}
-      text={s.text}
-      onSetText={onSetText}
+      text={item.text}
+      {...props}
     >
       <img
         src={track.album.images[2].url}
