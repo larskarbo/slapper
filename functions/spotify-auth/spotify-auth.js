@@ -12,21 +12,15 @@ const serverless = require('serverless-http');
 
 
 app
-// .use(cors())
+  // .use(cors())
   .use(cookieParser());
 
 
 var stateKey = 'spotify_auth_state';
 
 var client_id = '13f5eb87218a47ed87ce06e45329bd6c'; // Your client id
-var client_secret = process.env.SAMPLE_X_SPOTIFY_SECRET; // Your secret
-if (process.env.SAMPLE_X_LOCAL) {
-  var redirect_uri = 'http://localhost:8888/.netlify/functions/spotify-auth/callback'; // Your redirect uri
-  var app_uri = 'http://localhost:8888'; // Your redirect uri
-} else {
-  // var redirect_uri = 'https://server.focusmonkey.io/callback'; // Your redirect uri
-  // var app_uri = 'https://focusmonkey.io'; // Your redirect uri
-}
+var client_secret = process.env.SLAPPER_SPOTIFY_SECRET; // Your secret
+var redirect_uri = process.env.SLAPPER_ORIGIN + '/.netlify/functions/spotify-auth/callback'; // Your redirect uri
 
 const scopes = [
   "user-read-currently-playing",
@@ -107,13 +101,13 @@ router.get('/callback', function (req, res) {
         });
 
         // we can also pass the token to the browser to make requests from there
-        res.redirect(app_uri + '/#' +
+        res.redirect('/#' +
           querystring.stringify({
             access_token: access_token,
             refresh_token: refresh_token
           }));
       } else {
-        res.redirect(app_uri + '/#' +
+        res.redirect('/#' +
           querystring.stringify({
             error: 'invalid_token'
           }));

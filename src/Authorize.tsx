@@ -13,7 +13,7 @@ const Authorize = ({ spotify }) => {
 			<img
 				width="200px"
 				onClick={a => {
-					window.open("/.netlify/functions/spotify-auth/login","_self");
+					window.open("/.netlify/functions/spotify-auth/login?origin=" + location.origin,"_self");
 				}}
 				src={connect}
 			></img>
