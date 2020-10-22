@@ -1,5 +1,6 @@
 import netlifyIdentity from "netlify-identity-widget";
 import React from "react";
+import Main from "./src/Main";
 window.netlifyIdentity = netlifyIdentity;
 console.log("netlifyIdentity: ", netlifyIdentity);
 // You must run this once before trying to interact with the widget
@@ -18,11 +19,11 @@ const netlifyAuth = {
     });
   },
   signout(callback) {
-    this.isAuthenticated = false;
     netlifyIdentity.logout();
     netlifyIdentity.on("logout", () => {
       this.user = null;
-      callback();
+      this.isAuthenticated = false;
+      // callback();
     });
   },
 };
@@ -66,17 +67,19 @@ class Login extends React.Component {
   };
 
   render() {
-    // let { from } = this.props.location.state || { from: { pathname: '/' } };
-    // console.log('from: ', from);
-    let { redirectToReferrer } = this.state;
-    console.log("redirectToReferrer: ", redirectToReferrer);
 
-    // if (redirectToReferrer) return <Redirect to={from} />;
+    const user = netlifyIdentity.currentUser()
 
+    if(user){
+      return(
+        <Main />
+      )
+    }
     return (
       <div>
         <p>You must log in to view the page at </p>
         <button onClick={this.login}>Log in</button>
+        <button onClick={netlifyAuth.signout}>Log out</button>
       </div>
     );
   }
