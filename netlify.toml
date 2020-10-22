@@ -2,9 +2,9 @@
 # routing internally.
 
 [build]
-  command = "#"
+  command = "expo build:web"
   functions = "functions"
-  publish = "public"
+  publish = "web-build"
 
 [dev]
   framework = "#custom"
