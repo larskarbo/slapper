@@ -12,7 +12,15 @@ export const YoutubeBox = ({
   [key: string]: any;
 }) => {
   const youtubeItems = items.filter((i) => i.videoId);
-  // useEffect(() => playPauseWhatever(items), [items]);
+  const [lastActive, setLastActive] = useState(null)
+
+
+  useEffect(() => {
+    const playingItem = youtubeItems.find(i => i.state == "playing")
+    if(playingItem){
+      setLastActive(playingItem)
+    }
+  }, [youtubeItems]);
 
   return (
     <div
@@ -28,6 +36,7 @@ export const YoutubeBox = ({
           key={item.videoId}
           item={item}
           onSetMetaInfo={(metaInfo) => onSetMetaInfo(item, metaInfo)}
+          visible={item.videoId == lastActive?.videoId}
         />
       ))}
     </div>
@@ -37,11 +46,11 @@ export const YoutubeBox = ({
 const YoutubeVideo = ({
   item,
   onSetMetaInfo,
+  visible
 }: {
   item: Item;
   [key: string]: any;
 }) => {
-  console.log("item: ", item);
   const [youtubeElement, setYoutubeElement] = useState(null);
   const [playing, setPlaying] = useState(false);
 
@@ -100,14 +109,23 @@ const YoutubeVideo = ({
     <div
       style={{
         // display: item.state == "playing" ? "block" : "none",
-        display: "none",
+        display: visible ? "block" : "none",
+        // display: "none",
+        position: "relative"
       }}
     >
+      <div style={{
+        position: "absolute",
+        top: 0,
+        right: 0,
+        left: 0,
+        bottom: 0
+      }}></div>
       <YouTube
         videoId={item.videoId}
         opts={{
-          height: "120",
-          width: "240",
+          height: "100",
+          width: "200",
           playerVars: {
             controls: 0,
             modestbranding: 1,
@@ -118,48 +136,4 @@ const YoutubeVideo = ({
       />
     </div>
   );
-};
-
-const playPauseWhatever = (allItems) => {
-  if (!this.ready) {
-    return;
-  }
-  const items = allItems.filter((i) => i.trackId); // ← only get spotify items
-
-  if (items.every((i) => i.state == "paused")) {
-    if (this.playbackState.is_playing) {
-      console.log("need to pause");
-      this.api.pause();
-    }
-    return;
-  }
-
-  if (items.filter((i) => i.state == "playing").length > 1) {
-    throw new Error("You can only play one at the time!");
-  }
-
-  const playingItem = items.find((i) => i.state == "playing");
-
-  if (!this.isPlaying) {
-    // no playback, start song!
-    this.api.play({
-      uris: ["spotify:track:" + playingItem.trackId],
-      position_ms: playingItem.position,
-    });
-    this.isPlaying = true;
-    this.currentTrack = playingItem.trackId;
-  }
-
-  if (this.isPlaying) {
-    // is it the same song?
-    if (this.currentTrack == playingItem.trackId) {
-    } else {
-      this.api.play({
-        uris: ["spotify:track:" + playingItem.trackId],
-        position_ms: playingItem.position,
-      });
-      this.isPlaying = false;
-      this.currentTrack = playingItem.trackId;
-    }
-  }
 };

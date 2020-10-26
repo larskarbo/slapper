@@ -3,10 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Text, View } from "react-native";
 import SegmentView, { msToTime } from "./SegmentView/SegmentView";
 import { Entypo } from "@expo/vector-icons";
+import { useParams, Link, Route, Switch } from "react-router-dom";
 
 import styled from "styled-components/native";
 import Play from "./comp/Play";
-import { Item, Clip } from "./Croaker"
+import { Item, Clip } from "./Croaker";
+import { FaSpotify, FaYoutube } from "react-icons/fa";
 
 const StyledView = styled.View`
   width: 500 + 200;
@@ -46,8 +48,8 @@ export const SlapItem = ({
   onAddClip,
   item,
 }: {
-  item:Item
-  [key: string]: any
+  item: Item;
+  [key: string]: any;
 }) => {
   const [open, setOpen] = useState(false);
   const clips = item.clips || [];
@@ -81,17 +83,34 @@ export const SlapItem = ({
               justifyContent: "center",
             }}
           >
-            <Text
-              style={{
-                width: "100%",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                fontWeight: "bold",
-              }}
-            >
-              {title}
-            </Text>
-            {/* <Text>{msToTime(duration)}</Text> */}
+            <View style={{ flexDirection: "column", flex: 1 }}>
+              <Text
+                style={{
+                  width: "100%",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                }}
+              >
+                {title}
+              </Text>
+              <Text
+                style={{
+                  fontSize: 10,
+                }}
+              >
+                {item.videoId ? (
+                  <a target="_blank" href={"https://youtu.be/" + item.videoId}>
+                    <FaYoutube />
+                  </a>
+                ) : (
+
+                  <a target="_blank" href={"https://open.spotify.com/track/" + item.trackId}>
+                    <FaSpotify />
+                  </a>
+                )}
+              </Text>
+            </View>
           </Block>
           {clips.map((c) => (
             <Block
@@ -122,10 +141,7 @@ export const SlapItem = ({
             }}
             onClick={onAddClip}
           >
-            <Text
-            >
-              + Add clip
-            </Text>
+            <Text>+ Add clip</Text>
           </Block>
         </View>
 

@@ -8,7 +8,6 @@ export const SpotifyBox = ({ spotify, items } : {
   items:Item[]
   [key: string]: any
 }) => {
-
   useEffect(() => spotify.playPauseWhatever(items), [items]);
   
   return (

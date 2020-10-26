@@ -6,7 +6,9 @@ import request from "./utils/request";
 import { SpotifyFucker } from "./SpotifyFucker";
 import { YoutubeFucker } from "./YoutubeFucker";
 import { v4 as uuidv4 } from "uuid";
-import Players from "./Players";
+import Players from "./players/Players";
+import { useParams, Link, Route } from "react-router-dom";
+
 
 const itemsForServer = (items) => {
   const forServer = JSON.parse(JSON.stringify(items));
@@ -40,8 +42,9 @@ export interface Item {
   };
 }
 
-export default function Croaker({ spotify, slap }) {
+export default function Croaker({ spotify }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
+  const { collection } = useParams();
   const [input, setInput] = useState(
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
@@ -54,9 +57,9 @@ export default function Croaker({ spotify, slap }) {
   const [description, setDescription] = useState([]);
 
   useEffect(() => {
-    console.log("slap.id: ", slap.id);
-    request("GET", "fauna/" + slap.id).then((res) => {
-      console.log("res: ", res);
+    
+    request("GET", "fauna/" + collection).then((res) => {
+      
 
       setItems(
         res.data.items.map((i) => {
@@ -88,19 +91,19 @@ export default function Croaker({ spotify, slap }) {
       setDescription(res.data.description);
       setTitle(res.data.title);
     });
-  }, [slap.id]);
+  }, [collection]);
 
   useEffect(() => {
     if (saveCount == 0) {
       return;
     }
-    console.log("save!");
-    request("PUT", "fauna/" + slap.id, {
+    
+    request("PUT", "fauna/" + collection, {
       title,
       description,
       items: itemsForServer(items),
     }).then((res) => {
-      console.log("res: ", res);
+      
     });
   }, [saveCount]);
 
@@ -121,7 +124,7 @@ export default function Croaker({ spotify, slap }) {
       ]);
     } else if (input.includes("https://open.spotify.com")) {
       trackId = input.split("track/")[1].split("?")[0];
-      console.log("trackId: ", trackId);
+      
       setItems([
         ...items,
         {
@@ -217,7 +220,7 @@ export default function Croaker({ spotify, slap }) {
   };
 
   const updateClip = (item, clip, object) => {
-    console.log(" (item, clip, object) : ", item, clip, object);
+    
     setItems((items) =>
       items.map((y) => {
         if (y.id == item.id) {
