@@ -34,6 +34,7 @@ const Sidebar = ({ spotify }) => {
       title: "",
       description: "",
       items: [],
+      user: netlifyIdentity.currentUser().id
     }).then((res) => {
       console.log("res: ", res);
       history.replace({ pathname: "/s/" + res.ref["@ref"].id });

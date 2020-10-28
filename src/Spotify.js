@@ -224,8 +224,8 @@ export default class Spotify {
   }
 	
 	play = async (opts) => {
-		console.log('this.playbackState: ', this.playbackState);
-		if(!this.playbackState?.is_playing){
+    const playbackState = await this.api.getMyCurrentPlaybackState()
+		if(!playbackState?.device){
 			if(this.devices.length){
 				console.log('this.devices: ', this.devices);
         console.log('choose a device')
@@ -237,7 +237,7 @@ export default class Spotify {
 				await this.api.transferMyPlayback([foundDevice.id])
 			}
 		}
-		this.api.play(opts);
+		await this.api.play(opts);
 		this.isPlaying = true;
 	}
 
