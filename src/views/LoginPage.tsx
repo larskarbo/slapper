@@ -17,8 +17,8 @@ export default function () {
     from.pathname = "/s";
   }
 
-  const go = (user) => {
-    request("POST", "fauna/users/register", {
+  const go = async (user) => {
+    await request("POST", "fauna/users/register", {
       id: user.id,
       email: user.email,
       name: user.user_metadata.full_name,

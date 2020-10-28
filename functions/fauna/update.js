@@ -9,7 +9,6 @@ const client = new faunadb.Client({
 exports.handler = async (req, res) => {
   // const data = JSON.parse(req.body.data)
   const data = req.body
-  console.log('data: ', data);
   const id = req.params.id
   return client
     .query(q.Update(q.Ref(q.Collection('slapCollections'), id), { data }))

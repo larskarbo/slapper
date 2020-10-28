@@ -6,8 +6,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject",
-    "postinstall": "netlify-lambda install"
+    "eject": "expo eject"
   },
   "dependencies": {
     "@react-hook/hover": "^4.0.0",
@@ -42,7 +41,6 @@
     "@types/react-dom": "~16.9.8",
     "@types/react-native": "~0.63.2",
     "expo-cli": "^3.27.10",
-    "netlify-lambda": "^2.0.1",
     "react-native-web": "~0.13.7",
     "typescript": "~3.9.5"
   },

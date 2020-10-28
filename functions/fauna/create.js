@@ -21,7 +21,6 @@ exports.handler = async (req, res) => {
     )
     )
     .then(response => {
-      console.log('success', response)
       /* Success! return the response with statusCode 200 */
       res.json(response)
     })
