@@ -3,44 +3,48 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import netlifyIdentity from "netlify-identity-widget";
 import { useHistory, useLocation, Route, Switch } from "react-router-dom";
-import termsFrPath from '../../src/welcome.md'
+import termsFrPath from "../../src/welcome.md";
 import marked from "marked";
 import request from "../utils/request";
 
 export default function () {
   let history = useHistory();
   let location = useLocation();
-  const [markdown, setMarkdown] = useState(null)
- 
-  let { from } = location.state || { from: { pathname: "/" } };
-  if(from.pathname = "/"){
-    from.pathname = "/s"
-  }
-  const login = () => {
-    
-    netlifyIdentity.open();
-    if(netlifyIdentity.currentUser()){
-      history.replace(from);
-    }
+  const [markdown, setMarkdown] = useState(null);
 
-    netlifyIdentity.on("login", (user) => {
-      console.log("user: ", user);
-      request("POST", "fauna/users/register", {
-        id: user.id,
-        email: user.email,
-        name: user.user_metadata.full_name,
-      }).then((res) => {
-        console.log(res)
-      });
-      history.replace(from);
-    });
+  let { from } = location.state || { from: { pathname: "/" } };
+  if ((from.pathname = "/")) {
+    from.pathname = "/s";
   }
+
+  const go = (user) => {
+    request("POST", "fauna/users/register", {
+      id: user.id,
+      email: user.email,
+      name: user.user_metadata.full_name,
+    }).then((res) => {
+      console.log(res);
+    });
+    history.replace(from);
+  };
+
+  if (netlifyIdentity.currentUser()) {
+    go(netlifyIdentity.currentUser());
+  }
+
+  const login = () => {
+    netlifyIdentity.open();
+
+    netlifyIdentity.on("login", (user) => go(user));
+  };
 
   useEffect(() => {
-    fetch(termsFrPath).then((response) => response.text()).then((text) => {
-      setMarkdown(marked(text))
-    })
-  })
+    fetch(termsFrPath)
+      .then((response) => response.text())
+      .then((text) => {
+        setMarkdown(marked(text));
+      });
+  });
 
   return (
     <div
@@ -50,7 +54,7 @@ export default function () {
         display: "flex",
         flexDirection: "column",
         backgroundColor: "white",
-        padding:100,
+        padding: 100,
       }}
     >
       <Text
@@ -70,12 +74,14 @@ export default function () {
       </Text>
 
       <div
-      style={{
-        fontFamily: '"Segoe UI", Candara, "Bitstream Vera Sans", "DejaVu Sans", "Bitstream Vera Sans", "Trebuchet MS", Verdana, "Verdana Ref", sans-serif        '
-        ,color: "#1d1d1d",
-        maxWidth: 600
-      }}
-      dangerouslySetInnerHTML={{__html: markdown}}></div>
+        style={{
+          fontFamily:
+            '"Segoe UI", Candara, "Bitstream Vera Sans", "DejaVu Sans", "Bitstream Vera Sans", "Trebuchet MS", Verdana, "Verdana Ref", sans-serif        ',
+          color: "#1d1d1d",
+          maxWidth: 600,
+        }}
+        dangerouslySetInnerHTML={{ __html: markdown }}
+      ></div>
 
       <br />
       <div>
