@@ -102,8 +102,8 @@ router.get('/callback', function (req, res) {
         // we can also pass the token to the browser to make requests from there
         res.redirect('/#' +
           querystring.stringify({
-            access_token: access_token,
-            refresh_token: refresh_token
+            spotify_access_token: access_token,
+            spotify_refresh_token: refresh_token
           }));
       } else {
         res.redirect('/#' +
@@ -118,7 +118,7 @@ router.get('/callback', function (req, res) {
 router.get('/refresh_token', function (req, res) {
 
   // requesting access token from refresh token
-  var refresh_token = req.query.refresh_token;
+  var refresh_token = req.query.spotify_refresh_token;
   var authOptions = {
     url: 'https://accounts.spotify.com/api/token',
     headers: { 'Authorization': 'Basic ' + (new Buffer(client_id + ':' + client_secret).toString('base64')) },

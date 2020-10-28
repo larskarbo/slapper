@@ -14,8 +14,8 @@ export default class Spotify {
     this.devices = [];
     this.me = {};
     this.playerId = null;
-    this.accessToken = localStorage.getItem("access_token");
-    this.refreshToken = localStorage.getItem("refresh_token");
+    this.accessToken = localStorage.getItem("spotify_access_token");
+    this.refreshToken = localStorage.getItem("spotify_refresh_token");
     this.isPlaying = false;
 		this.currentTrack = null;
     this.weAreInControl = false
@@ -60,23 +60,23 @@ export default class Spotify {
       
     }
     
-    localStorage.setItem("access_token", accessToken);
+    localStorage.setItem("spotify_access_token", accessToken);
     
     this.accessToken = accessToken;
     this.api.setAccessToken(this.accessToken);
   };
 
   setRefreshToken = (refreshToken) => {
-    localStorage.setItem("refresh_token", refreshToken);
+    localStorage.setItem("spotify_refresh_token", refreshToken);
     this.refreshToken = refreshToken;
   };
 
   parseLocation = () => {
     const hash = qs.parse(window.location.hash);
-    if (hash.access_token && hash.access_token.length > 10) {
+    if (hash.spotify_access_token && hash.spotify_access_token.length > 10) {
       
-      this.setAccessToken(hash.access_token);
-      this.setRefreshToken(hash.refresh_token);
+      this.setAccessToken(hash.spotify_access_token);
+      this.setRefreshToken(hash.spotify_refresh_token);
       window.location.hash = "";
     }
   };
@@ -244,7 +244,7 @@ export default class Spotify {
   renewToken = async () => {
     
     const query = qs.stringify({
-      refresh_token: localStorage.getItem("refresh_token"),
+      spotify_refresh_token: localStorage.getItem("spotify_refresh_token"),
     });
     const res = await window
       .fetch("/.netlify/functions/spotify-auth/refresh_token?" + query)
@@ -257,13 +257,13 @@ export default class Spotify {
     // 	return
     // }
     
-    this.setAccessToken(res.access_token);
-    return res.access_token;
+    this.setAccessToken(res.spotify_access_token);
+    return res.spotify_access_token;
   };
 
   logOut = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("spotify_access_token");
+    localStorage.removeItem("spotify_refresh_token");
     window.location.reload();
   };
 }
