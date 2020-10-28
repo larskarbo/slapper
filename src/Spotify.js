@@ -14,8 +14,8 @@ export default class Spotify {
     this.devices = [];
     this.me = {};
     this.playerId = null;
-    this.accessToken = localStorage.getItem("spotify_access_token");
-    this.refreshToken = localStorage.getItem("spotify_refresh_token");
+    this.accessToken = localStorage.getItem("spotify_a_token");
+    this.refreshToken = localStorage.getItem("spotify_r_token");
     this.isPlaying = false;
 		this.currentTrack = null;
     this.weAreInControl = false
@@ -29,6 +29,7 @@ export default class Spotify {
     this.api.setOnRenew(this.renewToken);
     // this.renewToken()
     if (this.accessToken && this.refreshToken) {
+      console.log('this.accessToken && this.refreshToken: ', this.accessToken, this.refreshToken);
       this.initMe().then(() => {
         this.credentials = true;
         this.startSpotifyEngine();
@@ -57,26 +58,27 @@ export default class Spotify {
 
   setAccessToken = (accessToken) => {
     if (accessToken == null) {
-      
+      console.log("SETTING TO NULL!! -- SETTING TO NULL!! -- SETTING TO NULL!!")
     }
     
-    localStorage.setItem("spotify_access_token", accessToken);
+    localStorage.setItem("spotify_a_token", accessToken);
     
     this.accessToken = accessToken;
     this.api.setAccessToken(this.accessToken);
   };
 
   setRefreshToken = (refreshToken) => {
-    localStorage.setItem("spotify_refresh_token", refreshToken);
+    localStorage.setItem("spotify_r_token", refreshToken);
     this.refreshToken = refreshToken;
   };
 
   parseLocation = () => {
     const hash = qs.parse(window.location.hash);
-    if (hash.spotify_access_token && hash.spotify_access_token.length > 10) {
+    console.log('hash: ', hash);
+    if (hash.spotify_a_token && hash.spotify_a_token.length > 10) {
       
-      this.setAccessToken(hash.spotify_access_token);
-      this.setRefreshToken(hash.spotify_refresh_token);
+      this.setAccessToken(hash.spotify_a_token);
+      this.setRefreshToken(hash.spotify_r_token);
       window.location.hash = "";
     }
   };
@@ -244,7 +246,7 @@ export default class Spotify {
   renewToken = async () => {
     
     const query = qs.stringify({
-      spotify_refresh_token: localStorage.getItem("spotify_refresh_token"),
+      spotify_r_token: localStorage.getItem("spotify_r_token"),
     });
     const res = await window
       .fetch("/.netlify/functions/spotify-auth/refresh_token?" + query)
@@ -257,13 +259,13 @@ export default class Spotify {
     // 	return
     // }
     
-    this.setAccessToken(res.spotify_access_token);
-    return res.spotify_access_token;
+    this.setAccessToken(res.spotify_a_token);
+    return res.spotify_a_token;
   };
 
   logOut = () => {
-    localStorage.removeItem("spotify_access_token");
-    localStorage.removeItem("spotify_refresh_token");
+    localStorage.removeItem("spotify_a_token");
+    localStorage.removeItem("spotify_r_token");
     window.location.reload();
   };
 }
