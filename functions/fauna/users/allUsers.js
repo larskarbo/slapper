@@ -20,7 +20,7 @@ exports.handler = async (req, res) => {
       const getAllItemsDataQuery = itemRefs.map(ref => {
         return q.Get(ref)
       })
-      
+
       // then query the refs
       client.query(getAllItemsDataQuery).then(ret => {
         res.json(ret)
@@ -28,6 +28,6 @@ exports.handler = async (req, res) => {
     })
     .catch(error => {
       console.log('error', error)
-      return res.json(400, errorsdfa);
+      return res.json(400, error);
     })
 }
