@@ -7,20 +7,20 @@ import { Item, Clip } from "./Croaker";
 export const YoutubeBox = ({
   items,
   onSetMetaInfo,
+  playingNow,
+  onSetPlayingNow,
 }: {
   items: Item[];
   [key: string]: any;
 }) => {
   const youtubeItems = items.filter((i) => i.videoId);
-  const [lastActive, setLastActive] = useState(null)
-
+  const [lastActive, setLastActive] = useState(null);
 
   useEffect(() => {
-    const playingItem = youtubeItems.find(i => i.state == "playing")
-    if(playingItem){
-      setLastActive(playingItem)
+    if (playingNow) {
+      setLastActive(playingNow.item);
     }
-  }, [youtubeItems]);
+  }, [playingNow?.item.id]);
 
   return (
     <div
@@ -37,6 +37,8 @@ export const YoutubeBox = ({
           item={item}
           onSetMetaInfo={(metaInfo) => onSetMetaInfo(item, metaInfo)}
           visible={item.videoId == lastActive?.videoId}
+          playingNow={playingNow}
+          onSetPlayingNow={onSetPlayingNow}
         />
       ))}
     </div>
@@ -46,81 +48,96 @@ export const YoutubeBox = ({
 const YoutubeVideo = ({
   item,
   onSetMetaInfo,
-  visible
+  visible,
+  playingNow,
+  onSetPlayingNow,
 }: {
   item: Item;
   [key: string]: any;
 }) => {
   const [youtubeElement, setYoutubeElement] = useState(null);
-  const [playing, setPlaying] = useState(false);
+  const playingInfo = playingNow?.item.id == item.id ? playingNow : null;
+  const playing = playingNow?.item.id == item.id && playingNow?.type == "item";
 
   useEffect(() => {
+    // SET METAINFO
     if (youtubeElement) {
-      const player = youtubeElement.target;
-
-      // States: 1: playing, 2: paused, 5: stopped
-      if ([1, 2, 5].indexOf(player.getPlayerState()) >= 0) {
-        const data = player.getVideoData();
-
-        onSetMetaInfo({
-          duration: player.getDuration() * 1000,
-          title: player.getVideoData().title
-        });
-        // onSetTitle(player.getDuration() * 1000);
-        // onSetSegment({
-        //   from: item.from ? item.from : 0,
-        //   to: item.to ? item.to : player.getDuration() * 1000,
-        // });
-        // onSetTitle(player.getVideoData().title);
-        // if (item.from) {
-        //   youtubeElement.target.seekTo(item.from / 1000);
-        //   setPointerAt(item.from);
-        //   player.pauseVideo();
-        // }
-        // setLoading(false);
-        // if (autoplay) {
-        //   onPlay();
-        // }
-        // youtubeElement.target.playVideo()
-      }
+      onSetMetaInfo({
+        duration: youtubeElement.target.getDuration() * 1000,
+        title: youtubeElement.target.getVideoData().title,
+      });
     }
   }, [youtubeElement]);
 
   useEffect(() => {
     if (!youtubeElement) return;
-    if (item.state == "playing") {
-      console.log("item: ", item);
-      youtubeElement.target.playVideo();
-      setPlaying(true);
-    } else {
+    if (!playingInfo) {
       youtubeElement.target.pauseVideo();
-      setPlaying(false);
+      return
     }
-  }, [item.state, youtubeElement]);
+    
+    if(playingInfo.action == "wantToPause"){
+      youtubeElement.target.pauseVideo();
+    } else if(playingInfo.action == "wantToPlay"){
+      if(playingInfo.type == "item"){
+        if (!playingInfo.position) {
+          youtubeElement.target.seekTo(0);
+        }
+        youtubeElement.target.playVideo();
+      } else if(playingInfo.type == "clip") {
+        youtubeElement.target.seekTo(playingInfo.clip.from / 1000);
+        youtubeElement.target.playVideo();
+      }
+    }
+  }, [playingInfo?.clientUpdate, youtubeElement]);
 
-  useEffect(() => {
-    if (!youtubeElement) return;
-    if (item.state == "playing") {
-      youtubeElement.target.seekTo(item.position / 1000);
+  const onStateChange = ({ data }) => {
+    if (data == 1) {
+      // playing
+      onSetPlayingNow({
+        state: "playing",
+        position: youtubeElement.target.getCurrentTime() * 1000,
+      });
+    } else if (data == 2) {
+      // paused
+      console.log('paused')
+      onSetPlayingNow({
+        state: "paused",
+        position: youtubeElement.target.getCurrentTime() * 1000,
+      });
     }
-  }, [item.position, item.state, youtubeElement]);
+  };
+
+  // seeking
+  useEffect(() => {
+    if (playingInfo?.scrub) {
+      if (playing) {
+        youtubeElement.target.seekTo(playingInfo.scrub / 1000);
+      }
+      onSetPlayingNow({
+        position: playingInfo.scrub,
+      });
+    }
+  }, [playingInfo?.scrub]);
 
   return (
     <div
       style={{
-        // display: item.state == "playing" ? "block" : "none",
+        // display: playing ? "block" : "none",
         display: visible ? "block" : "none",
         // display: "none",
-        position: "relative"
+        position: "relative",
       }}
     >
-      <div style={{
-        position: "absolute",
-        top: 0,
-        right: 0,
-        left: 0,
-        bottom: 0
-      }}></div>
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          right: 0,
+          left: 0,
+          bottom: 0,
+        }}
+      ></div>
       <YouTube
         videoId={item.videoId}
         opts={{
@@ -132,7 +149,7 @@ const YoutubeVideo = ({
           },
         }}
         onReady={setYoutubeElement}
-        // onStateChange={func}
+        onStateChange={onStateChange}
       />
     </div>
   );

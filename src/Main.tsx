@@ -48,10 +48,10 @@ export default function Main() {
       <Sidebar />
       <div>
         <Switch>
-          <Route exact path="/c">
-            <h3>Please select a collection.</h3>
+          <Route exact path="/s">
+            <h3>Select a collection or create one to get started.</h3>
           </Route>
-          <Route path={`/c/:collection`}>
+          <Route path={`/s/:collectionId`}>
             <Croaker spotify={spotify} />
           </Route>
         </Switch>

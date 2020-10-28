@@ -8,7 +8,10 @@ import { YoutubeFucker } from "./YoutubeFucker";
 import { v4 as uuidv4 } from "uuid";
 import Players from "./players/Players";
 import { useParams, Link, Route } from "react-router-dom";
+import { SlapItem } from "./SlapItem";
+import netlifyIdentity from "netlify-identity-widget";
 
+import { useThrottle } from "use-throttle";
 
 const itemsForServer = (items) => {
   const forServer = JSON.parse(JSON.stringify(items));
@@ -31,8 +34,6 @@ export interface Clip {
 export interface Item {
   videoId?: string;
   trackId?: string;
-  position: number;
-  state: "paused" | "playing";
   id: string;
   clips: Clip[];
   text: string;
@@ -44,40 +45,43 @@ export interface Item {
 
 export default function Croaker({ spotify }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
-  const { collection } = useParams();
+  const { collectionId } = useParams();
+  
   const [input, setInput] = useState(
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
   );
+  const [playingNow, setPlayingNow] = useState(null);
 
-  const [saveCount, setSaveCount] = useState(0);
 
   const [items, setItems] = useState<Item[]>([]);
+  const [user, setUser] = useState(null);
+  const [loaded, setLoaded] = useState(false);
+
+  const throttledItems = useThrottle(items, 1000);
   const [title, setTitle] = useState([]);
+  const throttledTitle = useThrottle(title, 1000);
   const [description, setDescription] = useState([]);
+  const throttledDescription = useThrottle(description, 1000);
 
   useEffect(() => {
-    
-    request("GET", "fauna/" + collection).then((res) => {
-      
-
+    setLoaded(false)
+    request("GET", "fauna/collection/" + collectionId).then((res) => {
       setItems(
         res.data.items.map((i) => {
           const newItem: Item = {
             videoId: i.videoId,
             trackId: i.trackId,
-            position: 0,
-            state: "paused",
             id: i.id,
-            clips: (i.clips || []).map(clip => {
+            clips: (i.clips || []).map((clip) => {
               const newClip: Clip = {
                 from: clip.from,
                 to: clip.to,
                 title: clip.title,
                 id: clip.id,
                 color: clip.color,
-              }
-              return newClip
+              };
+              return newClip;
             }),
             text: i.text,
             metaInfo: {
@@ -90,22 +94,25 @@ export default function Croaker({ spotify }) {
       );
       setDescription(res.data.description);
       setTitle(res.data.title);
+      setUser(res.data.user);
+      setLoaded(true)
     });
-  }, [collection]);
+  }, [collectionId]);
 
   useEffect(() => {
-    if (saveCount == 0) {
-      return;
+    if(!loaded){
+      return
     }
-    
-    request("PUT", "fauna/" + collection, {
+    if(netlifyIdentity.currentUser().id != user){
+      return
+    }
+    request("PUT", "fauna/collection/" + collectionId, {
       title,
       description,
       items: itemsForServer(items),
-    }).then((res) => {
-      
-    });
-  }, [saveCount]);
+      user: netlifyIdentity.currentUser().id
+    }).then((res) => {});
+  }, [throttledItems, throttledDescription, throttledTitle]);
 
   const go = () => {
     let trackId;
@@ -124,7 +131,7 @@ export default function Croaker({ spotify }) {
       ]);
     } else if (input.includes("https://open.spotify.com")) {
       trackId = input.split("track/")[1].split("?")[0];
-      
+
       setItems([
         ...items,
         {
@@ -150,38 +157,32 @@ export default function Croaker({ spotify }) {
     setInput("");
   };
 
-  const play = (s) => {
-    setItems((items) =>
-      items.map((y) => {
-        if (y.id == s.id) {
-          return {
-            ...y,
-            state: "playing",
-          };
-        }
-        return {
-          ...y,
-          state: "paused",
-        };
-      })
-    );
+  const play = (playable) => {
+    setPlayingNow({
+      ...playingNow,
+      ...playable,
+      action: "wantToPlay",
+      clientUpdate: Math.random(),
+    });
   };
 
-  const pause = (s) => {
-    setItems((items) =>
-      items.map((y) => {
-        if (y.id == s.id) {
-          return {
-            ...y,
-            state: "paused",
-          };
-        }
-        return y;
-      })
-    );
+  const scrub = (to) => {
+    setPlayingNow({
+      ...playingNow,
+      scrub: to,
+    });
+  };
+
+  const pause = () => {
+    setPlayingNow({
+      ...playingNow,
+      action: "wantToPause",
+      clientUpdate: Math.random(),
+    });
   };
 
   const addClip = (item) => {
+    const colors = ["#B3EBE7", "#EDB7C4", "#E2EDB7"];
     setItems((items: Item[]) =>
       items.map((y) => {
         if (y.id == item.id) {
@@ -193,7 +194,7 @@ export default function Croaker({ spotify }) {
               {
                 id: uuidv4(),
                 title: "Clip",
-                color: "#B3EBE7",
+                color: colors[previousClips.length],
                 from: 10000,
                 to: 20000,
               },
@@ -227,7 +228,7 @@ export default function Croaker({ spotify }) {
           return {
             ...y,
             clips: y.clips.map((clipOld) => {
-              if ((clipOld.id = clip.id)) {
+              if (clipOld.id == clip.id) {
                 return {
                   ...clipOld,
                   ...object,
@@ -243,74 +244,68 @@ export default function Croaker({ spotify }) {
   };
 
   return (
-    <View style={{ paddingTop: 20 }}>
-      <button
-        onClick={() => {
-          setSaveCount(saveCount + 1);
-        }}
-      >
-        save
-      </button>
-      <CleanInput
-        style={{
-          paddingBottom: 20,
-          paddingTop: 100,
-          fontSize: 20,
-        }}
-        placeholder="Untitled"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <Text
-        style={{
-          paddingBottom: 10,
-          paddingTop: 0,
-          fontSize: 13,
-          maxWidth: 400,
-          // fontWeight: 200,
-        }}
-      >
-        {description}
-      </Text>
+    <View
+      style={{
+        paddingTop: 20,
+        height: "100vh",
+        maxHeight: "100vh",
+        justifyContent: "space-between",
+      }}
+    >
+      <View style={{overflow:"scroll", height: "calc(100vh - 200px);"}}>
+        <CleanInput
+          style={{
+            paddingBottom: 20,
+            paddingTop: 100,
+            fontSize: 20,
+          }}
+          placeholder="Untitled"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+        <Text
+          style={{
+            paddingBottom: 10,
+            paddingTop: 0,
+            fontSize: 13,
+            maxWidth: 400,
+            // fontWeight: 200,
+          }}
+        >
+          {description}
+        </Text>
 
-      {items.map((item, i) => {
-        const commonProps = {
-          item: item,
-          onPause: () => pause(item),
-          onPlay: () => play(item),
-          onSetPosition: (position) => updateItem(item, { position: position }),
-          onSetSegment: (segment) =>
-            updateItem(item, {
-              from: segment.from,
-              to: segment.to,
-            }),
-          onSetText: (text) => updateItem(item, { text: text }),
-          onSetTitle: (title) => updateItem(item, { title: title }),
-          onAddClip: () => addClip(item),
-          onUpdateClip: (clip, whatever) => updateClip(item, clip, whatever),
-        };
+        {items.map((item, i) => {
+          const commonProps = {
+            item: item,
+            playingNow: playingNow,
+            onPause: () => pause(),
+            onPlay: play,
+            onScrub: scrub,
+            onSetSegment: (segment) =>
+              updateItem(item, {
+                from: segment.from,
+                to: segment.to,
+              }),
+            onSetText: (text) => updateItem(item, { text: text }),
+            onSetTitle: (title) => updateItem(item, { title: title }),
+            onAddClip: () => addClip(item),
+            onUpdateClip: (clip, whatever) => updateClip(item, clip, whatever),
+          };
 
-        if (item.videoId) {
           return (
-            <YoutubeFucker
-              autoplay={false}
-              key={item.videoId}
+            <SlapItem
+              item={item}
+              duration={item.metaInfo?.duration}
+              title={item.metaInfo?.title}
+              text={item.text}
+              key={item.videoId || item.trackId}
               {...commonProps}
             />
           );
-        } else {
-          return (
-            <SpotifyFucker
-              autoplay={false}
-              spotify={spotify}
-              key={item.trackId}
-              {...commonProps}
-            />
-          );
-        }
-      })}
+        })}
 
-      {/* <Splat
+        {/* <Splat
         title="test song"
         duration={50000}
         pointerAt={20000}
@@ -320,27 +315,31 @@ export default function Croaker({ spotify }) {
         <Text>Image</Text>
       </Splat> */}
 
-      <KeyboardEventHandler handleKeys={["Enter"]} onKeyEvent={go}>
-        <CleanInput
-          style={{
-            fontSize: input.length ? 12 : 25,
-            height: 60,
-            width: 500,
-            padding: 20,
-          }}
-          placeholder="Paste youtube or spotify link here"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+        <KeyboardEventHandler handleKeys={["Enter"]} onKeyEvent={go}>
+          <CleanInput
+            style={{
+              fontSize: input.length ? 12 : 25,
+              height: 60,
+              width: 500,
+              padding: 20,
+            }}
+            placeholder="Paste youtube or spotify link here"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+        </KeyboardEventHandler>
+      </View>
+      <View style={{height: 200}}>
+        <Players
+          spotify={spotify}
+          playingNow={playingNow}
+          items={items}
+          onSetMetaInfo={(item, metaInfo) =>
+            updateItem(item, { metaInfo: metaInfo })
+          }
+          onSetPlayingNow={(pn) => setPlayingNow({ ...playingNow, ...pn })}
         />
-      </KeyboardEventHandler>
-
-      <Players
-        spotify={spotify}
-        items={items}
-        onSetMetaInfo={(item, metaInfo) =>
-          updateItem(item, { metaInfo: metaInfo })
-        }
-      />
+      </View>
     </View>
   );
 }

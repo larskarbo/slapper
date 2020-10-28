@@ -5,10 +5,8 @@ const q = faunadb.query
 const client = new faunadb.Client({
   secret: process.env.FAUNADB_SERVER_SECRET,
 })
-
-exports.handler = async (event, context) => {
-  console.log('Function `read-all` invoked')
-  return client
+exports.handler = async (req, res) => {
+  client
     .query(q.Paginate(q.Match(q.Ref('indexes/slapCollections_by_name'))))
     .then(response => {
       const itemRefs = response.data
@@ -17,11 +15,8 @@ exports.handler = async (event, context) => {
         return q.Get(ref)
       })
       // then query the refs
-      return client.query(getAllItemsDataQuery).then(ret => {
-        return {
-          statusCode: 200,
-          body: JSON.stringify(ret),
-        }
+      client.query(getAllItemsDataQuery).then(ret => {
+        res.json(ret)
       })
     })
     .catch(error => {

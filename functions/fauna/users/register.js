@@ -16,7 +16,7 @@ exports.handler = async (req, res) => {
   /* construct the fauna query */
   return client
     .query(q.Create(
-      q.Collection('slapCollections'),
+      q.Collection('users'),
       item,
     )
     )
@@ -27,10 +27,10 @@ exports.handler = async (req, res) => {
     })
     .catch(error => {
       console.log('error', error)
-      /* Error! return the error with statusCode 400 */
-      return {
-        statusCode: 400,
-        body: JSON.stringify(error),
-      }
+      // /* Error! return the error with statusCode 400 */
+      // return {
+      //   statusCode: 400,
+      //   body: JSON.stringify(error),
+      // }
     })
 }

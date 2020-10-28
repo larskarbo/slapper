@@ -1,63 +1,27 @@
-exports.handler = async (event, context) => {
-  const path = event.path.replace(/\.netlify\/functions\/[^/]+/, '')
-  const segments = path.split('/').filter(e => e)
 
-  switch (event.httpMethod) {
-    case 'GET':
-      // e.g. GET /.netlify/functions/fauna-crud
-      if (segments.length === 0) {
-        return require('./read-all').handler(event, context)
-      }
-      // e.g. GET /.netlify/functions/fauna-crud/123456
-      if (segments.length === 1) {
-        event.id = segments[0]
-        return require('./read').handler(event, context)
-      } else if (segments.length === 2) {
-        event.id = segments[0]
-        return {
-          statusCode: 200,
-          body: JSON.stringify({
-            message: process.env.FAUNADB_SERVER_SECRET
-          }),
-          // // more keys you can return:
-          // headers: { "headerName": "headerValue", ... },
-          // isBase64Encoded: true,
-        }
-      } else {
-        return {
-          statusCode: 500,
-          body:
-            'too many segments in GET request, must be either /.netlify/functions/fauna-crud or /.netlify/functions/fauna-crud/123456',
-        }
-      }
-    case 'POST':
-      // e.g. POST /.netlify/functions/fauna-crud with a body of key value pair objects, NOT strings
-      return require('./create').handler(event, context)
-    case 'PUT':
-      // e.g. PUT /.netlify/functions/fauna-crud/123456 with a body of key value pair objects, NOT strings
-      if (segments.length === 1) {
-        event.id = segments[0]
-        return require('./update').handler(event, context)
-      } else {
-        return {
-          statusCode: 500,
-          body: 'invalid segments in PUT request, must be /.netlify/functions/fauna-crud/123456',
-        }
-      }
-    case 'DELETE':
-      // e.g. DELETE /.netlify/functions/fauna-crud/123456
-      if (segments.length === 1) {
-        event.id = segments[0]
-        return require('./delete').handler(event, context)
-      } else {
-        return {
-          statusCode: 500,
-          body: 'invalid segments in DELETE request, must be /.netlify/functions/fauna-crud/123456',
-        }
-      }
-  }
-  return {
-    statusCode: 500,
-    body: 'unrecognized HTTP Method, must be one of GET/POST/PUT/DELETE',
-  }
-}
+const express = require('express');
+const app = express();
+const serverless = require('serverless-http');
+var bodyParser = require('body-parser')
+app.use( bodyParser.json() );  
+
+const router = express.Router();
+
+router.get('/collections', require('./collections').handler);
+router.get('/collection/:id', require('./read').handler);
+router.put('/collection/:id', require('./update').handler);
+router.post('/collection', require('./create').handler);
+
+router.post('/users/register', require('./users/register').handler);
+router.get('/users/find/:id', require('./users/findUser').handler);
+router.get('/users/findAll', require('./users/allUsers').handler);
+
+// router.get('/collections', (req, res) => {
+//   res.json({foo: "bars"});
+// });
+  
+app.use('/.netlify/functions/fauna', router);  // path must route to lambda
+
+// app.listen(1337)
+module.exports.handler = serverless(app);
+

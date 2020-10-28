@@ -3,6 +3,7 @@ import { View } from "react-native";
 import { SpotifyBox } from "./SpotifyBox";
 import { YoutubeBox } from "./YoutubeBox";
 import { Item, Clip } from "../Croaker";
+import PlayingContext from "./PlayingContext";
 
 export default function Players({
   spotify,
@@ -12,7 +13,6 @@ export default function Players({
   items: Item[];
   [key: string]: any;
 }) {
-  
   return (
     <View
       style={

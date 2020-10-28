@@ -8,33 +8,13 @@ import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-ro
 
 import netlifyIdentity from "netlify-identity-widget";
 import LoginPage from "./src/views/LoginPage";
+import IntroPage from "./src/views/IntroPage";
 
 window.netlifyIdentity = netlifyIdentity;
 console.log("netlifyIdentity: ", netlifyIdentity);
 // You must run this once before trying to interact with the widget
 netlifyIdentity.init();
 
-const netlifyAuth = {
-  isAuthenticated: false,
-  user: null,
-  authenticate(callback) {
-    this.isAuthenticated = true;
-    netlifyIdentity.open();
-    netlifyIdentity.on("login", (user) => {
-      console.log("user: ", user);
-      this.user = user;
-      callback(user);
-    });
-  },
-  signout(callback) {
-    netlifyIdentity.logout();
-    netlifyIdentity.on("logout", () => {
-      this.user = null;
-      this.isAuthenticated = false;
-      // callback();
-    });
-  },
-};
 
 export default function App() {
 
@@ -45,12 +25,15 @@ export default function App() {
     <View style={styles.container}>
       <Router>
         <Switch>
-          <PrivateRoute path={["/c/:collection","/c"]}>
+          <PrivateRoute path={["/s/:collectionId","/s"]}>
             <Main />
           </PrivateRoute>
           <PrivateRoute path="/u/:user">{/* <User /> */}</PrivateRoute>
           <Route path="/login">
             <LoginPage />
+          </Route>
+          <Route path="/">
+            <IntroPage />
           </Route>
           <PrivateRoute path="*">
             <NotFound />

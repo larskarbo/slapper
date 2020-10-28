@@ -18,7 +18,8 @@ export default class Spotify {
     this.refreshToken = localStorage.getItem("refresh_token");
     this.isPlaying = false;
 		this.currentTrack = null;
-		this.weAreInControl = false
+    this.weAreInControl = false
+    this.lastUpdatePlaybackState = null
 
     
     
@@ -144,6 +145,7 @@ export default class Spotify {
         })
         .then((playbackState) => {
           this.playbackState = playbackState;
+          this.lastUpdatePlaybackState = new Date()
           this.isPlaying = playbackState?.is_playing;
           this.currentTrack = playbackState?.item?.id;
           this.onUpdatePlaybackState(playbackState);
@@ -207,15 +209,32 @@ export default class Spotify {
         this.currentTrack = playingItem.trackId;
       }
     }
-	};
+  };
+  
+  estimatePosition = () => {
+    console.log('this.playbackState: ', this.playbackState);
+    if(this.playbackState){
+      if(this.playbackState.is_playing){
+        const timeSinceUpdate = new Date().getTime() - this.lastUpdatePlaybackState.getTime()
+        return this.playbackState.progress_ms + timeSinceUpdate
+      } else {
+        return this.playbackState.progress_ms
+      }
+    }
+  }
 	
 	play = async (opts) => {
 		console.log('this.playbackState: ', this.playbackState);
 		if(!this.playbackState?.is_playing){
 			if(this.devices.length){
 				console.log('this.devices: ', this.devices);
-				console.log('choose a device')
-				await this.api.transferMyPlayback([this.devices[0].id])
+        console.log('choose a device')
+        let foundDevice = this.devices.find(d => !d.name.includes("Slapper"))
+        if(!foundDevice){
+          foundDevice = this.devices[0]
+        }
+        
+				await this.api.transferMyPlayback([foundDevice.id])
 			}
 		}
 		this.api.play(opts);

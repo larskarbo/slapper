@@ -15,6 +15,9 @@
   "author": "Netlify",
   "license": "MIT",
   "dependencies": {
-    "faunadb": "^2.14.2"
+    "express": "^4.17.1",
+    "faunadb": "^2.14.2",
+    "lambda-router": "^2.10.0",
+    "serverless-http": "^2.6.0"
   }
 }

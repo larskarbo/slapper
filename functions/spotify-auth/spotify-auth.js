@@ -4,7 +4,6 @@
 const express = require('express');
 const app = express();
 var request = require('request');
-var cors = require('cors')
 var querystring = require('querystring');
 var cookieParser = require('cookie-parser');
 var randomString = require("randomstring");

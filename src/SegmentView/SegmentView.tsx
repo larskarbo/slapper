@@ -25,6 +25,15 @@ export default function SegmentView({
   const [draggingPointer, setDraggingPointer] = useState(false);
   const lineRef = useRef(null);
   const isHovering = useHover(lineRef);
+  
+  const [refReady, setRefReady] = useState(false);
+  
+
+  useEffect(() => {
+    if(lineRef){
+      setRefReady(true)
+    }
+  }, [lineRef]);
 
   useEffect(() => {
     setPointerAtRolling(pointerAt);
@@ -82,6 +91,7 @@ export default function SegmentView({
 
       {clips.map((clip) => (
         <Clip
+        key={clip.id}
           isHovering={isHovering}
           duration={duration}
           clip={clip}

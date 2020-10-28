@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
-import { useParams, Link, Route, Switch } from "react-router-dom";
+import { useParams, useHistory, Link, Route, Switch } from "react-router-dom";
 import request from "./utils/request";
 
 import netlifyIdentity from "netlify-identity-widget";
 const Sidebar = ({ spotify }) => {
-  const { collection } = useParams();
+  let history = useHistory();
+  const { collectionId } = useParams();
   // const [activeSlap, setActiveSlap] = useState(null);
-  const activeSlap = collection;
+  const activeSlap = collectionId;
 
   const [slaps, setSlaps] = useState([]);
+  const [updateCounter, setUpdateCounter] = useState(0);
+  const [allUsers, setAllUsers] = useState([]);
 
   useEffect(() => {
-    request("GET", "fauna").then((res) => {
-      
+    request("GET", "fauna/collections").then((res) => {
+      console.log("res: ", res);
+
       setSlaps(
         res.map((r) => ({
           ...r.data,
@@ -23,19 +27,39 @@ const Sidebar = ({ spotify }) => {
       );
       // setActiveSlap(279439751993360901);
     });
-  }, []);
+  }, [updateCounter]);
 
   const newSlapCollection = () => {
-    request("POST", "fauna/newSlapCollection", {
+    request("POST", "fauna/collection", {
       title: "",
       description: "",
       items: [],
     }).then((res) => {
-      
+      console.log("res: ", res);
+      history.replace({ pathname: "/s/" + res.ref["@ref"].id });
+      setUpdateCounter(updateCounter + 1);
     });
-	};
-	
-	// netlifyIdentity.open()
+  };
+
+  useEffect(() => {
+    // const user = netlifyIdentity.currentUser()
+    request("GET", "fauna/users/findAll").then((asdf) => {
+      setAllUsers(asdf);
+    });
+  }, []);
+
+  // useEffect(() => {
+  //   if(allUsers.length){
+  //     console.log('allUsers: ', allUsers);
+  //     // const user = netlifyIdentity.currentUser()
+  //     // request("GET", "fauna/users/findAll" ).then(asdf => {
+  //     //   console.log('asdf: ', asdf);
+
+  //     // })
+  //   }
+  // },[allUsers])
+
+  // netlifyIdentity.open()
   return (
     <div
       // className="reveal"
@@ -44,9 +68,9 @@ const Sidebar = ({ spotify }) => {
         height: "100vh",
         marginRight: 30,
         backgroundColor: "#f7f6f2",
-        paddingTop: 100,
       }}
     >
+      <div style={{ paddingTop: 100 }}></div>
       <Text
         style={{
           fontSize: 20,
@@ -64,61 +88,82 @@ const Sidebar = ({ spotify }) => {
         .io
       </Text>
 
-      <div
-        style={{
-          paddingTop: 50,
-				}}
-				onClick={() =>{
-          netlifyIdentity.open()
-          
-          netlifyIdentity.on("logout", () => {
-            location.reload()
-          });
-				}}
-      >
-        <Text
-          style={{
-            fontSize: 16,
-            paddingLeft: 20,
-            fontWeight: 900,
-            letterSpacing: "-1px",
-          }}
-        >
-          🥳 Lars Karbo:
-        </Text>
-      </div>
+      {allUsers.map((u) => (
+        <>
+          <User id={u.data.id} />
+          {slaps
+            .filter((s) => s.user == u.data.id)
+            .map((slap) => {
+              const active = slap.id == activeSlap;
+
+              return (
+                <Link key={slap.id} to={"/s/" + slap.id}>
+                  <View
+                    style={{
+                      paddingVertical: 6,
+                      backgroundColor: active && "#dddddd",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        fontSize: 12,
+                        paddingLeft: 20,
+                        fontWeight: active ? 700 : 400,
+                      }}
+                    >
+                      {slap.title.length ? slap.title : "Untitled"}
+                    </Text>
+                  </View>
+                </Link>
+              );
+            })}
+        </>
+      ))}
 
       <div
         style={{
           paddingTop: 10,
         }}
       >
-        {slaps.map((slap) => {
-          const active = slap.id == activeSlap;
-
-          return (
-            <Link key={slap.id} to={"/c/" + slap.id}>
-              <View
-                style={{
-                  paddingVertical: 6,
-                  backgroundColor: active && "#dddddd",
-                }}
-              >
-                <Text
-                  style={{
-                    fontSize: 12,
-                    paddingLeft: 20,
-                    fontWeight: active ? 700 : 400,
-                  }}
-                >
-                  {slap.title.length ? slap.title : "Untitled"}
-                </Text>
-              </View>
-            </Link>
-          );
-        })}
         <button onClick={newSlapCollection}>New collection +</button>
       </div>
+    </div>
+  );
+};
+
+const User = ({ id }) => {
+  const [user, setUser] = useState(null)
+  useEffect(() => {
+    // const user = netlifyIdentity.currentUser()
+    request("GET", "fauna/users/find/" + id).then((asdf) => {
+      console.log('userrrr: ', asdf);
+      setUser(asdf.data);
+    });
+  }, []);
+
+  return (
+    <div
+      style={{
+        paddingTop: 50,
+      }}
+      onClick={() => {
+        netlifyIdentity.open();
+
+        netlifyIdentity.on("logout", () => {
+          location.reload();
+        });
+      }}
+    >
+      <Text
+        style={{
+          fontSize: 16,
+          paddingLeft: 20,
+          fontWeight: 900,
+          letterSpacing: "-1px",
+        }}
+      >
+        🥳 {user?.name}
+      </Text>
     </div>
   );
 };
