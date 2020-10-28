@@ -253,6 +253,8 @@ export default function Croaker({ spotify }) {
       }}
     >
       <View style={{overflow:"scroll", height: "calc(100vh - 200px);"}}>
+        {netlifyIdentity.currentUser().id != user &&
+        <Text style={{color:"red"}}>You don't own this slap, so it won't be saved.</Text>}
         <CleanInput
           style={{
             paddingBottom: 20,
