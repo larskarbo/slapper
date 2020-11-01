@@ -13,7 +13,7 @@ export default function () {
   const [markdown, setMarkdown] = useState(null);
 
   let { from } = location.state || { from: { pathname: "/" } };
-  if ((from.pathname = "/")) {
+  if (!from.pathname.includes("/s")) {
     from.pathname = "/s";
   }
 
@@ -22,21 +22,30 @@ export default function () {
       id: user.id,
       email: user.email,
       name: user.user_metadata.full_name,
-    }).then((res) => {
-      console.log(res);
-    });
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
     history.replace(from);
   };
 
-  if (netlifyIdentity.currentUser()) {
-    go(netlifyIdentity.currentUser());
-  }
+  useEffect(() => {
+    if (netlifyIdentity.currentUser()) {
+      go(netlifyIdentity.currentUser());
+    }
+  }, [netlifyIdentity.currentUser()]);
 
   const login = () => {
     netlifyIdentity.open();
-
-    netlifyIdentity.on("login", (user) => go(user));
   };
+  
+  useEffect(() => {
+    netlifyIdentity.on("init", (user) => go(user));
+    netlifyIdentity.on("login", (user) => go(user));
+  });
 
   useEffect(() => {
     fetch(termsFrPath)
