@@ -18,7 +18,7 @@ export default function () {
       paddingTop: 20
     }}>
 
-      <div style={{padding: "50px 0px"}} className="cantwait">Beta users go here -> <a style={{textDecoration:"underline"}} href="/login">beta login</a>.</div>
+      <div style={{padding: "50px 0px"}} className="cantwait">Beta users go here -> <a style={{textDecoration:"underline"}} href="/login">go to app</a>.</div>
 
       <YouTube
         videoId={"OZEUbsy-Z4o"}
@@ -29,7 +29,6 @@ export default function () {
         // onReady={setYoutubeElement}
         // onStateChange={func}
       />
-      <div className="cantwait">Want to try? <a style={{textDecoration:"underline"}} href="https://calendly.com/larskarbo/slapper-beta">Schedule a demo call</a>.</div>
     </div>
   );
 }
