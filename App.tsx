@@ -1,43 +1,120 @@
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import Main from "./src/Main";
 
-import { BrowserRouter as Router, Switch, Route, Link, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  Redirect,
+} from "react-router-dom";
 
 import netlifyIdentity from "netlify-identity-widget";
 import LoginPage from "./src/views/LoginPage";
 import IntroPage from "./src/views/IntroPage";
+import { request, generateHeaders } from "./src/utils/request";
 
-window.netlifyIdentity = netlifyIdentity;
-console.log("netlifyIdentity: ", netlifyIdentity);
 // You must run this once before trying to interact with the widget
 netlifyIdentity.init();
 
-
 export default function App() {
+  const [user, setUser] = useState(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
+  const getUserFromServer = async (nUser) => {
+    await generateHeaders(nUser);
+    await request("POST", "fauna/users/getMe")
+      .then((res: any) => {
+        if (res.id) {
+          console.log("res.id: ", res.id);
+          setUser(res);
+        } else {
+          console.log("here");
+          console.log("res: ", res);
+          throw new Error("No res.id");
+        }
+      })
+      .catch((error) => {});
+  };
 
+  useEffect(() => {
+    netlifyIdentity.on("login", (user) => {
+      netlifyIdentity.close();
+      getUserFromServer(user);
+    });
+  }, []);
 
+  useEffect(() => {
+    netlifyIdentity.on("logout", (user) => {
+      console.log("logging out");
+      setUser(null);
+    });
+  }, []);
+
+  useEffect(() => {
+    const nUser = netlifyIdentity.currentUser();
+    if (!nUser) {
+      setLoadingUser(false);
+      return;
+    }
+    getUserFromServer(nUser).finally(() => {
+      setLoadingUser(false);
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
       <Router>
         <Switch>
-          <PrivateRoute path={["/s/:collectionId","/s"]}>
-            <Main />
-          </PrivateRoute>
-          <PrivateRoute path="/u/:user">{/* <User /> */}</PrivateRoute>
-          <Route path="/login">
-            <LoginPage />
-          </Route>
-          <Route path="/">
+          <Route exact path="/">
             <IntroPage />
           </Route>
-          <PrivateRoute path="*">
+
+          <Route path="/">
+            {/* <IntroPage /> */}
+            {loadingUser ? (
+              "loading..."
+            ) : (
+              <>
+                <Switch>
+                  <Route exact path="/login">
+                    {user ? <Redirect to={"/s"} /> : <LoginPage user={user} />}
+                  </Route>
+                  {user ? (
+                    <Route path={["/s/:collectionId", "/s"]}>
+                      <Main user={user} />
+                    </Route>
+                  ) : (
+                    <Switch>
+                      <Route
+                        render={() => (
+                          <Redirect
+                            to={{
+                              pathname: "/login",
+                            }}
+                          />
+                        )}
+                      />
+                    </Switch>
+                  )}
+                </Switch>
+              </>
+            )}
+          </Route>
+          {/* <Switch>
+            <Route path="/login">
+              <LoginPage user={user} />
+            </Route>
+            <Route path={["/s/:collectionId", "/s"]}>
+              <Main user={user} />
+            </Route>
+          </Switch> */}
+          <Route path="*">
             <NotFound />
-          </PrivateRoute>
+          </Route>
         </Switch>
       </Router>
       <StatusBar style="auto" />
@@ -45,18 +122,18 @@ export default function App() {
   );
 }
 
-function PrivateRoute({ children, ...rest }) {
+function PrivateRoute({ children, user, ...rest }) {
   return (
     <Route
       {...rest}
       render={({ location }) =>
-      netlifyIdentity.currentUser() ? (
+        user ? (
           children
         ) : (
           <Redirect
             to={{
               pathname: "/login",
-              state: { from: location }
+              state: { from: location },
             }}
           />
         )

@@ -3,37 +3,14 @@ import Spotify from "./Spotify";
 import React, { useEffect, useMemo, useState } from "react";
 import Croaker from "./Croaker";
 import { Text, View } from "react-native";
-import request from "./utils/request";
+import {request} from "./utils/request";
 import "./index.css";
 import useLocalStorage from "react-use-localstorage";
 import { useParams, Link, Route, Switch } from "react-router-dom";
 import Sidebar from "./Sidebar";
 
-export default function Main() {
-  const { collection } = useParams();
-  
-
+export default function Main({user}) {
   const spotify = useMemo(() => new Spotify(), []);
-  
-
-  // s.setOnError((error) => {
-  //   
-  //   
-  //   // firebase.analytics().logEvent('api-error', {error});
-  //   if (error.includes("Invalid access token")) {
-  //     // this.state.spotify.logOut();
-  //     
-  //   } else {
-  //     
-  //   }
-  // });
-
-  spotify.onUpdateState = () => {
-    
-    // this.setState({
-    // 	spotify: this.state.spotify,
-    // });
-  };
 
   return (
     <div
@@ -45,14 +22,14 @@ export default function Main() {
         backgroundColor: "white",
       }}
     >
-      <Sidebar />
+      <Sidebar user={user} />
       <div>
         <Switch>
           <Route exact path="/s">
             <h3>Select a collection or create one to get started.</h3>
           </Route>
           <Route path={`/s/:collectionId`}>
-            <Croaker spotify={spotify} />
+            <Croaker user={user} spotify={spotify} />
           </Route>
         </Switch>
       </div>

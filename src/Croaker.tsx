@@ -2,14 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { Text, View } from "react-native";
 import KeyboardEventHandler from "react-keyboard-event-handler";
 import urlParser from "js-video-url-parser";
-import request from "./utils/request";
-import { SpotifyFucker } from "./SpotifyFucker";
-import { YoutubeFucker } from "./YoutubeFucker";
+import { request } from "./utils/request";
 import { v4 as uuidv4 } from "uuid";
 import Players from "./players/Players";
 import { useParams, Link, Route } from "react-router-dom";
 import { SlapItem } from "./SlapItem";
-import netlifyIdentity from "netlify-identity-widget";
 
 import { useThrottle } from "use-throttle";
 
@@ -43,19 +40,18 @@ export interface Item {
   };
 }
 
-export default function Croaker({ spotify }) {
+export default function Croaker({ spotify, user }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
   const { collectionId } = useParams();
-  
+
   const [input, setInput] = useState(
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
   );
   const [playingNow, setPlayingNow] = useState(null);
 
-
   const [items, setItems] = useState<Item[]>([]);
-  const [user, setUser] = useState(null);
+  const [slapUserId, setSlapUserId] = useState(null);
   const [loaded, setLoaded] = useState(false);
 
   const throttledItems = useThrottle(items, 1000);
@@ -65,7 +61,7 @@ export default function Croaker({ spotify }) {
   const throttledDescription = useThrottle(description, 1000);
 
   useEffect(() => {
-    setLoaded(false)
+    setLoaded(false);
     request("GET", "fauna/collection/" + collectionId).then((res) => {
       setItems(
         res.data.items.map((i) => {
@@ -94,23 +90,23 @@ export default function Croaker({ spotify }) {
       );
       setDescription(res.data.description);
       setTitle(res.data.title);
-      setUser(res.data.user);
-      setLoaded(true)
+      setSlapUserId(res.data.user);
+      setLoaded(true);
     });
   }, [collectionId]);
 
   useEffect(() => {
-    if(!loaded){
-      return
+    if (!loaded) {
+      return;
     }
-    if(netlifyIdentity.currentUser().id != user){
-      return
+    if (user?.id != slapUserId) {
+      return;
     }
     request("PUT", "fauna/collection/" + collectionId, {
       title,
       description,
       items: itemsForServer(items),
-      user: netlifyIdentity.currentUser().id
+      user: user.id,
     }).then((res) => {});
   }, [throttledItems, throttledDescription, throttledTitle]);
 
@@ -221,7 +217,6 @@ export default function Croaker({ spotify }) {
   };
 
   const updateClip = (item, clip, object) => {
-    
     setItems((items) =>
       items.map((y) => {
         if (y.id == item.id) {
@@ -252,62 +247,68 @@ export default function Croaker({ spotify }) {
         justifyContent: "space-between",
       }}
     >
-      <View style={{overflow:"scroll", height: "calc(100vh - 200px);"}}>
-        {netlifyIdentity.currentUser().id != user &&
-        <Text style={{color:"red"}}>You don't own this slap, so it won't be saved.</Text>}
-        <CleanInput
-          style={{
-            paddingBottom: 20,
-            paddingTop: 100,
-            fontSize: 20,
-          }}
-          placeholder="Untitled"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <Text
-          style={{
-            paddingBottom: 10,
-            paddingTop: 0,
-            fontSize: 13,
-            maxWidth: 400,
-            // fontWeight: 200,
-          }}
-        >
-          {description}
-        </Text>
-
-        {items.map((item, i) => {
-          const commonProps = {
-            item: item,
-            playingNow: playingNow,
-            onPause: () => pause(),
-            onPlay: play,
-            onScrub: scrub,
-            onSetSegment: (segment) =>
-              updateItem(item, {
-                from: segment.from,
-                to: segment.to,
-              }),
-            onSetText: (text) => updateItem(item, { text: text }),
-            onSetTitle: (title) => updateItem(item, { title: title }),
-            onAddClip: () => addClip(item),
-            onUpdateClip: (clip, whatever) => updateClip(item, clip, whatever),
-          };
-
-          return (
-            <SlapItem
-              item={item}
-              duration={item.metaInfo?.duration}
-              title={item.metaInfo?.title}
-              text={item.text}
-              key={item.videoId || item.trackId}
-              {...commonProps}
+      {loaded && (
+        <>
+          <View style={{ overflow: "scroll", height: "calc(100vh - 200px)" }}>
+            {user?.id != slapUserId && (
+              <Text style={{ color: "red" }}>
+                You don't own this slap, so it won't be saved.
+              </Text>
+            )}
+            <CleanInput
+              style={{
+                paddingBottom: 20,
+                paddingTop: 100,
+                fontSize: 20,
+              }}
+              placeholder="Untitled"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
             />
-          );
-        })}
+            <Text
+              style={{
+                paddingBottom: 10,
+                paddingTop: 0,
+                fontSize: 13,
+                maxWidth: 400,
+                // fontWeight: 200,
+              }}
+            >
+              {description}
+            </Text>
 
-        {/* <Splat
+            {items.map((item, i) => {
+              const commonProps = {
+                item: item,
+                playingNow: playingNow,
+                onPause: () => pause(),
+                onPlay: play,
+                onScrub: scrub,
+                onSetSegment: (segment) =>
+                  updateItem(item, {
+                    from: segment.from,
+                    to: segment.to,
+                  }),
+                onSetText: (text) => updateItem(item, { text: text }),
+                onSetTitle: (title) => updateItem(item, { title: title }),
+                onAddClip: () => addClip(item),
+                onUpdateClip: (clip, whatever) =>
+                  updateClip(item, clip, whatever),
+              };
+
+              return (
+                <SlapItem
+                  item={item}
+                  duration={item.metaInfo?.duration}
+                  title={item.metaInfo?.title}
+                  text={item.text}
+                  key={item.videoId || item.trackId}
+                  {...commonProps}
+                />
+              );
+            })}
+
+            {/* <Splat
         title="test song"
         duration={50000}
         pointerAt={20000}
@@ -317,31 +318,33 @@ export default function Croaker({ spotify }) {
         <Text>Image</Text>
       </Splat> */}
 
-        <KeyboardEventHandler handleKeys={["Enter"]} onKeyEvent={go}>
-          <CleanInput
-            style={{
-              fontSize: input.length ? 12 : 25,
-              height: 60,
-              width: 500,
-              padding: 20,
-            }}
-            placeholder="Paste youtube or spotify link here"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-          />
-        </KeyboardEventHandler>
-      </View>
-      <View style={{height: 200}}>
-        <Players
-          spotify={spotify}
-          playingNow={playingNow}
-          items={items}
-          onSetMetaInfo={(item, metaInfo) =>
-            updateItem(item, { metaInfo: metaInfo })
-          }
-          onSetPlayingNow={(pn) => setPlayingNow({ ...playingNow, ...pn })}
-        />
-      </View>
+            <KeyboardEventHandler handleKeys={["Enter"]} onKeyEvent={go}>
+              <CleanInput
+                style={{
+                  fontSize: input.length ? 12 : 25,
+                  height: 60,
+                  width: 500,
+                  padding: 20,
+                }}
+                placeholder="Paste youtube or spotify link here"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+              />
+            </KeyboardEventHandler>
+          </View>
+          <View style={{ height: 200 }}>
+            <Players
+              spotify={spotify}
+              playingNow={playingNow}
+              items={items}
+              onSetMetaInfo={(item, metaInfo) =>
+                updateItem(item, { metaInfo: metaInfo })
+              }
+              onSetPlayingNow={(pn) => setPlayingNow({ ...playingNow, ...pn })}
+            />
+          </View>
+        </>
+      )}
     </View>
   );
 }

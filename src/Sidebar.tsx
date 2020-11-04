@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
 import { useParams, useHistory, Link, Route, Switch } from "react-router-dom";
-import request from "./utils/request";
-
+import {request} from "./utils/request";
 import netlifyIdentity from "netlify-identity-widget";
-const Sidebar = ({ spotify }) => {
+
+const Sidebar = ({ user }) => {
   let history = useHistory();
   const { collectionId } = useParams();
   // const [activeSlap, setActiveSlap] = useState(null);
@@ -17,7 +17,7 @@ const Sidebar = ({ spotify }) => {
 
   useEffect(() => {
     request("GET", "fauna/collections").then((res) => {
-      console.log("res: ", res);
+      
 
       setSlaps(
         res.map((r) => ({
@@ -34,36 +34,22 @@ const Sidebar = ({ spotify }) => {
       title: "",
       description: "",
       items: [],
-      user: netlifyIdentity.currentUser().id,
+      user: user.id,
     }).then((res) => {
-      console.log("res: ", res);
+      
       history.replace({ pathname: "/s/" + res.ref["@ref"].id });
       setUpdateCounter(updateCounter + 1);
     });
   };
 
   useEffect(() => {
-    // const user = netlifyIdentity.currentUser()
     request("GET", "fauna/users/findAll").then((asdf) => {
       setAllUsers(asdf);
     });
   }, []);
 
-  // useEffect(() => {
-  //   if(allUsers.length){
-  //     console.log('allUsers: ', allUsers);
-  //     // const user = netlifyIdentity.currentUser()
-  //     // request("GET", "fauna/users/findAll" ).then(asdf => {
-  //     //   console.log('asdf: ', asdf);
-
-  //     // })
-  //   }
-  // },[allUsers])
-
-  // netlifyIdentity.open()
   return (
     <div
-      // className="reveal"
       style={{
         width: 200,
         height: "100vh",
@@ -90,9 +76,9 @@ const Sidebar = ({ spotify }) => {
       </Text>
 
       {allUsers
-        .sort((a, b) => {if(a.data.id == netlifyIdentity.currentUser().id){return -10}})
+        .sort((a, b) => {if(a.data.id == user?.id){return -10}})
         .map((u) => (
-          <>
+          <div key={u.data.id}>
             <User id={u.data.id} />
             {slaps
               .filter((s) => s.user == u.data.id)
@@ -121,7 +107,7 @@ const Sidebar = ({ spotify }) => {
                 );
               })}
 
-            {u.data.id == netlifyIdentity.currentUser().id && (
+            {u.data.id == user?.id && (
               <div
                 style={{
                   paddingTop: 10,
@@ -130,7 +116,7 @@ const Sidebar = ({ spotify }) => {
                 <button onClick={newSlapCollection}>New collection +</button>
               </div>
             )}
-          </>
+          </div>
         ))}
     </div>
   );
@@ -139,9 +125,7 @@ const Sidebar = ({ spotify }) => {
 const User = ({ id }) => {
   const [user, setUser] = useState(null);
   useEffect(() => {
-    // const user = netlifyIdentity.currentUser()
     request("GET", "fauna/users/find/" + id).then((asdf) => {
-      console.log("userrrr: ", asdf);
       setUser(asdf.data);
     });
   }, []);
@@ -155,7 +139,7 @@ const User = ({ id }) => {
         netlifyIdentity.open();
 
         netlifyIdentity.on("logout", () => {
-          location.reload();
+          // location.reload();
         });
       }}
     >

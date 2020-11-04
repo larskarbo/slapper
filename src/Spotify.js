@@ -29,7 +29,7 @@ export default class Spotify {
     this.api.setOnRenew(this.renewToken);
     // this.renewToken()
     if (this.accessToken && this.refreshToken) {
-      console.log('this.accessToken && this.refreshToken: ', this.accessToken, this.refreshToken);
+      
       this.initMe().then(() => {
         this.credentials = true;
         this.startSpotifyEngine();
@@ -58,7 +58,7 @@ export default class Spotify {
 
   setAccessToken = (accessToken) => {
     if (accessToken == null) {
-      console.log("SETTING TO NULL!! -- SETTING TO NULL!! -- SETTING TO NULL!!")
+      
     }
     
     localStorage.setItem("spotify_a_token", accessToken);
@@ -74,7 +74,7 @@ export default class Spotify {
 
   parseLocation = () => {
     const hash = qs.parse(window.location.hash);
-    console.log('hash: ', hash);
+    
     if (hash.spotify_a_token && hash.spotify_a_token.length > 10) {
       
       this.setAccessToken(hash.spotify_a_token);
@@ -214,7 +214,7 @@ export default class Spotify {
   };
   
   estimatePosition = () => {
-    console.log('this.playbackState: ', this.playbackState);
+    
     if(this.playbackState){
       if(this.playbackState.is_playing){
         const timeSinceUpdate = new Date().getTime() - this.lastUpdatePlaybackState.getTime()
@@ -229,8 +229,8 @@ export default class Spotify {
     const playbackState = await this.api.getMyCurrentPlaybackState()
 		if(!playbackState?.device){
 			if(this.devices.length){
-				console.log('this.devices: ', this.devices);
-        console.log('choose a device')
+				
+        
         let foundDevice = this.devices.find(d => !d.name.includes("Slapper"))
         if(!foundDevice){
           foundDevice = this.devices[0]
