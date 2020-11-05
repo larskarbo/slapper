@@ -29,6 +29,9 @@ export default function () {
         // onReady={setYoutubeElement}
         // onStateChange={func}
       />
+      
+      <div className="cantwait">Want to try? <a style={{textDecoration:"underline"}} href="https://calendly.com/larskarbo/slapper-beta">Schedule a demo call</a>.</div>
+    
     </div>
   );
 }
