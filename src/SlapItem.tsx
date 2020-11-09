@@ -60,6 +60,8 @@ export const SlapItem = ({
     playingNow?.type == "item" &&
     playingNow?.state == "playing";
 
+  console.log('playingNow?.state: ', playingNow?.state);
+
   return (
     <StyledView className="horse" style={{}}>
       <MenuProvider id={item.id}>
