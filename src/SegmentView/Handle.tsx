@@ -87,47 +87,16 @@ class Handle extends Component {
           background: this.props.color || "#898989",
           position: 'absolute',
           left: handlePos - handle_width / 2 + "px",
-          top: 20,
+          top: 45,
           borderRadius: 5
         }}
           onMouseDown={(e) => {
             this.down(e, "start")
           }}
         />
-        {/* <div style={{
-          height: 80,
-          width: endHandlePos - startHandlePos + "px",
-          background: "rgba(245, 9, 9, 0.48)",
-          position: 'absolute',
-          left: startHandlePos + "px",
-        }}
-        /> */}
       </>
     )
     
-    return (
-      <>
-        <div className="handle" style={{
-          height: 60,
-          width: handle_width + "px",
-          background: this.props.color || "#898989",
-          position: 'absolute',
-          left: handlePos - handle_width / 2 + "px",
-        }}
-          onMouseDown={(e) => {
-            this.down(e, "start")
-          }}
-        />
-        {/* <div style={{
-          height: 80,
-          width: endHandlePos - startHandlePos + "px",
-          background: "rgba(245, 9, 9, 0.48)",
-          position: 'absolute',
-          left: startHandlePos + "px",
-        }}
-        /> */}
-      </>
-    )
   }
 };
 

@@ -93,10 +93,7 @@ export const SpotifyBox = ({
   return (
     <div
       style={{
-        width: 200,
-        height: 100,
-        // overflow: "hidden",
-        border: "2px solid green",
+        
       }}
     >
       <Authorize spotify={spotify} />
@@ -118,9 +115,12 @@ export const SpotifyBox = ({
 const Track = ({ item, onSetMetaInfo, spotify }) => {
   useEffect(() => {
     spotify.api.getTrack(item.trackId).then((track) => {
+      console.log('track: ', track);
       onSetMetaInfo(item, {
         duration: track.duration_ms,
         title: track.name,
+        image: track.album.images[0].url,
+        artist: track.artists[0].name
       });
     });
   }, [item.trackId]);

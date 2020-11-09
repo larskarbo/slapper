@@ -5,6 +5,13 @@ import SegmentView, { msToTime } from "./SegmentView/SegmentView";
 import { Entypo } from "@expo/vector-icons";
 import { useParams, Link, Route, Switch } from "react-router-dom";
 
+import {
+  Menu,
+  Item as ContextItem,
+  Separator,
+  Submenu,
+  MenuProvider,
+} from "react-contexify";
 import styled from "styled-components/native";
 import Play from "./comp/Play";
 import { Item, Clip } from "./Croaker";
@@ -30,21 +37,16 @@ const Block = styled.View`
 `;
 
 export const SlapItem = ({
-  loading,
-  children,
-  duration,
   title = "...",
   onPause,
   onPlay,
   onScrub,
-  segment,
-  text,
-  onSetSegment,
   onSetText,
-  onSetTitle,
   onUpdateClip,
   playingNow,
   onAddClip,
+  onDeleteClip,
+  onDeleteItem,
   item,
 }: {
   item: Item;
@@ -53,7 +55,6 @@ export const SlapItem = ({
   const [open, setOpen] = useState(false);
   const clips = item.clips || [];
 
-
   const songIsPlaying =
     playingNow?.item.id == item.id &&
     playingNow?.type == "item" &&
@@ -61,226 +62,199 @@ export const SlapItem = ({
 
   return (
     <StyledView className="horse" style={{}}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
+      <MenuProvider id={item.id}>
         <View
           style={{
             flexDirection: "row",
+            justifyContent: "space-between",
           }}
         >
-          <Block>
-            {/* {children} */}
-            <Play
-              playing={songIsPlaying}
-              onPress={() => {
-                const playable = {
-                  type: "item",
-                  item: item,
-                };
-                songIsPlaying ? onPause() : onPlay(playable);
-              }}
-            />
-          </Block>
-
-          <Block
+          <View
             style={{
-              width: 180,
-              justifyContent: "center",
+              flexDirection: "row",
             }}
           >
-            <View style={{ flexDirection: "column", flex: 1 }}>
-              <Text
-                style={{
-                  width: "100%",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  fontWeight: "bold",
+            <Block>
+              {/* {children} */}
+              <Play
+                playing={songIsPlaying}
+                onPress={() => {
+                  const playable = {
+                    type: "item",
+                    item: item,
+                  };
+                  songIsPlaying ? onPause() : onPlay(playable);
                 }}
-              >
-                {title}
-              </Text>
-              <Text
-                style={{
-                  fontSize: 10,
-                }}
-              >
-                {item.videoId ? (
-                  <a target="_blank" href={"https://youtu.be/" + item.videoId}>
-                    <FaYoutube />
-                  </a>
-                ) : (
-                  <a
-                    target="_blank"
-                    href={"https://open.spotify.com/track/" + item.trackId}
-                  >
-                    <FaSpotify />
-                  </a>
-                )}
-              </Text>
-            </View>
-          </Block>
-          {clips.map((c) => {
-            const clipIsPlaying =
-              playingNow?.type == "clip" &&
-              playingNow?.clip.id == c.id &&
-              playingNow?.state == "playing";
-            return (
-              <Block
-                key={c.id}
-                style={{
-                  backgroundColor: c.color || "#EDB7C4",
-                }}
-              >
-                <Play
-                  playing={clipIsPlaying}
-                  onPress={() => {
-                    const playable = {
-                      type: "clip",
-                      item: item,
-                      clip: c,
-                    };
-                    onUpdateClip(c, { state: "playing" });
-                    if (clipIsPlaying) {
-                      onPause();
-                    } else {
-                      onPlay(playable);
-                    }
-                  }}
-                />
-                <Text
-                  style={{
-                    paddingLeft: 6,
-                  }}
-                >
-                  {c.title}
-                </Text>
-              </Block>
-            );
-          })}
-          {(clips.length < 3 && open) && (
+              />
+            </Block>
+
             <Block
               style={{
-                backgroundColor: "#E9E9E9",
+                width: 180,
+                justifyContent: "center",
               }}
-              onClick={onAddClip}
             >
-              <Text>+ Add clip</Text>
+              <View style={{ flexDirection: "column", flex: 1 }}>
+                <Text
+                  style={{
+                    width: "100%",
+                    overflow: "hidden",
+                    whiteSpace: "nowrap",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {title}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 10,
+                  }}
+                >
+                  {item.videoId ? (
+                    <a
+                      target="_blank"
+                      href={"https://youtu.be/" + item.videoId}
+                    >
+                      <FaYoutube />
+                    </a>
+                  ) : (
+                    <a
+                      target="_blank"
+                      href={"https://open.spotify.com/track/" + item.trackId}
+                    >
+                      <FaSpotify />
+                    </a>
+                  )}
+                </Text>
+              </View>
             </Block>
-          )}
-        </View>
+            {clips.map((c) => {
+              const clipIsPlaying =
+                playingNow?.type == "clip" &&
+                playingNow?.clip.id == c.id &&
+                playingNow?.state == "playing";
+              return (
+                <MenuProvider id={c.id}>
+                  <Block
+                    key={c.id}
+                    style={{
+                      backgroundColor: c.color || "#EDB7C4",
+                    }}
+                  >
+                    <Play
+                      playing={clipIsPlaying}
+                      onPress={() => {
+                        const playable = {
+                          type: "clip",
+                          item: item,
+                          clip: c,
+                        };
+                        onUpdateClip(c, { state: "playing" });
+                        if (clipIsPlaying) {
+                          onPause();
+                        } else {
+                          onPlay(playable);
+                        }
+                      }}
+                    />
+                    <Text
+                      style={{
+                        paddingLeft: 6,
+                      }}
+                    >
+                      {c.title}
+                    </Text>
+                  </Block>
+                  <ClipContextMenu id={c.id} onDelete={() => onDeleteClip(c)} />
+                </MenuProvider>
+              );
+            })}
+            {clips.length < 3 && open && (
+              <Block
+                style={{
+                  backgroundColor: "#E9E9E9",
+                }}
+                onClick={onAddClip}
+              >
+                <Text>+ Add clip</Text>
+              </Block>
+            )}
+          </View>
 
-        <View
-          style={{
-            flexDirection: "row",
-          }}
-        >
-          <Block
+          <View
             style={{
-              flex: 1,
-              backgroundColor: "#FFFFD6",
-              borderLeft: "1px solid #3b3b3b",
-              borderRight: "1px solid #3b3b3b",
+              flexDirection: "row",
             }}
           >
-            <TextInput value={item.text}  multiline
-          onChange={(e) => onSetText(e.target.value)}
-          placeholder="Write notes here..."
-          style={{
-            flex:1,
-            height: "100%",
-            outline: "none"
-          }}
-           />
-          </Block>
-          <Block
-            style={{
-              backgroundColor: open ? "black" : "#E9E9E9",
-            }}
-            onClick={()=>setOpen(!open)}
-          >
-            <Text
+            <Block
               style={{
-                paddingLeft: 6,
-                color: open ? "white" : "black",
+                flex: 1,
+                backgroundColor: "#FFFFD6",
+                borderLeft: "1px solid #3b3b3b",
+                borderRight: "1px solid #3b3b3b",
               }}
             >
-              ▼
-            </Text>
-          </Block>
+              <TextInput
+                value={item.text}
+                multiline
+                onChange={(e) => onSetText(e.target.value)}
+                placeholder="Write notes here..."
+                style={{
+                  flex: 1,
+                  height: "100%",
+                  outline: "none",
+                }}
+              />
+            </Block>
+            <Block
+              style={{
+                backgroundColor: open ? "black" : "#E9E9E9",
+              }}
+              onClick={() => setOpen(!open)}
+            >
+              <Text
+                style={{
+                  paddingLeft: 6,
+                  color: open ? "white" : "black",
+                }}
+              >
+                ▼
+              </Text>
+            </Block>
+          </View>
         </View>
-      </View>
 
-      {open && (
-        <View style={{}}>
-          <SegmentView
-            clips={clips}
-            duration={duration || 0}
-            pointerAt={
-              (playingNow?.item.id == item.id && playingNow?.position) || 0
-            }
-            playing={
-              playingNow?.item.id == item.id && playingNow?.state == "playing"
-            }
-            onScrub={onScrub}
-            onUpdateClip={onUpdateClip}
-          />
-        </View>
-      )}
-
-      {/* <View
-        style={{
-          width: 200,
-          height: 60,
-        }}
-      >
-        <textarea
-          style={{
-            width: 200,
-            height: 60,
-            backgroundColor: "#ffff88",
-          }}
-          onChange={(e) => onSetText(e.target.value)}
-        >
-          {text}
-        </textarea>
-      </View> */}
+        {open && (
+          <View style={{}}>
+            <SegmentView
+              clips={clips}
+              duration={item.metaInfo.duration || 0}
+              pointerAt={
+                (playingNow?.item.id == item.id && playingNow?.position) || 0
+              }
+              playing={
+                playingNow?.item.id == item.id && playingNow?.state == "playing"
+              }
+              onScrub={onScrub}
+              onUpdateClip={onUpdateClip}
+            />
+          </View>
+        )}
+      </MenuProvider>
+      <SongContextMenu id={item.id} onDelete={onDeleteItem} />
     </StyledView>
   );
 };
 
-// const Play = ({ onPress, playing }) => {
-//   const ref = useRef(null);
-//   const isHover = useHover(ref);
-//   const show = isHover || !playing;
+// create your menu first
+const SongContextMenu = ({ id, onDelete }) => (
+  <Menu id={id}>
+    <ContextItem onClick={onDelete}>Remove song</ContextItem>
+  </Menu>
+);
 
-//   return (
-//     <div
-//       onClick={onPress}
-//       ref={ref}
-//       style={{
-//         top: 0,
-//         left: 0,
-//         right: 0,
-//         bottom: 0,
-//         position: "absolute",
-//         backgroundColor: show ? "rgba(0,0,0,0.5)" : "transparent",
-//         opacity: show ? 1 : 0,
-//         cursor:"pointer",
-
-//         display: "flex",
-//         justifyContent: "center",
-//         alignItems: "center",
-//       }}
-//     >
-//       {playing ? (
-//         <Entypo name="controller-paus" size={34} color="white" />
-//       ) : (
-//         <Entypo name="controller-play" size={34} color="white" />
-//       )}
-//     </div>
-//   );
-// };
+const ClipContextMenu = ({ id, onDelete }) => (
+  <Menu id={id}>
+    <ContextItem onClick={onDelete}>Remove clip</ContextItem>
+  </Menu>
+);

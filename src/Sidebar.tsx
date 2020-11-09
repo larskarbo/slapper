@@ -52,7 +52,6 @@ const Sidebar = ({ user }) => {
     <div
       style={{
         width: 200,
-        height: "100vh",
         marginRight: 30,
         backgroundColor: "#f7f6f2",
       }}

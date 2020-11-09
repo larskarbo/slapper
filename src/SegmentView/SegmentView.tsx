@@ -18,20 +18,19 @@ export default function SegmentView({
   duration,
   onScrub,
   onUpdateClip,
-  clips
+  clips,
 }) {
   const [pointerAtRolling, setPointerAtRolling] = useState(0);
   const [draggingPointerValue, setDraggingPointerValue] = useState(0);
   const [draggingPointer, setDraggingPointer] = useState(false);
   const lineRef = useRef(null);
   const isHovering = useHover(lineRef);
-  
+
   const [refReady, setRefReady] = useState(false);
-  
 
   useEffect(() => {
-    if(lineRef){
-      setRefReady(true)
+    if (lineRef) {
+      setRefReady(true);
     }
   }, [lineRef]);
 
@@ -56,6 +55,8 @@ export default function SegmentView({
         borderLeftStyle: "solid",
         borderLeftColor: "#727272",
         borderLeftWidth: 1,
+        display: "flex",
+        flexGrow: 1,
       }}
       ref={lineRef}
     >
@@ -91,7 +92,7 @@ export default function SegmentView({
 
       {clips.map((clip) => (
         <Clip
-        key={clip.id}
+          key={clip.id}
           isHovering={isHovering}
           duration={duration}
           clip={clip}
@@ -156,42 +157,48 @@ export default function SegmentView({
 }
 
 const Clip = ({ isHovering, duration, parent, clip, onUpdate }) => {
+  
+  const [localFrom, setLocalFrom] = useState(clip.from);
+  const [localTo, setLocalTo] = useState(clip.to);
+
   return (
     <>
       <Segment
         style={{
           opacity: isHovering ? 0.5 : 0.2,
-          borderRadius: 3
+          borderRadius: 3,
         }}
         duration={duration}
         parent={parent}
-        from={clip.from}
-        to={clip.to}
+        from={localFrom}
+        to={localTo}
         color={clip.color}
       />
       <Handle
         duration={duration}
-        value={clip.from}
+        value={localFrom}
         parent={parent}
         updateValue={(a) => {
-          if (clip.to - a < 2000) {
+          if (localTo - a < 2000) {
             return;
           }
-          onUpdate({
-            from: a,
-          });
+          setLocalFrom(a)
+          // onUpdate({
+          //   from: a,
+          // });
         }}
         isHovering={isHovering}
       />
 
       <Handle
         duration={duration}
-        value={clip.to}
+        value={localTo}
         parent={parent}
         updateValue={(a) => {
-          onUpdate({
-            to: a,
-          });
+          setLocalTo(a)
+          // onUpdate({
+          //   to: a,
+          // });
         }}
         isHovering={isHovering}
       />

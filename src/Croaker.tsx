@@ -5,11 +5,14 @@ import urlParser from "js-video-url-parser";
 import { request } from "./utils/request";
 import { v4 as uuidv4 } from "uuid";
 import Players from "./players/Players";
-import { useParams, Link, Route } from "react-router-dom";
+import { useParams, Link, Route, Switch } from "react-router-dom";
 import { SlapItem } from "./SlapItem";
 
 import { useThrottle } from "use-throttle";
+import Sidebar from "./Sidebar";
+import Footer from "./Footer";
 
+export const FOOTER_HEIGHT = 100;
 const itemsForServer = (items) => {
   const forServer = JSON.parse(JSON.stringify(items));
 
@@ -202,6 +205,26 @@ export default function Croaker({ spotify, user }) {
     );
   };
 
+  const deleteItem = (item) => {
+    console.log("item: ", item);
+    setItems((items) => items.filter((y) => y.id !== item.id));
+  };
+
+  const deleteClip = (item, clip) => {
+    setItems((items: Item[]) =>
+      items.map((y) => {
+        if (y.id == item.id) {
+          const previousClips = y.clips || [];
+          return {
+            ...y,
+            clips: previousClips.filter((y) => y.id !== clip.id),
+          };
+        }
+        return y;
+      })
+    );
+  };
+
   const updateItem = (item, object) => {
     setItems((items) =>
       items.map((y) => {
@@ -239,113 +262,148 @@ export default function Croaker({ spotify, user }) {
   };
 
   return (
-    <View
+    <div
       style={{
-        paddingTop: 20,
-        height: "100vh",
-        maxHeight: "100vh",
-        justifyContent: "space-between",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        backgroundColor: "white",
       }}
     >
-      {loaded && (
-        <>
-          <View style={{ overflow: "scroll", height: "calc(100vh - 200px)" }}>
-            {user?.id != slapUserId && (
-              <Text style={{ color: "red" }}>
-                You don't own this slap, so it won't be saved.
-              </Text>
-            )}
-            <CleanInput
-              style={{
-                paddingBottom: 20,
-                paddingTop: 100,
-                fontSize: 20,
-              }}
-              placeholder="Untitled"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <Text
-              style={{
-                paddingBottom: 10,
-                paddingTop: 0,
-                fontSize: 13,
-                maxWidth: 400,
-                // fontWeight: 200,
-              }}
-            >
-              {description}
-            </Text>
-
-            {items.map((item, i) => {
-              const commonProps = {
-                item: item,
-                playingNow: playingNow,
-                onPause: () => pause(),
-                onPlay: play,
-                onScrub: scrub,
-                onSetSegment: (segment) =>
-                  updateItem(item, {
-                    from: segment.from,
-                    to: segment.to,
-                  }),
-                onSetText: (text) => updateItem(item, { text: text }),
-                onSetTitle: (title) => updateItem(item, { title: title }),
-                onAddClip: () => addClip(item),
-                onUpdateClip: (clip, whatever) =>
-                  updateClip(item, clip, whatever),
-              };
-
-              return (
-                <SlapItem
-                  item={item}
-                  duration={item.metaInfo?.duration}
-                  title={item.metaInfo?.title}
-                  text={item.text}
-                  key={item.videoId || item.trackId}
-                  {...commonProps}
-                />
-              );
-            })}
-
-            {/* <Splat
-        title="test song"
-        duration={50000}
-        pointerAt={20000}
-        playing={true}
-        loading={false}
+      <div
+        style={{
+          width: "100%",
+          // height: "100%",
+          display: "flex",
+          flexDirection: "row",
+          backgroundColor: "white",
+          overflow: "scroll",
+          height: `calc(100vh - ${FOOTER_HEIGHT}px)`,
+        }}
       >
-        <Text>Image</Text>
-      </Splat> */}
-
-            <KeyboardEventHandler handleKeys={["Enter"]} onKeyEvent={go}>
-              <CleanInput
+        <Sidebar user={user} />
+        <div>
+          <Switch>
+            <Route exact path="/s">
+              <h3>Select a collection or create one to get started.</h3>
+            </Route>
+            <Route path={`/s/:collectionId`}>
+              <View
                 style={{
-                  fontSize: input.length ? 12 : 25,
-                  height: 60,
-                  width: 500,
-                  padding: 20,
+                  paddingTop: 20,
+                  justifyContent: "space-between",
                 }}
-                placeholder="Paste youtube or spotify link here"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-              />
-            </KeyboardEventHandler>
-          </View>
-          <View style={{ height: 200 }}>
-            <Players
-              spotify={spotify}
-              playingNow={playingNow}
-              items={items}
-              onSetMetaInfo={(item, metaInfo) =>
-                updateItem(item, { metaInfo: metaInfo })
-              }
-              onSetPlayingNow={(pn) => setPlayingNow({ ...playingNow, ...pn })}
-            />
-          </View>
-        </>
-      )}
-    </View>
+              >
+                {loaded && (
+                  <View>
+                    <View style={{}}>
+                      {user?.id != slapUserId && (
+                        <Text style={{ color: "red" }}>
+                          You don't own this slap, so it won't be saved.
+                        </Text>
+                      )}
+                      <CleanInput
+                        style={{
+                          paddingBottom: 20,
+                          paddingTop: 100,
+                          fontSize: 20,
+                        }}
+                        placeholder="Untitled"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                      />
+                      <Text
+                        style={{
+                          paddingBottom: 10,
+                          paddingTop: 0,
+                          fontSize: 13,
+                          maxWidth: 400,
+                          // fontWeight: 200,
+                        }}
+                      >
+                        {description}
+                      </Text>
+
+                      {items.map((item, i) => (
+                        <SlapItem
+                          item={item}
+                          duration={item.metaInfo?.duration}
+                          title={item.metaInfo?.title}
+                          text={item.text}
+                          key={item.videoId || item.trackId}
+                          playingNow={playingNow}
+                          onPause={() => pause()}
+                          onPlay={play}
+                          onScrub={scrub}
+                          onSetSegment={(segment) => {
+                            updateItem(item, {
+                              from: segment.from,
+                              to: segment.to,
+                            });
+                          }}
+                          onSetText={(text) => updateItem(item, { text: text })}
+                          onSetTitle={(title) =>
+                            updateItem(item, { title: title })
+                          }
+                          onAddClip={() => addClip(item)}
+                          onDeleteClip={(clip) => deleteClip(item, clip)}
+                          onDeleteItem={() => deleteItem(item)}
+                          onUpdateClip={(clip, whatever) =>
+                            updateClip(item, clip, whatever)
+                          }
+                        />
+                      ))}
+
+                      <KeyboardEventHandler
+                        handleKeys={["Enter"]}
+                        onKeyEvent={go}
+                      >
+                        <CleanInput
+                          style={{
+                            fontSize: input.length ? 12 : 25,
+                            height: 60,
+                            width: 500,
+                            padding: 20,
+                          }}
+                          placeholder="Paste youtube or spotify link here"
+                          value={input}
+                          onChange={(e) => setInput(e.target.value)}
+                        />
+                      </KeyboardEventHandler>
+                    </View>
+                  </View>
+                )}
+              </View>
+            </Route>
+          </Switch>
+        </div>
+      </div>
+      <div
+        style={{
+          height: FOOTER_HEIGHT,
+        }}
+        className="footer"
+      >
+        <Footer
+          spotify={spotify}
+          playingNow={playingNow}
+          items={items}
+          onUpdateClip={updateClip}
+          onScrub={scrub}
+        >
+          <Players
+            spotify={spotify}
+            playingNow={playingNow}
+            items={items}
+            onSetMetaInfo={(item, metaInfo) =>
+              updateItem(item, { metaInfo: metaInfo })
+            }
+            onSetPlayingNow={(pn) => setPlayingNow({ ...playingNow, ...pn })}
+          />
+        </Footer>
+      </div>
+    </div>
   );
 }
 

@@ -3,6 +3,7 @@ import DeviceSelector from "../DeviceSelector";
 import React, { useEffect, useState } from "react";
 import YouTube from "react-youtube";
 import { Item, Clip } from "./Croaker";
+import { FOOTER_HEIGHT } from "../Croaker";
 
 export const YoutubeBox = ({
   items,
@@ -15,6 +16,7 @@ export const YoutubeBox = ({
 }) => {
   const youtubeItems = items.filter((i) => i.videoId);
   const [lastActive, setLastActive] = useState(null);
+  const [sizeBig, setSizeBig] = useState(true);
 
   useEffect(() => {
     if (playingNow) {
@@ -25,14 +27,22 @@ export const YoutubeBox = ({
   return (
     <div
       style={{
-        width: 200,
-        height: 100,
-        // overflow: "hidden",
-        border: "2px solid red",
+        position: "absolute",
+        right: 10,
+        bottom: FOOTER_HEIGHT + 10,
+        borderRadius: 10,
+        background: "black",
+        overflow: "hidden",
+
+        transformOrigin: "right bottom",
+        transform: sizeBig ? "scale(1)" : "scale(0.3)",
+        transition: "transform 0.4s ease",
       }}
     >
       {youtubeItems.map((item) => (
         <YoutubeVideo
+          onToggleSize={() => setSizeBig(!sizeBig)}
+          sizeBig={sizeBig}
           key={item.videoId}
           item={item}
           onSetMetaInfo={(metaInfo) => onSetMetaInfo(item, metaInfo)}
@@ -51,6 +61,7 @@ const YoutubeVideo = ({
   visible,
   playingNow,
   onSetPlayingNow,
+  onToggleSize,
 }: {
   item: Item;
   [key: string]: any;
@@ -73,18 +84,18 @@ const YoutubeVideo = ({
     if (!youtubeElement) return;
     if (!playingInfo) {
       youtubeElement.target.pauseVideo();
-      return
+      return;
     }
-    
-    if(playingInfo.action == "wantToPause"){
+
+    if (playingInfo.action == "wantToPause") {
       youtubeElement.target.pauseVideo();
-    } else if(playingInfo.action == "wantToPlay"){
-      if(playingInfo.type == "item"){
+    } else if (playingInfo.action == "wantToPlay") {
+      if (playingInfo.type == "item") {
         if (!playingInfo.position) {
           youtubeElement.target.seekTo(0);
         }
         youtubeElement.target.playVideo();
-      } else if(playingInfo.type == "clip") {
+      } else if (playingInfo.type == "clip") {
         youtubeElement.target.seekTo(playingInfo.clip.from / 1000);
         youtubeElement.target.playVideo();
       }
@@ -100,7 +111,7 @@ const YoutubeVideo = ({
       });
     } else if (data == 2) {
       // paused
-      console.log('paused')
+      console.log("paused");
       onSetPlayingNow({
         state: "paused",
         position: youtubeElement.target.getCurrentTime() * 1000,
@@ -111,9 +122,7 @@ const YoutubeVideo = ({
   // seeking
   useEffect(() => {
     if (playingInfo?.scrub) {
-      if (playing) {
-        youtubeElement.target.seekTo(playingInfo.scrub / 1000);
-      }
+      youtubeElement.target.seekTo(playingInfo.scrub / 1000);
       onSetPlayingNow({
         position: playingInfo.scrub,
       });
@@ -128,6 +137,7 @@ const YoutubeVideo = ({
         // display: "none",
         position: "relative",
       }}
+      onClick={onToggleSize}
     >
       <div
         style={{
@@ -141,8 +151,8 @@ const YoutubeVideo = ({
       <YouTube
         videoId={item.videoId}
         opts={{
-          height: "100",
-          width: "200",
+          height: "300",
+          width: "600",
           playerVars: {
             controls: 0,
             modestbranding: 1,
