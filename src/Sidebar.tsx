@@ -4,6 +4,7 @@ import { Text, View } from "react-native";
 import { useParams, useHistory, Link, Route, Switch } from "react-router-dom";
 import {request} from "./utils/request";
 import netlifyIdentity from "netlify-identity-widget";
+import { TText } from "./utils/font";
 
 const Sidebar = ({ user }) => {
   let history = useHistory();
@@ -57,7 +58,7 @@ const Sidebar = ({ user }) => {
       }}
     >
       <div style={{ paddingTop: 100 }}></div>
-      <Text
+      <TText
         style={{
           fontSize: 20,
           fontWeight: 200,
@@ -72,7 +73,7 @@ const Sidebar = ({ user }) => {
           Slapper
         </span>
         .io
-      </Text>
+      </TText>
 
       {allUsers
         .sort((a, b) => {if(a.data.id == user?.id){return -10}})
@@ -92,7 +93,7 @@ const Sidebar = ({ user }) => {
                         backgroundColor: active && "#dddddd",
                       }}
                     >
-                      <Text
+                      <TText
                         style={{
                           fontSize: 12,
                           paddingLeft: 20,
@@ -100,7 +101,7 @@ const Sidebar = ({ user }) => {
                         }}
                       >
                         {slap.title.length ? slap.title : "Untitled"}
-                      </Text>
+                      </TText>
                     </View>
                   </Link>
                 );
@@ -142,7 +143,7 @@ const User = ({ id }) => {
         });
       }}
     >
-      <Text
+      <TText
         style={{
           fontSize: 16,
           paddingLeft: 20,
@@ -151,7 +152,7 @@ const User = ({ id }) => {
         }}
       >
         🥳 {user?.name}
-      </Text>
+      </TText>
     </div>
   );
 };

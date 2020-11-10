@@ -11,6 +11,7 @@
   "dependencies": {
     "@feedback-fish/react": "^1.1.0",
     "@react-hook/hover": "^4.0.0",
+    "bootstrap": "^4.5.3",
     "cookie-parser": "^1.4.5",
     "delay": "^4.4.0",
     "expo": "~39.0.2",
@@ -27,6 +28,7 @@
     "query-string": "^6.13.2",
     "randomstring": "^1.1.5",
     "react": "16.13.1",
+    "react-bootstrap": "^1.4.0",
     "react-contexify": "^4.1.1",
     "react-dom": "16.13.1",
     "react-double-marquee": "^1.0.6",
@@ -38,6 +40,7 @@
     "react-player-controls": "^2.0.0-beta.0",
     "react-router-dom": "^5.2.0",
     "react-select": "^3.1.0",
+    "react-use-clipboard": "^1.0.2",
     "react-use-localstorage": "^3.5.3",
     "react-youtube": "^7.12.0",
     "request": "^2.88.2",

@@ -3,6 +3,7 @@ import { Text, View } from "react-native";
 import SegmentView from "./SegmentView/SegmentView";
 import MarqueeText from "react-native-marquee";
 import useHover from "@react-hook/hover";
+import { TText } from "./utils/font";
 
 const Footer = ({ playingNow, children, onUpdateClip, onScrub, items }) => {
   // console.log('playingNow: ', JSON.stringify(playingNow));
@@ -54,13 +55,13 @@ const Footer = ({ playingNow, children, onUpdateClip, onScrub, items }) => {
           {playingNow?.item.metaInfo.title}
         </MarqueeText>
 
-        <Text
+        <TText
           style={{
             fontWeight: "200",
           }}
         >
           {playingNow?.item.metaInfo.artist}
-        </Text>
+        </TText>
       </View>
 
       <View

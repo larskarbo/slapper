@@ -6,6 +6,7 @@ import { Text } from "react-native";
 import niceTicks from "nice-ticks";
 import useHover from "@react-hook/hover";
 import Play from "../comp/Play";
+import { TText } from "../utils/font";
 
 export const msToTime = (ms) => {
   return new Date(ms).toISOString().substr(15, 4);
@@ -53,7 +54,7 @@ export default function SegmentView({
       }}
       ref={lineRef}
     >
-      <Text
+      <TText
         style={{
           top: 5,
           left: 5,
@@ -61,8 +62,8 @@ export default function SegmentView({
         }}
       >
         {msToTime(pointerAtRolling)}
-      </Text>
-      <Text
+      </TText>
+      <TText
         style={{
           top: 5,
           right: 5,
@@ -70,7 +71,7 @@ export default function SegmentView({
         }}
       >
         {msToTime(duration)}
-      </Text>
+      </TText>
 
       <Segment
         style={{
@@ -179,7 +180,7 @@ const Clip = ({ isHovering, duration, parent, clip, onUpdate, clips }) => {
         <div style={{
           height: 20,
         }}>
-        <Text>{clip.title}</Text>
+        <TText>{clip.title}</TText>
 
         </div>
         <div style={{

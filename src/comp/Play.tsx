@@ -5,6 +5,7 @@ import pause from "./pause.svg";
 import styled from "styled-components/native";
 import { ImPause2, ImVolumeMedium, ImPlay3 } from "react-icons/im";
 import useHover from "@react-hook/hover";
+import { DEFAULT_BLACK } from "../utils/font";
 
 const NoButton = styled.Pressable`
   background: transparent;
@@ -17,7 +18,7 @@ export default function Play({ playing, onPress, small=false, disabled }) {
 
   const iconProps = {
     size: small ? 8 : 12,
-    color: disabled ? "#5a5a5a" : "black"
+    color: disabled ? "#5a5a5a" : DEFAULT_BLACK
   }
 
   return (
@@ -26,7 +27,7 @@ export default function Play({ playing, onPress, small=false, disabled }) {
       onPress={onPress}
       style={{
         borderStyle: "solid",
-        borderColor: isHovering ? "black" : "#5a5a5a",
+        borderColor: isHovering ? DEFAULT_BLACK : "#5a5a5a",
         ...(disabled && {borderColor: "#5a5a5a"}),
         borderWidth: isHovering ? 2 : 1,
         borderRadius: "100%",

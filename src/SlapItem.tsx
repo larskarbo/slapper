@@ -16,6 +16,7 @@ import styled from "styled-components/native";
 import Play from "./comp/Play";
 import { Item, Clip } from "./Croaker";
 import { FaSpotify, FaYoutube } from "react-icons/fa";
+import { sansSerif, TText } from "./utils/font";
 
 const StyledView = styled.View`
   width: 700;
@@ -103,7 +104,7 @@ export const SlapItem = ({
               }}
             >
               <View style={{ flexDirection: "column", flex: 1 }}>
-                <Text
+                <TText
                   style={{
                     width: "100%",
                     overflow: "hidden",
@@ -112,8 +113,8 @@ export const SlapItem = ({
                   }}
                 >
                   {title}
-                </Text>
-                <Text
+                </TText>
+                <TText
                   style={{
                     fontSize: 10,
                   }}
@@ -133,7 +134,7 @@ export const SlapItem = ({
                       <FaSpotify />
                     </a>
                   )}
-                </Text>
+                </TText>
               </View>
             </Block>
             {clips.map((c) => {
@@ -165,13 +166,13 @@ export const SlapItem = ({
                         }
                       }}
                     />
-                    <Text
+                    <TText
                       style={{
                         paddingLeft: 6,
                       }}
                     >
                       {c.title}
-                    </Text>
+                    </TText>
                   </Block>
                   <ClipContextMenu id={c.id} onDelete={() => onDeleteClip(c)} />
                 </MenuProvider>
@@ -184,7 +185,7 @@ export const SlapItem = ({
                 }}
                 onClick={onAddClip}
               >
-                <Text>+ Add clip</Text>
+                <TText>+ Add clip</TText>
               </Block>
             )}
           </View>
@@ -211,6 +212,7 @@ export const SlapItem = ({
                   flex: 1,
                   height: "100%",
                   outline: "none",
+                  ...sansSerif
                 }}
               />
             </Block>
@@ -220,14 +222,14 @@ export const SlapItem = ({
               }}
               onClick={() => setOpen(!open)}
             >
-              <Text
+              <TText
                 style={{
                   paddingLeft: 6,
                   color: open ? "white" : "black",
                 }}
               >
                 ▼
-              </Text>
+              </TText>
             </Block>
           </View>
         </View>

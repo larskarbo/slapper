@@ -7,12 +7,15 @@ import { v4 as uuidv4 } from "uuid";
 import Players from "./players/Players";
 import { useParams, Link, Route, Switch } from "react-router-dom";
 import { SlapItem } from "./SlapItem";
-
 import { useThrottle } from "use-throttle";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { FeedbackFish } from "@feedback-fish/react";
 import Authorize from "./Authorize";
+import { sansSerif } from "./utils/font.tsx";
+import { CleanInput, TText } from "./utils/font";
+
+import LinkShare from "./comp/LinkShare";
 
 export const FOOTER_HEIGHT = 100;
 const itemsForServer = (items) => {
@@ -299,14 +302,17 @@ export default function Croaker({ spotify, user }) {
               >
                 {loaded && (
                   <View>
-                    <View style={{
-                            paddingTop: 100,
-                            }}>
+                    <View
+                      style={{
+                        paddingTop: 100,
+                      }}
+                    >
                       {user?.id != slapUserId && (
-                        <Text style={{ color: "red" }}>
+                        <TText style={{ color: "red" }}>
                           You don't own this slap, so it won't be saved.
-                        </Text>
+                        </TText>
                       )}
+                      <LinkShare link={"https://slapper.io/s/" + collectionId} />
                       {!spotify.credentials && (
                         <View
                           style={{
@@ -315,31 +321,31 @@ export default function Croaker({ spotify, user }) {
                             padding: 10,
                           }}
                         >
-                          <Text>Connect with spotify to play this Slap</Text>
+                          <TText>Connect with spotify to play this Slap</TText>
                           <Authorize spotify={spotify} />
                         </View>
                       )}
                       <CleanInput
                         style={{
-                          marginTop: 20,
+                          marginTop: 10,
                           paddingBottom: 20,
-                          fontSize: 20,
+                          fontSize: 24,
+                          fontWeight: 900,
+                          color: "#313131",
                         }}
                         placeholder="Untitled"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                       />
-                      <Text
+                      <CleanInput
                         style={{
-                          paddingBottom: 10,
-                          paddingTop: 0,
-                          fontSize: 13,
-                          maxWidth: 400,
-                          // fontWeight: 200,
+                          paddingBottom: 30,
+                          fontSize: 16,
                         }}
-                      >
-                        {description}
-                      </Text>
+                        placeholder="Description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                      />
 
                       {items.map((item, i) => (
                         <SlapItem
@@ -425,15 +431,3 @@ export default function Croaker({ spotify, user }) {
     </div>
   );
 }
-
-const CleanInput = ({ style, ...props }) => (
-  <input
-    {...props}
-    style={{
-      outline: "none",
-      borderWidth: 0,
-      ...style,
-    }}
-    type="text"
-  />
-);
