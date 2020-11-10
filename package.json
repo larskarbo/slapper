@@ -9,8 +9,10 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@feedback-fish/react": "^1.1.0",
     "@react-hook/hover": "^4.0.0",
     "cookie-parser": "^1.4.5",
+    "delay": "^4.4.0",
     "expo": "~39.0.2",
     "expo-status-bar": "~1.0.2",
     "express": "^4.17.1",

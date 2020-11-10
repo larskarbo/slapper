@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { PADDING_SV } from "./SegmentView";
 
-export default function Segment ({ from, to, duration, parent, style, color="rgba(66, 135, 245, 0.48)"}) {
+export default function Segment ({ children, from, to, duration, parent, style, color="rgba(66, 135, 245, 0.48)"}) {
   let w
   if (!parent) {
     w = 0
@@ -14,16 +14,17 @@ export default function Segment ({ from, to, duration, parent, style, color="rgb
   return (
     <>
       <div style={{
-        height: 60,
         width: endPos - startPos,
-        background: color,
         position: 'absolute',
-        top: "50%",
-        transform: "translateY(-50%)",
+        top: 0,
+        // transform: "translateY(-50%)",
         left: startPos,
         ...style
       }}
-      />
+      >
+        {children}
+        
+        </div>
     </>
   )
 }

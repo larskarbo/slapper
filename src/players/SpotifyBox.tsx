@@ -15,7 +15,6 @@ export const SpotifyBox = ({
 }) => {
   const spotifyItems = items.filter((i) => i.trackId);
   const playingNowTrack = playingNow?.item.trackId ? playingNow : null;
-  // useEffect(() => spotify.playPauseWhatever(items), [items]);
 
   useEffect(() => {
     spotify.onUpdatePlaybackState = (playbackState) => {
@@ -79,7 +78,12 @@ export const SpotifyBox = ({
       } else if (playingNowTrack.type == "clip") {
         playObject.position_ms = playingNowTrack.clip.from;
       }
-      await spotify.play(playObject);
+      try{
+        await spotify.play(playObject);
+      } catch(e) {
+        alert("Error: " + e.message)
+        return
+      }
       onSetPlayingNow({
         state: "playing",
         action: null,
@@ -96,7 +100,6 @@ export const SpotifyBox = ({
         
       }}
     >
-      <Authorize spotify={spotify} />
 
       {spotifyItems.map((item) => (
         <Track

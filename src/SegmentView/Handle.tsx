@@ -75,24 +75,44 @@ class Handle extends Component {
     const handlePos = PADDING_SV + (this.props.value / this.props.duration) * w
 
     // const handle_width = this.props.isHovering ? HANDLE_WIDTH : 1
-    const handle_width = 10
+    const handle_width = 30
     if(!this.props.isHovering){
       return null
     }
     return (
       <>
         <div className="handle" style={{
-          height: 10,
-          width: 10 + "px",
+          height: handle_width,
+          width: handle_width,
           background: this.props.color || "#898989",
           position: 'absolute',
           left: handlePos - handle_width / 2 + "px",
-          top: 45,
-          borderRadius: 5
+          // top: 45,
+          zIndex: 10,
+          ...(this.props.topMargin && {
+            top: this.props.topMargin - handle_width/2
+          }),
+          opacity: 0,
+          borderRadius: "100%",
+          ...this.props.style
         }}
           onMouseDown={(e) => {
             this.down(e, "start")
           }}
+        />
+        <div className="handle" style={{
+          height: 10,
+          width: 10,
+          background: this.props.color || "#898989",
+          position: 'absolute',
+          left: handlePos - 10 / 2 + "px",
+          // top: 45,
+          ...(this.props.topMargin && {
+            top: this.props.topMargin - 10/2
+          }),
+          borderRadius: "100%",
+          ...this.props.style
+        }}
         />
       </>
     )

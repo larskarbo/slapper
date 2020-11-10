@@ -4,7 +4,9 @@ import SegmentView from "./SegmentView/SegmentView";
 import MarqueeText from "react-native-marquee";
 import useHover from "@react-hook/hover";
 
-const Footer = ({ playingNow, spotify, children, onUpdateClip, onScrub, items }) => {
+const Footer = ({ playingNow, children, onUpdateClip, onScrub, items }) => {
+  // console.log('playingNow: ', JSON.stringify(playingNow));
+  // console.log('items: ', JSON.stringify(items));
   return (
     <View
       style={{

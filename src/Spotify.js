@@ -1,5 +1,6 @@
 import SpotifyApi from "spotify-web-api-js";
 import qs from "query-string";
+import delay from "delay"
 
 import { PARSE_SERVER_BASE } from "./Main";
 import { compare } from "js-deep-equals";
@@ -168,51 +169,6 @@ export default class Spotify {
     this.onGood();
   };
 
-  playPauseWhatever = (allItems) => {
-    if (!this.ready) {
-      return;
-    }
-    const items = allItems.filter((i) => i.trackId); // ← only get spotify items
-
-    if (items.every((i) => i.state == "paused")) {
-      if (this.playbackState?.is_playing) {
-        if(this.weAreInControl){
-					this.api.pause();
-				}
-      }
-      return;
-		}
-		
-		this.weAreInControl = true
-
-    if (items.filter((i) => i.state == "playing").length > 1) {
-      throw new Error("You can only play one at the time!");
-    }
-
-    const playingItem = items.find((i) => i.state == "playing");
-
-    if (!this.isPlaying) {
-      // no playback, start song!
-      this.play({
-        uris: ["spotify:track:" + playingItem.trackId],
-        position_ms: playingItem.position,
-      });
-      this.currentTrack = playingItem.trackId;
-    }
-
-    if (this.isPlaying) {
-      // is it the same song?
-      if (this.currentTrack == playingItem.trackId) {
-      } else {
-        this.play({
-          uris: ["spotify:track:" + playingItem.trackId],
-          position_ms: playingItem.position,
-        });
-        this.currentTrack = playingItem.trackId;
-      }
-    }
-  };
-  
   estimatePosition = () => {
     
     if(this.playbackState){
@@ -226,7 +182,9 @@ export default class Spotify {
   }
 	
 	play = async (opts) => {
+    console.log('playing')
     const playbackState = await this.api.getMyCurrentPlaybackState()
+    console.log('playbackState: ', playbackState);
 		if(!playbackState?.device){
 			if(this.devices.length){
 				
@@ -235,12 +193,23 @@ export default class Spotify {
         if(!foundDevice){
           foundDevice = this.devices[0]
         }
-        
+        console.log('transfering device')
 				await this.api.transferMyPlayback([foundDevice.id])
 			}
-		}
-		await this.api.play(opts);
-		this.isPlaying = true;
+    }
+    console.log('play it')
+    for(const i of [1,2,3]){
+      const playbackState = await this.api.getMyCurrentPlaybackState()
+      console.log('playbackState: ', playbackState);
+      if(playbackState?.device){
+        await this.api.play(opts);
+        this.isPlaying = true;
+        return
+      } else {
+        await delay(500)
+      }
+    }
+    throw new Error("Couldn't play!")
 	}
 
   renewToken = async () => {

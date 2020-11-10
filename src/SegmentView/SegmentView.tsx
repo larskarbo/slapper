@@ -5,6 +5,7 @@ import "./SegmentView.css";
 import { Text } from "react-native";
 import niceTicks from "nice-ticks";
 import useHover from "@react-hook/hover";
+import Play from "../comp/Play";
 
 export const msToTime = (ms) => {
   return new Date(ms).toISOString().substr(15, 4);
@@ -25,14 +26,6 @@ export default function SegmentView({
   const [draggingPointer, setDraggingPointer] = useState(false);
   const lineRef = useRef(null);
   const isHovering = useHover(lineRef);
-
-  const [refReady, setRefReady] = useState(false);
-
-  useEffect(() => {
-    if (lineRef) {
-      setRefReady(true);
-    }
-  }, [lineRef]);
 
   useEffect(() => {
     setPointerAtRolling(pointerAt);
@@ -81,13 +74,30 @@ export default function SegmentView({
 
       <Segment
         style={{
-          height: 2,
+          height: 4,
+          transform: "translateY(-50%)",
+          top: "50%",
+          backgroundColor: "#9B9B9B"
         }}
         parent={lineRef.current}
         from={0}
         to={duration}
         duration={duration}
-        color="black"
+        
+      />
+
+      <Segment
+        style={{
+          height: 4,
+          transform: "translateY(-50%)",
+          top: "50%",
+          backgroundColor: "#606060"
+        }}
+        parent={lineRef.current}
+        from={0}
+        to={pointerAtRolling}
+        duration={duration}
+       
       />
 
       {clips.map((clip) => (
@@ -96,27 +106,21 @@ export default function SegmentView({
           isHovering={isHovering}
           duration={duration}
           clip={clip}
+          clips={clips}
           parent={lineRef.current}
           onUpdate={(obj) => onUpdateClip(clip, obj)}
         />
       ))}
 
-      <Segment
-        style={{
-          height: 2,
-        }}
-        parent={lineRef.current}
-        from={0}
-        to={pointerAtRolling}
-        duration={duration}
-        color="red"
-      />
-
       <Handle
         duration={duration}
         value={draggingPointer ? draggingPointerValue : pointerAtRolling}
         parent={lineRef.current}
-        color="red"
+        color="#606060"
+        style={{
+          transform: "translateY(-50%)",
+          top: "50%",
+        }}
         updateValue={(a) => {
           setDraggingPointerValue(a);
         }}
@@ -156,8 +160,7 @@ export default function SegmentView({
   );
 }
 
-const Clip = ({ isHovering, duration, parent, clip, onUpdate }) => {
-  
+const Clip = ({ isHovering, duration, parent, clip, onUpdate, clips }) => {
   const [localFrom, setLocalFrom] = useState(clip.from);
   const [localTo, setLocalTo] = useState(clip.to);
 
@@ -165,15 +168,33 @@ const Clip = ({ isHovering, duration, parent, clip, onUpdate }) => {
     <>
       <Segment
         style={{
-          opacity: isHovering ? 0.5 : 0.2,
-          borderRadius: 3,
+          // opacity: isHovering ? 0.5 : 0.2,
+          // borderRadius: 3,
         }}
         duration={duration}
         parent={parent}
         from={localFrom}
         to={localTo}
-        color={clip.color}
-      />
+      >
+        <div style={{
+          height: 20,
+        }}>
+        <Text>{clip.title}</Text>
+
+        </div>
+        <div style={{
+          height: 60,
+          background: "rgba(196,196,196,0.31)",
+          border: "1px solid black"
+        }}>
+          </div>
+        <div style={{
+          height: 20,
+        }}>
+          <Play small playing={false} />
+        </div>
+
+      </Segment>
       <Handle
         duration={duration}
         value={localFrom}
@@ -182,11 +203,12 @@ const Clip = ({ isHovering, duration, parent, clip, onUpdate }) => {
           if (localTo - a < 2000) {
             return;
           }
-          setLocalFrom(a)
+          setLocalFrom(a);
           // onUpdate({
           //   from: a,
           // });
         }}
+        topMargin={20}
         isHovering={isHovering}
       />
 
@@ -195,11 +217,12 @@ const Clip = ({ isHovering, duration, parent, clip, onUpdate }) => {
         value={localTo}
         parent={parent}
         updateValue={(a) => {
-          setLocalTo(a)
+          setLocalTo(a);
           // onUpdate({
           //   to: a,
           // });
         }}
+        topMargin={20}
         isHovering={isHovering}
       />
     </>

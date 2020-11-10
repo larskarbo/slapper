@@ -11,21 +11,27 @@ const NoButton = styled.Pressable`
   border: none;
 `;
 
-export default function Play({ playing, onPress }) {
+export default function Play({ playing, onPress, small=false, disabled }) {
   const myRef = useRef(null);
-  const isHovering = useHover(myRef);
+  const isHovering = disabled ? false : useHover(myRef);
+
+  const iconProps = {
+    size: small ? 8 : 12,
+    color: disabled ? "#5a5a5a" : "black"
+  }
 
   return (
     <NoButton
       ref={myRef}
       onPress={onPress}
       style={{
-        border: "1px solid black",
+        borderStyle: "solid",
         borderColor: isHovering ? "black" : "#5a5a5a",
+        ...(disabled && {borderColor: "#5a5a5a"}),
         borderWidth: isHovering ? 2 : 1,
         borderRadius: "100%",
-        width: 30,
-        height: 30,
+        width: small ? 15 : 30,
+        height: small ? 15 : 30,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -35,12 +41,12 @@ export default function Play({ playing, onPress }) {
     >
       {isHovering && (
         <>
-          {playing ? <ImPause2 /> : <ImPlay3 style={{marginLeft:2}} />}
+          {playing ? <ImPause2 {...iconProps} /> : <ImPlay3  {...iconProps} style={{marginLeft:small ? 1 :2}} />}
         </>
       )}
       {!isHovering && (
         <>
-          {playing ? <ImVolumeMedium /> : <ImPlay3 style={{marginLeft:2}} />}
+          {playing ? <ImVolumeMedium  {...iconProps} /> : <ImPlay3  {...iconProps} style={{marginLeft:small ? 1 :2}} />}
         </>
       )}
     </NoButton>

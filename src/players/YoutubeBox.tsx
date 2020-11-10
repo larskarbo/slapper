@@ -73,6 +73,7 @@ const YoutubeVideo = ({
   useEffect(() => {
     // SET METAINFO
     if (youtubeElement) {
+      
       onSetMetaInfo({
         duration: youtubeElement.target.getDuration() * 1000,
         title: youtubeElement.target.getVideoData().title,

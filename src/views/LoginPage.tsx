@@ -10,22 +10,17 @@ import {request} from "../utils/request";
 export default function ({user}) {
   let history = useHistory();
   let location = useLocation();
+  
+  
+  let { from } = location.state || { from: { pathname: '/s' } };
+  if(!from.pathname.includes("/s")){
+    from = { pathname: '/s' }
+  }
 
+  if(user){
+    return <Redirect to={from} />
+  }
 
-  const register = async (user) => {
-    await request("POST", "fauna/users/register", {
-      id: user.id,
-      email: user.email,
-      name: user.user_metadata.full_name,
-    })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-    history.replace(from);
-  };
 
   useEffect(() => {
     netlifyIdentity.open();

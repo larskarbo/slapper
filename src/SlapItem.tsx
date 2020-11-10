@@ -46,6 +46,7 @@ export const SlapItem = ({
   playingNow,
   onAddClip,
   onDeleteClip,
+  disabled,
   onDeleteItem,
   item,
 }: {
@@ -80,7 +81,12 @@ export const SlapItem = ({
               {/* {children} */}
               <Play
                 playing={songIsPlaying}
+                disabled={disabled}
                 onPress={() => {
+                  if(disabled){
+                    alert("You need to connect to Spotify to play this song.")
+                    return
+                  }
                   const playable = {
                     type: "item",
                     item: item,

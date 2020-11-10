@@ -11,6 +11,8 @@ import { SlapItem } from "./SlapItem";
 import { useThrottle } from "use-throttle";
 import Sidebar from "./Sidebar";
 import Footer from "./Footer";
+import { FeedbackFish } from "@feedback-fish/react";
+import Authorize from "./Authorize";
 
 export const FOOTER_HEIGHT = 100;
 const itemsForServer = (items) => {
@@ -297,16 +299,30 @@ export default function Croaker({ spotify, user }) {
               >
                 {loaded && (
                   <View>
-                    <View style={{}}>
+                    <View style={{
+                            paddingTop: 100,
+                            }}>
                       {user?.id != slapUserId && (
                         <Text style={{ color: "red" }}>
                           You don't own this slap, so it won't be saved.
                         </Text>
                       )}
+                      {!spotify.credentials && (
+                        <View
+                          style={{
+                            border: "1px solid black",
+                            width: "fit-content",
+                            padding: 10,
+                          }}
+                        >
+                          <Text>Connect with spotify to play this Slap</Text>
+                          <Authorize spotify={spotify} />
+                        </View>
+                      )}
                       <CleanInput
                         style={{
+                          marginTop: 20,
                           paddingBottom: 20,
-                          paddingTop: 100,
                           fontSize: 20,
                         }}
                         placeholder="Untitled"
@@ -335,6 +351,7 @@ export default function Croaker({ spotify, user }) {
                           playingNow={playingNow}
                           onPause={() => pause()}
                           onPlay={play}
+                          disabled={item.trackId && !spotify.credentials}
                           onScrub={scrub}
                           onSetSegment={(segment) => {
                             updateItem(item, {
@@ -371,6 +388,9 @@ export default function Croaker({ spotify, user }) {
                           onChange={(e) => setInput(e.target.value)}
                         />
                       </KeyboardEventHandler>
+                      <FeedbackFish projectId="84e4f29205e0f4">
+                        <button>Send feedback</button>
+                      </FeedbackFish>
                     </View>
                   </View>
                 )}
@@ -386,7 +406,6 @@ export default function Croaker({ spotify, user }) {
         className="footer"
       >
         <Footer
-          spotify={spotify}
           playingNow={playingNow}
           items={items}
           onUpdateClip={updateClip}
