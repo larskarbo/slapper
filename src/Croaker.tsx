@@ -251,15 +251,17 @@ export default function Croaker({ spotify, user }) {
         if (y.id == item.id) {
           return {
             ...y,
-            clips: y.clips.map((clipOld) => {
-              if (clipOld.id == clip.id) {
-                return {
-                  ...clipOld,
-                  ...object,
-                };
-              }
-              return clipOld;
-            }),
+            clips: y.clips
+              .map((clipOld) => {
+                if (clipOld.id == clip.id) {
+                  return {
+                    ...clipOld,
+                    ...object,
+                  };
+                }
+                return clipOld;
+              })
+              .sort((a, b) => a.from - b.from),
           };
         }
         return y;
@@ -313,7 +315,9 @@ export default function Croaker({ spotify, user }) {
                           You don't own this slap, so it won't be saved.
                         </TText>
                       )}
-                      <LinkShare link={"https://slapper.io/s/" + collectionId} />
+                      <LinkShare
+                        link={"https://slapper.io/s/" + collectionId}
+                      />
                       {!spotify.credentials && (
                         <View
                           style={{
@@ -396,7 +400,9 @@ export default function Croaker({ spotify, user }) {
                         />
                       </KeyboardEventHandler>
                       <FeedbackFish projectId="84e4f29205e0f4">
-                        <BButton style={{marginTop: 150}}>Send instant feedback ⚡</BButton>
+                        <BButton style={{ marginTop: 150 }}>
+                          Send instant feedback ⚡
+                        </BButton>
                       </FeedbackFish>
                     </View>
                   </View>

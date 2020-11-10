@@ -230,10 +230,13 @@ const Clip = ({ isHovering,onPlay, duration, parent, clip, onUpdate, clips }) =>
         value={localFrom}
         parent={parent}
         updateValue={(a) => {
-          if (localTo - a < 2000) {
-            return;
+          let thisClipIndex = clips.findIndex(c => c.id == clip.id)
+          let boundaryStart = thisClipIndex == 0 ? 0 : clips[thisClipIndex - 1].to
+          if (a - boundaryStart < 1000) {
+            setLocalFrom(boundaryStart);
+          } else {
+            setLocalFrom(a);
           }
-          setLocalFrom(Math.max(a, 0));
         }}
         onUp={(a) => {
           onUpdate({
@@ -249,7 +252,14 @@ const Clip = ({ isHovering,onPlay, duration, parent, clip, onUpdate, clips }) =>
         value={localTo}
         parent={parent}
         updateValue={(a) => {
-          setLocalTo(a);
+          let thisClipIndex = clips.findIndex(c => c.id == clip.id)
+          const lastIndex = clips.length - 1
+          let boundaryEnd = thisClipIndex == lastIndex ? duration : clips[thisClipIndex + 1].from
+          if (boundaryEnd - a < 1000) {
+            setLocalTo(boundaryEnd);
+          } else {
+            setLocalTo(a);
+          }
         }}
         onUp={(a) => {
           onUpdate({
