@@ -8,6 +8,7 @@ import Play from "./comp/Play";
 
 const Footer = ({
   onAddClip,
+  onDeleteClip,
   playingNow,
   onPause,
   children,
@@ -117,6 +118,7 @@ const Footer = ({
           onPause={onPause}
           item={playingNow?.item}
           onAddClip={onAddClip}
+          onDeleteClip={onDeleteClip}
           onUpdateClip={(clip, whatever) =>
             onUpdateClip(playingNow?.item, clip, whatever)
           }

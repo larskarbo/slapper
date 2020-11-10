@@ -429,6 +429,7 @@ export default function Croaker({ spotify, user }) {
           onPlay={play}
           onPause={() => pause()}
           onAddClip={addClip}
+          onDeleteClip={deleteClip}
         >
           <Players
             spotify={spotify}

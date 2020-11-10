@@ -12,6 +12,7 @@ export const Clip = ({
   isHovering,
   onPlay,
   onPause,
+  onDeleteClip,
   playing,
   duration,
   parent,
@@ -83,7 +84,7 @@ export const Clip = ({
             playing={playing}
             style={{ paddingRight: 2 }}
           />
-          <CircleButton Icon={MdDelete} small />
+          <CircleButton onPress={onDeleteClip} Icon={MdDelete} small />
 
           </View>
          

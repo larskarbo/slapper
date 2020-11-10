@@ -29,6 +29,7 @@ export default function SegmentView({
   item,
   clips,playingNow,
   onAddClip,
+  onDeleteClip,
   onPlay,
   onPause,
 }) {
@@ -121,6 +122,7 @@ export default function SegmentView({
               duration={duration}
               clip={clip}
               clips={clips}
+              onDeleteClip={() => onDeleteClip(item, clip)}
               parent={lineRef.current}
               onUpdate={(obj) => onUpdateClip(clip, obj)}
               onPlay={onPlay}
