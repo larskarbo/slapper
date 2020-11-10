@@ -18,7 +18,7 @@ import { CleanInput, TText } from "./utils/font";
 import LinkShare from "./comp/LinkShare";
 import { BButton } from "./comp/BButton";
 
-export const FOOTER_HEIGHT = 100;
+export const FOOTER_HEIGHT = 120;
 const itemsForServer = (items) => {
   const forServer = JSON.parse(JSON.stringify(items));
 

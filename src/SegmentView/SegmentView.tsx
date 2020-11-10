@@ -199,11 +199,35 @@ const Clip = ({
       >
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            height: 20,
+            flexDirection: "column",
+            justifyContent: "center",
+            height: 40,
           }}
         >
+           <View 
+          style={{
+            flexDirection: "column",
+          }}
+          >
+          <CleanInput
+            value={clip.title}
+            style={{
+              backgroundColor: "transparent",
+              fontSize: 10
+            }}
+            onChange={(value) => {
+              onUpdate({
+                title: value,
+              });
+            }}
+          ></CleanInput>
+          </View>
+          <View 
+          style={{
+            flexDirection: "row",
+            width: "100%",
+            justifyContent: "space-between",
+          }}>
           <Play
             onPress={() => {
               onPlay(clip);
@@ -212,18 +236,10 @@ const Clip = ({
             playing={false}
             style={{ paddingRight: 2 }}
           />
-          <CleanInput
-            value={clip.title}
-            style={{
-              backgroundColor: "transparent",
-            }}
-            onChange={(value) => {
-              onUpdate({
-                title: value,
-              });
-            }}
-          ></CleanInput>
           <CircleButton Icon={MdDelete} small />
+
+          </View>
+         
         </View>
         <div
           style={{

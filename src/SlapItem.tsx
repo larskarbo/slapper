@@ -145,7 +145,7 @@ export const SlapItem = ({
                   <Block
                     key={c.id}
                     style={{
-                      backgroundColor: c.color || "#EDB7C4",
+                      backgroundColor: "#E9E9E9",
                     }}
                   >
                     <Play
