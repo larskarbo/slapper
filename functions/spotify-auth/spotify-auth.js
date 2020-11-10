@@ -16,6 +16,7 @@ app
 
 
 var stateKey = 'spotify_auth_state';
+var redirectToCookie = 'redirect_to_cookie';
 
 var client_id = '13f5eb87218a47ed87ce06e45329bd6c'; // Your client id
 var client_secret = process.env.SLAPPER_SPOTIFY_SECRET; // Your secret
@@ -42,6 +43,7 @@ router.get('/login', function (req, res) {
 
   var state = randomString.generate(16);
   res.cookie(stateKey, state);
+  res.cookie(redirectToCookie, req.query.redirect);
 
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
@@ -61,6 +63,7 @@ router.get('/callback', function (req, res) {
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
+  var redirectTo = req.cookies ? req.cookies[redirectToCookie] : null;
 
   if (state === null || state !== storedState) {
     res.redirect('/#' +
@@ -100,13 +103,13 @@ router.get('/callback', function (req, res) {
         });
 
         // we can also pass the token to the browser to make requests from there
-        res.redirect('/s#' +
+        res.redirect((redirectTo || "/s") + '#' +
           querystring.stringify({
             spotify_a_token: access_token,
             spotify_r_token: refresh_token
           }));
       } else {
-        res.redirect('/#' +
+        res.redirect((redirectTo || "/s") + '#' +
           querystring.stringify({
             error: 'invalid_token'
           }));
