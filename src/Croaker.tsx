@@ -16,6 +16,7 @@ import { sansSerif } from "./utils/font.tsx";
 import { CleanInput, TText } from "./utils/font";
 
 import LinkShare from "./comp/LinkShare";
+import { BButton } from "./comp/BButton";
 
 export const FOOTER_HEIGHT = 100;
 const itemsForServer = (items) => {
@@ -395,7 +396,7 @@ export default function Croaker({ spotify, user }) {
                         />
                       </KeyboardEventHandler>
                       <FeedbackFish projectId="84e4f29205e0f4">
-                        <button>Send feedback</button>
+                        <BButton style={{marginTop: 150}}>Send instant feedback ⚡</BButton>
                       </FeedbackFish>
                     </View>
                   </View>
