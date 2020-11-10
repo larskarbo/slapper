@@ -163,6 +163,12 @@ export default function Croaker({ spotify, user }) {
   };
 
   const play = (playable) => {
+    console.log('play', {
+      ...playingNow,
+      ...playable,
+      action: "wantToPlay",
+      clientUpdate: Math.random(),
+    })
     setPlayingNow({
       ...playingNow,
       ...playable,
@@ -421,6 +427,7 @@ export default function Croaker({ spotify, user }) {
           onUpdateClip={updateClip}
           onScrub={scrub}
           onPlay={play}
+          onPause={() => pause()}
           onAddClip={addClip}
         >
           <Players

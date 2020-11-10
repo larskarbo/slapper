@@ -17,6 +17,7 @@ import Play from "./comp/Play";
 import { Item, Clip } from "./Croaker";
 import { FaSpotify, FaYoutube } from "react-icons/fa";
 import { sansSerif, TText } from "./utils/font";
+import { isClipPlaying } from "./utils/helpers";
 
 const StyledView = styled.View`
   width: 700;
@@ -136,10 +137,7 @@ export const SlapItem = ({
               </View>
             </Block>
             {clips.map((c) => {
-              const clipIsPlaying =
-                playingNow?.type == "clip" &&
-                playingNow?.clip.id == c.id &&
-                playingNow?.state == "playing";
+              const clipIsPlaying = isClipPlaying(playingNow, c)
               return (
                 <MenuProvider id={c.id}>
                   <Block

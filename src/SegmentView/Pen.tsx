@@ -1,4 +1,5 @@
-import React, { Component, useEffect, useState } from "react";
+import useHover from "@react-hook/hover";
+import React, { Component, useEffect, useRef, useState } from "react";
 import { PADDING_SV } from "./SegmentView";
 import { getCoordinates, getPosition, xToMS } from "./util";
 
@@ -6,8 +7,6 @@ let y = 0
 let isInsideAClip = false
 export default function Pen ({ clips, duration, parent, createClip}) {
   const [mouseMS, setMouseMS] = useState(0);
-  
-
   
 
   const onMove = (e) => {
