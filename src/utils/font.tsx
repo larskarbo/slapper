@@ -9,16 +9,18 @@ export const sansSerif = {
 }
 
 
-export const CleanInput = ({ style, ...props }) => (
+export const CleanInput = ({ style,onChange, ...props }) => (
   <input
     {...props}
     style={{
       outline: "none",
       borderWidth: 0,
+      width:"100%",
       ...sansSerif,
       ...style,
     }}
     type="text"
+    onChange={(e) => onChange(e.target.value)}
   />
 );
 

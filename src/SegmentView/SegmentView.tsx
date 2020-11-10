@@ -2,11 +2,13 @@ import Handle from "./Handle";
 import Segment from "./Segment";
 import React, { Component, useEffect, useRef, useState } from "react";
 import "./SegmentView.css";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import niceTicks from "nice-ticks";
 import useHover from "@react-hook/hover";
 import Play from "../comp/Play";
-import { TText } from "../utils/font";
+import { CleanInput, TText } from "../utils/font";
+import CircleButton from "../comp/CircleButton";
+import { MdDelete } from "react-icons/md";
 
 export const msToTime = (ms) => {
   return new Date(ms).toISOString().substr(15, 4);
@@ -21,6 +23,7 @@ export default function SegmentView({
   onScrub,
   onUpdateClip,
   clips,
+  onPlay
 }) {
   const [pointerAtRolling, setPointerAtRolling] = useState(0);
   const [draggingPointerValue, setDraggingPointerValue] = useState(0);
@@ -78,13 +81,12 @@ export default function SegmentView({
           height: 4,
           transform: "translateY(-50%)",
           top: "50%",
-          backgroundColor: "#9B9B9B"
+          backgroundColor: "#9B9B9B",
         }}
         parent={lineRef.current}
         from={0}
         to={duration}
         duration={duration}
-        
       />
 
       <Segment
@@ -92,13 +94,12 @@ export default function SegmentView({
           height: 4,
           transform: "translateY(-50%)",
           top: "50%",
-          backgroundColor: "#606060"
+          backgroundColor: "#606060",
         }}
         parent={lineRef.current}
         from={0}
         to={pointerAtRolling}
         duration={duration}
-       
       />
 
       {clips.map((clip) => (
@@ -110,6 +111,7 @@ export default function SegmentView({
           clips={clips}
           parent={lineRef.current}
           onUpdate={(obj) => onUpdateClip(clip, obj)}
+          onPlay={onPlay}
         />
       ))}
 
@@ -161,40 +163,67 @@ export default function SegmentView({
   );
 }
 
-const Clip = ({ isHovering, duration, parent, clip, onUpdate, clips }) => {
+const Clip = ({ isHovering,onPlay, duration, parent, clip, onUpdate, clips }) => {
   const [localFrom, setLocalFrom] = useState(clip.from);
   const [localTo, setLocalTo] = useState(clip.to);
+
+  useEffect(() => {
+    setLocalFrom(clip.from);
+  }, [clip.from]);
+
+  useEffect(() => {
+    setLocalTo(clip.to);
+  }, [clip.to]);
 
   return (
     <>
       <Segment
-        style={{
-          // opacity: isHovering ? 0.5 : 0.2,
-          // borderRadius: 3,
-        }}
+        style={
+          {
+            // opacity: isHovering ? 0.5 : 0.2,
+            // borderRadius: 3,
+          }
+        }
         duration={duration}
         parent={parent}
         from={localFrom}
         to={localTo}
       >
-        <div style={{
-          height: 20,
-        }}>
-        <TText>{clip.title}</TText>
-
-        </div>
-        <div style={{
-          height: 60,
-          background: "rgba(196,196,196,0.31)",
-          border: "1px solid black"
-        }}>
-          </div>
-        <div style={{
-          height: 20,
-        }}>
-          <Play small playing={false} />
-        </div>
-
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              height: 20
+            }}
+          >
+            <Play onPress={() => {
+              onPlay(clip)
+            }} small playing={false} style={{ paddingRight: 2 }} />
+            <CleanInput
+              value={clip.title}
+              style={{
+                backgroundColor:"transparent",
+              }}
+              onChange={(value) => {
+                onUpdate({
+                  title: value,
+                });
+              }}
+            ></CleanInput>
+            <CircleButton Icon={MdDelete} small />
+          </View>
+        <div
+          style={{
+            height: 60,
+            background: "rgba(196,196,196,0.31)",
+            border: "1px solid black",
+          }}
+        ></div>
+        <div
+          style={{
+            height: 20,
+          }}
+        ></div>
       </Segment>
       <Handle
         duration={duration}
@@ -204,12 +233,14 @@ const Clip = ({ isHovering, duration, parent, clip, onUpdate, clips }) => {
           if (localTo - a < 2000) {
             return;
           }
-          setLocalFrom(a);
-          // onUpdate({
-          //   from: a,
-          // });
+          setLocalFrom(Math.max(a, 0));
         }}
-        topMargin={20}
+        onUp={(a) => {
+          onUpdate({
+            from: localFrom,
+          });
+        }}
+        bottomMargin={20}
         isHovering={isHovering}
       />
 
@@ -219,11 +250,13 @@ const Clip = ({ isHovering, duration, parent, clip, onUpdate, clips }) => {
         parent={parent}
         updateValue={(a) => {
           setLocalTo(a);
-          // onUpdate({
-          //   to: a,
-          // });
         }}
-        topMargin={20}
+        onUp={(a) => {
+          onUpdate({
+            to: localTo,
+          });
+        }}
+        bottomMargin={20}
         isHovering={isHovering}
       />
     </>

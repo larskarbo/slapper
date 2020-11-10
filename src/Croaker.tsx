@@ -336,7 +336,7 @@ export default function Croaker({ spotify, user }) {
                         }}
                         placeholder="Untitled"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(value) => setTitle(value)}
                       />
                       <CleanInput
                         style={{
@@ -345,7 +345,7 @@ export default function Croaker({ spotify, user }) {
                         }}
                         placeholder="Description"
                         value={description}
-                        onChange={(e) => setDescription(e.target.value)}
+                        onChange={(value) => setDescription(value)}
                       />
 
                       {items.map((item, i) => (
@@ -392,7 +392,7 @@ export default function Croaker({ spotify, user }) {
                           }}
                           placeholder="Paste youtube or spotify link here"
                           value={input}
-                          onChange={(e) => setInput(e.target.value)}
+                          onChange={(value) => setInput(value)}
                         />
                       </KeyboardEventHandler>
                       <FeedbackFish projectId="84e4f29205e0f4">
@@ -417,6 +417,7 @@ export default function Croaker({ spotify, user }) {
           items={items}
           onUpdateClip={updateClip}
           onScrub={scrub}
+          onPlay={play}
         >
           <Players
             spotify={spotify}

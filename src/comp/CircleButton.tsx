@@ -12,7 +12,7 @@ const NoButton = styled.Pressable`
   border: none;
 `;
 
-export default function Play({ playing, onPress, small=false, disabled, style }) {
+export default function CircleButton({ children, Icon, onPress, small=false, disabled, style }) {
   const myRef = useRef(null);
   const isHovering = disabled ? false : useHover(myRef);
 
@@ -41,16 +41,7 @@ export default function Play({ playing, onPress, small=false, disabled, style })
         ...style
       }}
     >
-      {isHovering && (
-        <>
-          {playing ? <ImPause2 {...iconProps} /> : <ImPlay3  {...iconProps} style={{marginLeft:small ? 1 :2}} />}
-        </>
-      )}
-      {!isHovering && (
-        <>
-          {playing ? <ImVolumeMedium  {...iconProps} /> : <ImPlay3  {...iconProps} style={{marginLeft:small ? 1 :2}} />}
-        </>
-      )}
+      <Icon {...iconProps} />
     </NoButton>
   );
 }

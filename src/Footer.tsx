@@ -5,7 +5,7 @@ import MarqueeText from "react-native-marquee";
 import useHover from "@react-hook/hover";
 import { TText } from "./utils/font";
 
-const Footer = ({ playingNow, children, onUpdateClip, onScrub, items }) => {
+const Footer = ({ playingNow, children, onUpdateClip, onScrub, items, onPlay }) => {
   // console.log('playingNow: ', JSON.stringify(playingNow));
   // console.log('items: ', JSON.stringify(items));
   return (
@@ -76,6 +76,14 @@ const Footer = ({ playingNow, children, onUpdateClip, onScrub, items }) => {
           pointerAt={playingNow?.position || 0}
           playing={playingNow?.state == "playing"}
           onScrub={onScrub}
+          onPlay={(clip) => {
+            const playable = {
+              type: "clip",
+              item: playingNow?.item,
+              clip: clip,
+            };
+            onPlay(playable)
+          }}
           onUpdateClip={(clip, whatever) => onUpdateClip(playingNow?.item, clip, whatever)}
         />
       </View>

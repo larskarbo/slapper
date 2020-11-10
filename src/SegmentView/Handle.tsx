@@ -89,8 +89,8 @@ class Handle extends Component {
           left: handlePos - handle_width / 2 + "px",
           // top: 45,
           zIndex: 10,
-          ...(this.props.topMargin && {
-            top: this.props.topMargin - handle_width/2
+          ...(this.props.bottomMargin && {
+            bottom: this.props.bottomMargin - handle_width/2
           }),
           opacity: 0,
           borderRadius: "100%",
@@ -107,8 +107,8 @@ class Handle extends Component {
           position: 'absolute',
           left: handlePos - 10 / 2 + "px",
           // top: 45,
-          ...(this.props.topMargin && {
-            top: this.props.topMargin - 10/2
+          ...(this.props.bottomMargin && {
+            bottom: this.props.bottomMargin - 10/2
           }),
           borderRadius: "100%",
           ...this.props.style
