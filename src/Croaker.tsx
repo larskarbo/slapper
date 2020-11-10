@@ -186,8 +186,7 @@ export default function Croaker({ spotify, user }) {
     });
   };
 
-  const addClip = (item) => {
-    const colors = ["#B3EBE7", "#EDB7C4", "#E2EDB7"];
+  const addClip = (item, clipProps) => {
     setItems((items: Item[]) =>
       items.map((y) => {
         if (y.id == item.id) {
@@ -199,11 +198,10 @@ export default function Croaker({ spotify, user }) {
               {
                 id: uuidv4(),
                 title: "Clip",
-                color: colors[previousClips.length],
-                from: 10000,
-                to: 20000,
+                ...clipProps
               },
-            ],
+            ].sort((a, b) => a.from - b.from)
+            ,
           };
         }
         return y;
@@ -374,7 +372,6 @@ export default function Croaker({ spotify, user }) {
                           onSetTitle={(title) =>
                             updateItem(item, { title: title })
                           }
-                          onAddClip={() => addClip(item)}
                           onDeleteClip={(clip) => deleteClip(item, clip)}
                           onDeleteItem={() => deleteItem(item)}
                           onUpdateClip={(clip, whatever) =>
@@ -424,6 +421,7 @@ export default function Croaker({ spotify, user }) {
           onUpdateClip={updateClip}
           onScrub={scrub}
           onPlay={play}
+          onAddClip={addClip}
         >
           <Players
             spotify={spotify}

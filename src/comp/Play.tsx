@@ -14,7 +14,8 @@ const NoButton = styled.Pressable`
 
 export default function Play({ playing, onPress, small=false, disabled, style }) {
   const myRef = useRef(null);
-  const isHovering = disabled ? false : useHover(myRef);
+  const isHoveringHook = useHover(myRef);
+  const isHovering = disabled ? false : isHoveringHook;
 
   const iconProps = {
     size: small ? 8 : 12,
