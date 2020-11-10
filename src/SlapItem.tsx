@@ -1,15 +1,10 @@
-import useHover from "@react-hook/hover";
-import React, { useState, useEffect, useRef } from "react";
-import { Text, TextInput, View } from "react-native";
-import SegmentView, { msToTime } from "./SegmentView/SegmentView";
-import { Entypo } from "@expo/vector-icons";
-import { useParams, Link, Route, Switch } from "react-router-dom";
+import React, { useState, } from "react";
+import { TextInput, View } from "react-native";
+import SegmentView from "./SegmentView/SegmentView";
 
 import {
   Menu,
   Item as ContextItem,
-  Separator,
-  Submenu,
   MenuProvider,
 } from "react-contexify";
 import styled from "styled-components/native";
@@ -20,7 +15,7 @@ import { sansSerif, TText } from "./utils/font";
 import { isClipPlaying } from "./utils/helpers";
 
 const StyledView = styled.View`
-  width: 700;
+  width: 100%;
   /* height: 46px; */
   border-width: 1px;
   box-sizing: content-box;
@@ -55,7 +50,6 @@ export const SlapItem = ({
   item: Item;
   [key: string]: any;
 }) => {
-  const [open, setOpen] = useState(false);
   const clips = item.clips || [];
 
   const songIsPlaying =
@@ -174,16 +168,6 @@ export const SlapItem = ({
                 </MenuProvider>
               );
             })}
-            {clips.length < 3 && open && (
-              <Block
-                style={{
-                  backgroundColor: "#E9E9E9",
-                }}
-                onClick={onAddClip}
-              >
-                <TText>+ Add clip</TText>
-              </Block>
-            )}
           </View>
 
           <View
@@ -212,40 +196,8 @@ export const SlapItem = ({
                 }}
               />
             </Block>
-            <Block
-              style={{
-                backgroundColor: open ? "black" : "#E9E9E9",
-              }}
-              onClick={() => setOpen(!open)}
-            >
-              <TText
-                style={{
-                  paddingLeft: 6,
-                  color: open ? "white" : "black",
-                }}
-              >
-                ▼
-              </TText>
-            </Block>
           </View>
         </View>
-
-        {open && (
-          <View style={{}}>
-            <SegmentView
-              clips={clips}
-              duration={item.metaInfo.duration || 0}
-              pointerAt={
-                (playingNow?.item.id == item.id && playingNow?.position) || 0
-              }
-              playing={
-                playingNow?.item.id == item.id && playingNow?.state == "playing"
-              }
-              onScrub={onScrub}
-              onUpdateClip={onUpdateClip}
-            />
-          </View>
-        )}
       </MenuProvider>
       <SongContextMenu id={item.id} onDelete={onDeleteItem} />
     </StyledView>
