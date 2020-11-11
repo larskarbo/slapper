@@ -1,13 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 
-import { useParams, useHistory, Link, Route, Switch } from "react-router-dom";
-import {request} from "./utils/request";
+import {
+  useParams,
+  useHistory,
+  Link,
+  Route,
+  Switch,
+  useLocation,
+} from "react-router-dom";
+import { request } from "./utils/request";
 import netlifyIdentity from "netlify-identity-widget";
 import { TText } from "./utils/font";
+import { BButton } from "./comp/BButton";
 
-const Sidebar = ({ user }) => {
+const Sidebar = ({ user, loadingUser }) => {
+  console.log('user: ', user);
   let history = useHistory();
+  let location = useLocation();
   const { collectionId } = useParams();
   // const [activeSlap, setActiveSlap] = useState(null);
   const activeSlap = collectionId;
@@ -18,8 +28,6 @@ const Sidebar = ({ user }) => {
 
   useEffect(() => {
     request("GET", "fauna/collections").then((res) => {
-      
-
       setSlaps(
         res.map((r) => ({
           ...r.data,
@@ -37,7 +45,6 @@ const Sidebar = ({ user }) => {
       items: [],
       user: user.id,
     }).then((res) => {
-      
       history.replace({ pathname: "/s/" + res.ref["@ref"].id });
       setUpdateCounter(updateCounter + 1);
     });
@@ -75,8 +82,29 @@ const Sidebar = ({ user }) => {
         .io
       </TText>
 
+      {(!loadingUser && !user) &&
+      <View style={{
+        paddingTop: 20,
+        paddingHorizontal: 10
+      }}>
+        <Text>With a slapper account you can create your own shareable collections!</Text>
+        <BButton
+        variant="secondary"
+          onClick={() => {
+            history.push("/login", { from: location });
+          }}
+        >
+          Login/sign up
+        </BButton>
+      </View>
+      }
+
       {allUsers
-        .sort((a, b) => {if(a.data.id == user?.id){return -10}})
+        .sort((a, b) => {
+          if (a.data.id == user?.id) {
+            return -10;
+          }
+        })
         .map((u) => (
           <div key={u.data.id}>
             <User id={u.data.id} />

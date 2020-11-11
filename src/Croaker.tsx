@@ -49,7 +49,7 @@ export interface Item {
   };
 }
 
-export default function Croaker({ spotify, user }) {
+export default function Croaker({ spotify,loadingUser, user }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
   const { collectionId } = useParams();
 
@@ -284,7 +284,7 @@ export default function Croaker({ spotify, user }) {
           height: `calc(100vh - ${FOOTER_HEIGHT}px)`,
         }}
       >
-        <Sidebar user={user} />
+        <Sidebar loadingUser={loadingUser} user={user} />
         <div>
           <Switch>
             <Route exact path="/s">
@@ -312,7 +312,7 @@ export default function Croaker({ spotify, user }) {
                       <LinkShare
                         link={"https://slapper.io/s/" + collectionId}
                       />
-                      {!spotify.credentials && (
+                      {(!spotify.credentials && items.find(i => i.trackId)) && (
                         <View
                           style={{
                             border: "1px solid black",

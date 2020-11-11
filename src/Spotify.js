@@ -49,7 +49,7 @@ export default class Spotify {
     if(error.includes("Unknown error: Player command failed: Restriction violated")){
       console.log('oooops')
     } else {
-      throw new Error(error)
+      console["error"](error)
     }
   }
 

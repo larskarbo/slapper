@@ -70,122 +70,37 @@ export default function App() {
     <View style={styles.container}>
       <Router>
         <Switch>
-          <Route exact path="/test">
-            <div
-              style={{
-                height: 100,
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                left: 0,
-              }}
-            >
-              <Footer
-                playingNow={{
-                  type: "item",
-                  item: {
-                    trackId: "5cF0dROlMOK5uNZtivgu50",
-                    id: "192638bc-4928-41ef-a87f-8371c4513e3e",
-                    clips: [
-                      {
-                        from: 49740,
-                        to: 67241,
-                        title: "Clip",
-                        id: "77ee7a70-bcb8-45c5-b63e-a533dbe7b5f1",
-                        color: "#B3EBE7",
-                      },
-                      {
-                        from: 66934,
-                        to: 87813,
-                        title: "Clip",
-                        id: "8a7a281a-66e7-4fdc-ae5e-9ddadcede7bc",
-                        color: "#EDB7C4",
-                      },
-                    ],
-                    metaInfo: {
-                      duration: 208786,
-                      title: "Attention",
-                      image:
-                        "https://i.scdn.co/image/ab67616d0000b273897f73256b9128a9d70eaf66",
-                      artist: "Charlie Puth",
-                    },
-                  },
-                  action: null,
-                  clientUpdate: 0.21938923806654387,
-                  state: "playing",
-                  scrub: 23365,
-                  position: 28271,
-                }}
-                items={[
-                  
-                  {
-                    trackId: "5cF0dROlMOK5uNZtivgu50",
-                    id: "192638bc-4928-41ef-a87f-8371c4513e3e",
-                    clips: [
-                      {
-                        from: 49740,
-                        to: 63241,
-                        title: "Clip",
-                        id: "77ee7a70-bcb8-45c5-b63e-a533dbe7b5f1",
-                        color: "#B3EBE7",
-                      },
-                      {
-                        from: 66934,
-                        to: 87813,
-                        title: "Clip",
-                        id: "8a7a281a-66e7-4fdc-ae5e-9ddadcede7bc",
-                        color: "#EDB7C4",
-                      },
-                    ],
-                    metaInfo: {
-                      duration: 208786,
-                      title: "Attention",
-                      image:
-                        "https://i.scdn.co/image/ab67616d0000b273897f73256b9128a9d70eaf66",
-                      artist: "Charlie Puth",
-                    },
-                  },
-                ]}
-                // onUpdateClip={updateClip}
-                // onScrub={scrub}
-              />
-            </div>
-          </Route>
           <Route exact path="/">
             <IntroPage />
           </Route>
 
           <Route path="/">
             {/* <IntroPage /> */}
-            {loadingUser ? (
-              "loading..."
-            ) : (
-              <>
-                <Switch>
-                  <Route exact path="/login">
-                    <LoginPage user={user} />
+            <>
+              <Switch>
+                <Route exact path="/login">
+                  <LoginPage user={user} />
+                </Route>
+                {(user || true) ? (
+                  <Route path={["/s/:collectionId", "/s"]}>
+                    <Main loadingUser={loadingUser} user={user} />
                   </Route>
-                  {user ? (
-                    <Route path={["/s/:collectionId", "/s"]}>
-                      <Main user={user} />
-                    </Route>
-                  ) : (
-                    <Switch>
-                      <Route
-                        render={(props) => (
-                          <Redirect
-                            to={{
-                              pathname: "/login",
-                              state: { from: props.location },
-                            }}
-                          />
-                        )}
-                      />
-                    </Switch>
-                  )}
-                </Switch>
-              </>
-            )}
+                ) : (
+                  <Switch>
+                    <Route
+                      render={(props) => (
+                        <Redirect
+                          to={{
+                            pathname: "/login",
+                            state: { from: props.location },
+                          }}
+                        />
+                      )}
+                    />
+                  </Switch>
+                )}
+              </Switch>
+            </>
           </Route>
           {/* <Switch>
             <Route path="/login">
