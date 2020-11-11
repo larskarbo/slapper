@@ -4,7 +4,7 @@ import KeyboardEventHandler from "react-keyboard-event-handler";
 import urlParser from "js-video-url-parser";
 import { request } from "./utils/request";
 import { v4 as uuidv4 } from "uuid";
-import Players from "./players/Players";
+import Players, { PlayingNow, PlayIntent } from "./players/Players";
 import { useParams, Link, Route, Switch } from "react-router-dom";
 import { SlapItem } from "./SlapItem";
 import { useThrottle } from "use-throttle";
@@ -57,7 +57,8 @@ export default function Croaker({ spotify, user }) {
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
   );
-  const [playingNow, setPlayingNow] = useState(null);
+  const [playingNow, setPlayingNow] = useState<PlayingNow>(null);
+  const [playIntent, setPlayIntent] = useState<PlayIntent>(null);
 
   const [items, setItems] = useState<Item[]>([]);
   const [slapUserId, setSlapUserId] = useState(null);
@@ -163,32 +164,23 @@ export default function Croaker({ spotify, user }) {
   };
 
   const play = (playable) => {
-    console.log('play', {
-      ...playingNow,
+    setPlayIntent({
       ...playable,
-      action: "wantToPlay",
-      clientUpdate: Math.random(),
-    })
-    setPlayingNow({
-      ...playingNow,
-      ...playable,
-      action: "wantToPlay",
-      clientUpdate: Math.random(),
+      action: "play",
     });
   };
 
   const scrub = (to) => {
-    setPlayingNow({
-      ...playingNow,
-      scrub: to,
+    setPlayIntent({
+      action: "scrub",
+      to: to,
     });
   };
 
   const pause = () => {
-    setPlayingNow({
+    setPlayIntent({
       ...playingNow,
-      action: "wantToPause",
-      clientUpdate: Math.random(),
+      action: "pause",
     });
   };
 
@@ -204,10 +196,9 @@ export default function Croaker({ spotify, user }) {
               {
                 id: uuidv4(),
                 title: "Clip",
-                ...clipProps
+                ...clipProps,
               },
-            ].sort((a, b) => a.from - b.from)
-            ,
+            ].sort((a, b) => a.from - b.from),
           };
         }
         return y;
@@ -216,7 +207,6 @@ export default function Croaker({ spotify, user }) {
   };
 
   const deleteItem = (item) => {
-    console.log("item: ", item);
     setItems((items) => items.filter((y) => y.id !== item.id));
   };
 
@@ -434,6 +424,7 @@ export default function Croaker({ spotify, user }) {
           <Players
             spotify={spotify}
             playingNow={playingNow}
+            playIntent={playIntent}
             items={items}
             onSetMetaInfo={(item, metaInfo) =>
               updateItem(item, { metaInfo: metaInfo })

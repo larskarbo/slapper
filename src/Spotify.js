@@ -28,6 +28,7 @@ export default class Spotify {
     this.api.setAccessToken(this.accessToken);
 
     this.api.setOnRenew(this.renewToken);
+    this.api.setOnError(this.onError);
     // this.renewToken()
     if (this.accessToken && this.refreshToken) {
       
@@ -42,9 +43,15 @@ export default class Spotify {
     this.onGood = () => {};
   }
 
-  // onError = (asdf) => {
-  // 	
-  // }
+  onError = (error) => {
+    console.log('error: ', error);
+    console.log("Error from spotify js")
+    if(error.includes("Unknown error: Player command failed: Restriction violated")){
+      console.log('oooops')
+    } else {
+      throw new Error(error)
+    }
+  }
 
   initMe = async () => {
     const me = await this.api.getMe();
@@ -178,6 +185,14 @@ export default class Spotify {
       } else {
         return this.playbackState.progress_ms
       }
+    }
+  }
+
+  pause = async () => {
+    try{
+      await this.api.pause()
+    } catch(e){
+
     }
   }
 	

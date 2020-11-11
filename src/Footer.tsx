@@ -17,8 +17,22 @@ const Footer = ({
   items,
   onPlay,
 }) => {
-  // console.log('playingNow: ', JSON.stringify(playingNow));
-  // console.log('items: ', JSON.stringify(items));
+  //
+  //
+  const playOrPause = () =>
+    playingNow?.state == "playing" ? onPause() : onPlay();
+
+  useEffect(() => {
+    document.onkeydown = (e) => {
+      if (e.code == "Space") {
+        if (e.target.nodeName === "TEXTAREA" || e.target.nodeName === "INPUT") {
+          return;
+        }
+        e.preventDefault();
+        playOrPause();
+      }
+    };
+  }, [playingNow?.state]);
   return (
     <View
       style={{
@@ -34,7 +48,7 @@ const Footer = ({
           paddingHorizontal: 10,
         }}
       >
-        <View
+        {/* <View
           style={{
             position: "absolute",
             top: 0,
@@ -45,10 +59,8 @@ const Footer = ({
             alignItems: "center",
           }}
         >
-          {playingNow?.item && (
-            <Play playing={playingNow?.state == "playing"} onPress={() => playingNow?.state == "playing" ? onPause() : onPlay()} />
-          )}
-        </View>
+          
+        </View> */}
         <img
           style={{
             width: 64,
@@ -88,6 +100,17 @@ const Footer = ({
         >
           {playingNow?.item.metaInfo.artist}
         </TText>
+      </View>
+      
+      <View 
+        style={{
+          justifyContent: "center",
+          paddingHorizontal: 5
+        }}>
+      {playingNow?.item && (
+        <Play playing={playingNow?.state == "playing"} onPress={playOrPause} />
+      )}
+
       </View>
 
       <View

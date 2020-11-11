@@ -7,6 +7,7 @@ export const SpotifyBox = ({
   spotify,
   items,
   playingNow,
+  playIntent,
   onSetMetaInfo,
   onSetPlayingNow,
 }: {
@@ -14,7 +15,9 @@ export const SpotifyBox = ({
   [key: string]: any;
 }) => {
   const spotifyItems = items.filter((i) => i.trackId);
-  const playingNowTrack = playingNow?.item.trackId ? playingNow : null;
+  const playingNowTrack = playingNow?.item.trackId && playingNow;
+  const spotifyWasPlaying = !!playingNow?.item.trackId
+  
 
   useEffect(() => {
     spotify.onUpdatePlaybackState = (playbackState) => {
@@ -29,78 +32,83 @@ export const SpotifyBox = ({
     };
   }, [spotify, playingNowTrack]);
 
-  useEffect(() => {}, [playingNowTrack?.clientUpdate]);
-
   useEffect(() => {
-    if (!playingNowTrack) {
-      spotify.api.pause();
-      return;
+    
+    if(!playIntent){
+      if(spotify.playbackState){
+        console.log('1')
+        spotify.pause()
+      }
+      return
     }
-    if (!playingNowTrack.action) return;
-
-    playAction();
-  }, [playingNowTrack?.clientUpdate]);
-
-  // seeking
-  useEffect(() => {
-    if (playingNowTrack?.scrub) {
-      onSetPlayingNow({
-        position: playingNowTrack.scrub,
-      });
-      (async () => {
-        await spotify.api.seek(playingNowTrack.scrub);
+    (async () => {
+      if (playIntent.action == "pause") {
+        if(spotifyWasPlaying){
+          const position = spotify.estimatePosition();
+          console.log('2')
+          await spotify.pause();
           onSetPlayingNow({
-            position: playingNowTrack.scrub,
+            state: "paused",
+            position,
           });
-      
-      })()
-    }
-  }, [playingNowTrack?.scrub]);
-
-  const playAction = async () => {
-    if (playingNowTrack.action == "wantToPause") {
-      const position = spotify.estimatePosition();
-      await spotify.api.pause();
-      onSetPlayingNow({
-        state: "paused",
-        action: null,
-        position,
-      });
-    } else if (playingNowTrack.action == "wantToPlay") {
-      const playObject: any = {
-        uris: ["spotify:track:" + playingNowTrack.item.trackId],
-      };
-
-      if (playingNowTrack.type == "item") {
-        if (!playingNowTrack.position) {
-          playObject.position_ms = 0;
         }
-      } else if (playingNowTrack.type == "clip") {
-        playObject.position_ms = playingNowTrack.clip.from;
+      } else if (playIntent.action == "play") {
+        if(playIntent.item?.videoId){
+          if(spotifyWasPlaying){
+            console.log('3')
+            await spotify.pause();
+          }
+          return
+        }
+        if(playingNow?.item?.videoId && typeof playIntent.item == "undefined"){
+          return
+        }
+        let playObject: any = {
+          ...(playIntent.item && {uris: ["spotify:track:" + playIntent.item.trackId]}),
+        };
+  
+        if (playIntent.type == "item") {
+          if (!playIntent.position) {
+            playObject.position_ms = 0;
+          }
+        } else if (playIntent.type == "clip") {
+          playObject.position_ms = playIntent.clip.from;
+        } else {
+          // a generic resume, only do if playingNow is spotify!
+          if(playingNow.videoId){
+            return
+          }
+          playObject = {}
+        }
+        try {
+          await spotify.play(playObject);
+        } catch (e) {
+          alert("Error: " + e.message);
+          return;
+        }
+        onSetPlayingNow({
+          state: "playing",
+          ...(playIntent.type && {type: playIntent.type}),
+          ...(playIntent.item && {item: playIntent.item}),
+          ...(playIntent.clip && {clip: playIntent.clip}),
+          ...(playObject.position_ms && { position: playObject.position_ms }),
+        });
+      } else if (playIntent.action == "scrub"){
+        onSetPlayingNow({
+          position: playIntent.to,
+        });
+        (async () => {
+          await spotify.api.seek(playIntent.to);
+          onSetPlayingNow({
+            position: playIntent.to,
+          });
+        })();
       }
-      try{
-        await spotify.play(playObject);
-      } catch(e) {
-        alert("Error: " + e.message)
-        return
-      }
-      onSetPlayingNow({
-        state: "playing",
-        action: null,
-        ...(playObject.position_ms
-          ? { position: playObject.position_ms }
-          : undefined),
-      });
-    }
-  };
+    })()
+  }, [playIntent]);
 
   return (
-    <div
-      style={{
-        
-      }}
-    >
-
+    <div style={{}}>
       {spotifyItems.map((item) => (
         <Track
           key={item.trackId}
@@ -118,12 +126,12 @@ export const SpotifyBox = ({
 const Track = ({ item, onSetMetaInfo, spotify }) => {
   useEffect(() => {
     spotify.api.getTrack(item.trackId).then((track) => {
-      console.log('track: ', track);
+      
       onSetMetaInfo(item, {
         duration: track.duration_ms,
         title: track.name,
         image: track.album.images[0].url,
-        artist: track.artists[0].name
+        artist: track.artists[0].name,
       });
     });
   }, [item.trackId]);

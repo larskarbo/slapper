@@ -3,7 +3,22 @@ import { View } from "react-native";
 import { SpotifyBox } from "./SpotifyBox";
 import { YoutubeBox } from "./YoutubeBox";
 import { Item, Clip } from "../Croaker";
-import PlayingContext from "./PlayingContext";
+
+export interface PlayingNow {
+  type: "item" | "clip"
+  item: Item
+  position: number
+  state: "playing" | "paused"
+  clip?: Clip
+}
+
+export interface PlayIntent {
+  action: "pause" | "scrub" | "play"
+  item?: Item
+  clip?: Clip
+  type?: "item" | "clip"
+  to?: number
+}
 
 export default function Players({
   spotify,
