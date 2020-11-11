@@ -181,6 +181,7 @@ export const SlapItem = ({
                 backgroundColor: "#FFFFD6",
                 borderLeft: "1px solid #3b3b3b",
                 borderRight: "1px solid #3b3b3b",
+                padding: 0
               }}
             >
               <TextInput
@@ -189,6 +190,8 @@ export const SlapItem = ({
                 onChange={(e) => onSetText(e.target.value)}
                 placeholder="Write notes here..."
                 style={{
+                  padding: 0,
+                  fontSize: 10,
                   flex: 1,
                   height: "100%",
                   outline: "none",
