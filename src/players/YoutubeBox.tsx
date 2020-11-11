@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import YouTube from "react-youtube";
 import { Item, Clip } from "./Croaker";
 import { FOOTER_HEIGHT } from "../Croaker";
+import { Button, ButtonGroup } from "react-bootstrap";
+import { View } from "react-native";
 
 export const YoutubeBox = ({
   items,
@@ -31,9 +33,6 @@ export const YoutubeBox = ({
         position: "absolute",
         right: 10,
         bottom: FOOTER_HEIGHT + 10,
-        borderRadius: 10,
-        background: "black",
-        overflow: "hidden",
 
         transformOrigin: "right bottom",
         transform: sizeBig ? "scale(1)" : "scale(0.3)",
@@ -70,6 +69,9 @@ const YoutubeVideo = ({
   [key: string]: any;
 }) => {
   const [youtubeElement, setYoutubeElement] = useState(null);
+  const [playbackRates, setPlaybackRates] = useState([]);
+  const [playbackRate, setPlaybackRate] = useState(1);
+  console.log("playbackRates: ", playbackRates);
   const playingHere = playingNow?.item.id == item.id && playingNow;
   const playIntentVideo =
     (playIntent?.item?.id == item.id || playingHere) && playIntent;
@@ -81,6 +83,8 @@ const YoutubeVideo = ({
         duration: youtubeElement.target.getDuration() * 1000,
         title: youtubeElement.target.getVideoData().title,
       });
+
+      setPlaybackRates(youtubeElement.target.getAvailablePlaybackRates());
     }
   }, [youtubeElement]);
 
@@ -90,7 +94,6 @@ const YoutubeVideo = ({
       youtubeElement.target.pauseVideo();
       return;
     }
-    
 
     if (playIntentVideo.action == "pause") {
       youtubeElement.target.pauseVideo();
@@ -135,7 +138,7 @@ const YoutubeVideo = ({
       });
     } else if (data == 2) {
       // paused
-      
+
       if (playingNow.item.videoId) {
         onSetPlayingNow({
           state: "paused",
@@ -151,11 +154,38 @@ const YoutubeVideo = ({
         // display: playing ? "block" : "none",
         display: visible ? "block" : "none",
         // display: "none",
-        position: "relative",
       }}
-      onClick={onToggleSize}
     >
+      
+
+      <View
+        style={{
+          justifyContent: "space-between",
+          flexDirection: "row"
+        }}
+      >
+        <div></div>
+        <ButtonGroup size="sm" aria-label="Basic example">
+          {playbackRates.map((rate) => (
+            <Button
+              variant={playbackRate == rate ? "secondary" : "light"}
+              onClick={() => youtubeElement.target.setPlaybackRate(rate)}
+            >
+              {rate}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </View>
       <div
+        style={{
+          borderRadius: 10,
+          background: "black",
+          overflow: "hidden",
+          position: "relative",
+        }}
+        onClick={onToggleSize}
+      >
+        <div
         style={{
           position: "absolute",
           top: 0,
@@ -164,19 +194,23 @@ const YoutubeVideo = ({
           bottom: 0,
         }}
       ></div>
-      <YouTube
-        videoId={item.videoId}
-        opts={{
-          height: "300",
-          width: "600",
-          playerVars: {
-            controls: 0,
-            modestbranding: 1,
-          },
-        }}
-        onReady={setYoutubeElement}
-        onStateChange={onStateChange}
-      />
+        <YouTube
+          videoId={item.videoId}
+          opts={{
+            height: "300",
+            width: "600",
+            playerVars: {
+              controls: 0,
+              modestbranding: 1,
+            },
+          }}
+          onReady={setYoutubeElement}
+          onStateChange={onStateChange}
+          onPlaybackRateChange={({ data }) => {
+            setPlaybackRate(data);
+          }}
+        />
+      </div>
     </div>
   );
 };
