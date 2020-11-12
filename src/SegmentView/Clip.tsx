@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { View } from "react-native";
@@ -52,42 +51,41 @@ export const Clip = ({
             height: 40,
           }}
         >
-           <View 
-          style={{
-            flexDirection: "column",
-          }}
-          >
-          <CleanInput
-            value={clip.title}
+          <View
             style={{
-              backgroundColor: "transparent",
-              fontSize: 10
+              flexDirection: "column",
             }}
-            onChange={(value) => {
-              onUpdate({
-                title: value,
-              });
-            }}
-          ></CleanInput>
+          >
+            <CleanInput
+              value={clip.title}
+              style={{
+                backgroundColor: "transparent",
+                fontSize: 10,
+              }}
+              onChange={(value) => {
+                onUpdate({
+                  title: value,
+                });
+              }}
+            ></CleanInput>
           </View>
-          <View 
-          style={{
-            flexDirection: "row",
-            width: "100%",
-            justifyContent: "space-between",
-          }}>
-          <Play
-            onPress={() => {
-              playing ? onPause() : onPlay(clip);
+          <View
+            style={{
+              flexDirection: "row",
+              width: "100%",
+              justifyContent: "space-between",
             }}
-            small
-            playing={playing}
-            style={{ paddingRight: 2 }}
-          />
-          <CircleButton onPress={onDeleteClip} Icon={MdDelete} small />
-
+          >
+            <Play
+              onPress={() => {
+                playing ? onPause() : onPlay(clip);
+              }}
+              small
+              playing={playing}
+              style={{ paddingRight: 2 }}
+            />
+            <CircleButton onPress={onDeleteClip} Icon={MdDelete} small />
           </View>
-         
         </View>
         <div
           style={{
@@ -108,11 +106,16 @@ export const Clip = ({
         parent={parent}
         updateValue={(a) => {
           let thisClipIndex = clips.findIndex((c) => c.id == clip.id);
-          let boundaryStart =
-            thisClipIndex == 0 ? 0 : clips[thisClipIndex - 1].to;
+          const lastIndex = clips.length - 1;
+          let boundaryStart = thisClipIndex == 0 ? 0 : clips[thisClipIndex - 1].to;
+          let boundaryEnd = clip.to;
+          console.log('boundaryStart: ', boundaryStart);
           if (a - boundaryStart < 1000) {
             setLocalFrom(boundaryStart);
-          } else {
+          } else if (boundaryEnd - a < 1000) {
+            setLocalFrom(boundaryEnd - 1000);
+            
+          }else {
             setLocalFrom(a);
           }
         }}
@@ -132,12 +135,16 @@ export const Clip = ({
         updateValue={(a) => {
           let thisClipIndex = clips.findIndex((c) => c.id == clip.id);
           const lastIndex = clips.length - 1;
+          let boundaryStart = clip.from;
           let boundaryEnd =
             thisClipIndex == lastIndex
               ? duration
               : clips[thisClipIndex + 1].from;
+          console.log("boundaryEnd: ", boundaryEnd);
           if (boundaryEnd - a < 1000) {
             setLocalTo(boundaryEnd);
+          } else if (a - boundaryStart < 1000) {
+            setLocalFrom(boundaryStart + 1000);
           } else {
             setLocalTo(a);
           }

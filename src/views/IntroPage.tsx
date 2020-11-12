@@ -96,9 +96,18 @@ export default function () {
           loop
           autoPlay
         >
-          <source src="https://res.cloudinary.com/dfzqjzusj/video/upload/vc_h265,w_700,c_limit/slapperland.mp4" type="video/mp4; codecs=hvc1" />
-   <source src="https://res.cloudinary.com/dfzqjzusj/video/upload/vc_vp9,w_700,c_limit/slapperland.webm" type="video/webm; codecs=vp9" />
-   <source src="https://res.cloudinary.com/dfzqjzusj/video/upload/vc_auto,w_700,c_limit/slapperland.mp4" type="video/mp4" /> 
+          <source
+            src="https://res.cloudinary.com/dfzqjzusj/video/upload/vc_h265,w_700,c_limit/slapperland.mp4"
+            type="video/mp4; codecs=hvc1"
+          />
+          <source
+            src="https://res.cloudinary.com/dfzqjzusj/video/upload/vc_vp9,w_700,c_limit/slapperland.webm"
+            type="video/webm; codecs=vp9"
+          />
+          <source
+            src="https://res.cloudinary.com/dfzqjzusj/video/upload/vc_auto,w_700,c_limit/slapperland.mp4"
+            type="video/mp4"
+          />
           Sorry, your browser doesn't support embedded videos.
         </video>
 
