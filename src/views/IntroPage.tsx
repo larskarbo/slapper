@@ -13,6 +13,7 @@ import segments from "./segments.png";
 import songs from "./songs.png";
 import Typist from "react-typist";
 import { Logo } from "../Sidebar";
+import { Helmet } from "react-helmet";
 
 export default function () {
   return (
@@ -83,7 +84,7 @@ export default function () {
           from Spotify and Youtube in the same list.
         </TText>
 
-        <GetStarted style={{marginTop: 20}} />
+        <GetStarted style={{ marginTop: 20 }} />
 
         <video
           style={{
@@ -136,13 +137,13 @@ export default function () {
           }}
           src={segments}
         />
-        <GetStarted  style={{marginTop: 20}} />
+        <GetStarted style={{ marginTop: 20 }} />
       </View>
     </View>
   );
 }
 
-const GetStarted = ({style}) => {
+const GetStarted = ({ style }) => {
   let history = useHistory();
   return (
     <Link to="/login">
@@ -150,7 +151,7 @@ const GetStarted = ({style}) => {
         style={{
           marginTop: 50,
           marginBottom: 30,
-          ...style
+          ...style,
         }}
         variant="success"
       >

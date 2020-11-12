@@ -17,6 +17,7 @@ import { CleanInput, TText } from "./utils/font";
 
 import LinkShare from "./comp/LinkShare";
 import { BButton } from "./comp/BButton";
+import { Helmet } from "react-helmet";
 
 export const FOOTER_HEIGHT = 120;
 const itemsForServer = (items) => {
@@ -49,7 +50,7 @@ export interface Item {
   };
 }
 
-export default function Croaker({ spotify,loadingUser, user }) {
+export default function Croaker({ spotify, loadingUser, user }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
   const { collectionId } = useParams();
 
@@ -284,6 +285,12 @@ export default function Croaker({ spotify,loadingUser, user }) {
           height: `calc(100vh - ${FOOTER_HEIGHT}px)`,
         }}
       >
+        <Helmet>
+          {title.length && <title>{title} - Slapper.io</title>}
+          {description.length && (
+            <meta name="description" content={description} />
+          )}
+        </Helmet>
         <Sidebar loadingUser={loadingUser} user={user} />
         <div>
           <Switch>
@@ -312,7 +319,7 @@ export default function Croaker({ spotify,loadingUser, user }) {
                       <LinkShare
                         link={"https://slapper.io/s/" + collectionId}
                       />
-                      {(!spotify.credentials && items.find(i => i.trackId)) && (
+                      {!spotify.credentials && items.find((i) => i.trackId) && (
                         <View
                           style={{
                             border: "1px solid black",

@@ -32,6 +32,7 @@
     "react-contexify": "^4.1.1",
     "react-dom": "16.13.1",
     "react-double-marquee": "^1.0.6",
+    "react-helmet": "^6.1.0",
     "react-icons": "^3.11.0",
     "react-keyboard-event-handler": "^1.5.4",
     "react-native": "https://github.com/expo/react-native/archive/sdk-39.0.2.tar.gz",
