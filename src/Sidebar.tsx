@@ -65,22 +65,7 @@ const Sidebar = ({ user, loadingUser }) => {
       }}
     >
       <div style={{ paddingTop: 100 }}></div>
-      <TText
-        style={{
-          fontSize: 20,
-          fontWeight: 200,
-          paddingLeft: 20,
-        }}
-      >
-        <span
-          style={{
-            fontWeight: 700,
-          }}
-        >
-          Slapper
-        </span>
-        .io
-      </TText>
+      <Logo />
 
       {(!loadingUser && !user) &&
       <View style={{
@@ -179,10 +164,28 @@ const User = ({ id }) => {
           letterSpacing: "-1px",
         }}
       >
-        🥳 {user?.name}
+        {user?.name}
       </TText>
     </div>
   );
 };
 
 export default Sidebar;
+
+
+export const Logo = () => <TText
+style={{
+  fontSize: 20,
+  fontWeight: 200,
+  paddingLeft: 20,
+}}
+>
+<span
+  style={{
+    fontWeight: 700,
+  }}
+>
+  Slapper
+</span>
+.io
+</TText>

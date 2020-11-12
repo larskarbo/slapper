@@ -192,6 +192,7 @@ export const SlapItem = ({
                 style={{
                   padding: 0,
                   fontSize: 10,
+                  width: 200,
                   flex: 1,
                   height: "100%",
                   outline: "none",

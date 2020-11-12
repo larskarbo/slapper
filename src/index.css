@@ -27,3 +27,14 @@ a {
 .footer {
   border-top: 4px solid black;
 }
+
+.Typist {
+  display: inline-block;
+  min-width: 200px;
+    padding-left: 10px;
+    font-weight: 700;
+}
+
+.Cursor {
+  font-weight: 300;
+}
