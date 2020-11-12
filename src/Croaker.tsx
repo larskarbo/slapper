@@ -147,7 +147,7 @@ export default function Croaker({ spotify, loadingUser, user }) {
           id,
         },
       ]);
-    } else if (parsed) {
+    } else if (parsed && parsed.provider == "youtube") {
       setItems([
         ...items,
         {
