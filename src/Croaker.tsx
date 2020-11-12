@@ -295,7 +295,9 @@ export default function Croaker({ spotify, loadingUser, user }) {
         <div>
           <Switch>
             <Route exact path="/s">
-              <h3>Select a collection or create one to get started.</h3>
+              {!loadingUser && (
+                <h3>Select a collection or create one to get started.</h3>
+              )}
             </Route>
             <Route path={`/s/:collectionId`}>
               <View

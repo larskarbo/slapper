@@ -15,7 +15,7 @@ import { TText } from "./utils/font";
 import { BButton } from "./comp/BButton";
 
 const Sidebar = ({ user, loadingUser }) => {
-  console.log('user: ', user);
+  
   let history = useHistory();
   let location = useLocation();
   const { collectionId } = useParams();
@@ -25,6 +25,19 @@ const Sidebar = ({ user, loadingUser }) => {
   const [slaps, setSlaps] = useState([]);
   const [updateCounter, setUpdateCounter] = useState(0);
   const [allUsers, setAllUsers] = useState([]);
+
+
+  useEffect(() => {
+    if(user && !collectionId && slaps.length){
+      const userSlaps = slaps.filter(slap => slap.user == user.id)
+      if(userSlaps.length) {
+        history.push("/s/" + userSlaps[0].id)
+      } else {
+        newSlapCollection()
+      }
+    }
+    
+  },[collectionId, user, slaps])
 
   useEffect(() => {
     request("GET", "fauna/collections").then((res) => {
