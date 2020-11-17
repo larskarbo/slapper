@@ -24,7 +24,7 @@ const Profile = ({ user }) => {
 
   const upgrade = () => {
     return request("POST", "money/checkout", {
-      priceId: "price_1HoUBFAtEfCrIWZMucoYP33X",
+      priceId: location.href.includes("localhost") ? "price_1HoUBFAtEfCrIWZMucoYP33X" : "price_1HoawrAtEfCrIWZMEehEeLtN",
     }).then(function (result: any) {
       console.log('result: ', result);
       stripe
