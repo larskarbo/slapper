@@ -197,7 +197,7 @@ export const SlapItem = ({
                 pointer: "default"
               }}
             >
-              ...
+              <TText>...</TText>
             </Block>
           </MenuProvider>
         </View>

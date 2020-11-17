@@ -15,7 +15,9 @@ const Footer = ({
   onDeleteClip,
   playingNow,
   onPause,
-  children,clipRepeat,setClipRepeat,
+  children,
+  clipRepeat,
+  setClipRepeat,
   onUpdateClip,
   onScrub,
   onSetPlayingNow,
@@ -38,6 +40,7 @@ const Footer = ({
       }
     };
   }, [playingNow?.state]);
+
   return (
     <View
       style={{
@@ -139,18 +142,24 @@ const Footer = ({
                 flexDirection: "row",
               }}
             >
-              <CircleButton Icon={ImPlay3} onPress={() => {
-                
-                const playable = {
-                  type: "clip",
-                  item: playingNow.item,
-                  clip: playingNow.clip,
-                };
-                onPlay(playable);
-              }} />
-              <CircleButton inverted={clipRepeat} Icon={RiRepeatFill} onPress={() => {
-                setClipRepeat(!clipRepeat)
-              }} />
+              <CircleButton
+                Icon={ImPlay3}
+                onPress={() => {
+                  const playable = {
+                    type: "clip",
+                    item: playingNow.item,
+                    clip: playingNow.clip,
+                  };
+                  onPlay(playable);
+                }}
+              />
+              <CircleButton
+                inverted={clipRepeat}
+                Icon={RiRepeatFill}
+                onPress={() => {
+                  setClipRepeat(!clipRepeat);
+                }}
+              />
             </View>
           </View>
         )}
@@ -162,33 +171,37 @@ const Footer = ({
           flexGrow: 1,
         }}
       >
-        <SegmentView
-          clips={
-            playingNow
-              ? items.find((i) => playingNow.item.id == i.id)?.clips || []
-              : []
-          }
-          duration={playingNow?.item.metaInfo.duration || 0}
-          pointerAt={playingNow?.position || 0}
-          playing={playingNow?.state == "playing"}
-          playingNow={playingNow}
-          onScrub={onScrub}
-          onPlay={(clip) => {
-            const playable = {
-              type: "clip",
-              item: playingNow?.item,
-              clip: clip,
-            };
-            onPlay(playable);
-          }}
-          onPause={onPause}
-          item={playingNow?.item}
-          onAddClip={onAddClip}
-          onDeleteClip={onDeleteClip}
-          onUpdateClip={(clip, whatever) =>
-            onUpdateClip(playingNow?.item, clip, whatever)
-          }
-        />
+        {playingNow ? (
+          <SegmentView
+            clips={
+              playingNow
+                ? items.find((i) => playingNow.item.id == i.id)?.clips || []
+                : []
+            }
+            duration={playingNow?.item.metaInfo.duration || 0}
+            pointerAt={playingNow?.position || 0}
+            playing={playingNow?.state == "playing"}
+            playingNow={playingNow}
+            onScrub={onScrub}
+            onPlay={(clip) => {
+              const playable = {
+                type: "clip",
+                item: playingNow?.item,
+                clip: clip,
+              };
+              onPlay(playable);
+            }}
+            onPause={onPause}
+            item={playingNow?.item}
+            onAddClip={onAddClip}
+            onDeleteClip={onDeleteClip}
+            onUpdateClip={(clip, whatever) =>
+              onUpdateClip(playingNow?.item, clip, whatever)
+            }
+          />
+        ) : (
+          <TText>Play song to get started...</TText>
+        )}
       </View>
       {children}
       {/* <View

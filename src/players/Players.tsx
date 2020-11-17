@@ -40,17 +40,13 @@ export default function Players({
       return
     }
     if(playingNow?.position){
-      console.log("playingNow.position: ", playingNow.position);
-
       if (playingNow.type == "clip") {
         const realClip = items.find((i) => playingNow.item.id == i.id)?.clips.find(c => playingNow.clip.id == c.id)
         const timeUntilPause =
           realClip.to - playingNow.position;
-        console.log("timeUntilPause: ", timeUntilPause);
         clearTimeout(timer);
         if(timeUntilPause > 0){
           timer = setTimeout(() => {
-            console.log('clipRepeat: ', clipRepeat);
             if (clipRepeat) {
               const playable = {
                 type: "clip",
