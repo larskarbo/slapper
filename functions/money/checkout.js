@@ -33,6 +33,7 @@ exports.handler = async (req, res) => {
       sessionId: session.id,
     });
   } catch (e) {
+    console.log("error", e.message)
     res.status(400);
     return res.send({
       error: {
