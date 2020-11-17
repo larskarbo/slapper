@@ -26,6 +26,7 @@ const Profile = ({ user }) => {
     return request("POST", "money/checkout", {
       priceId: "price_1HoUBFAtEfCrIWZMucoYP33X",
     }).then(function (result: any) {
+      console.log('result: ', result);
       stripe
         .redirectToCheckout({
           sessionId: result.sessionId,
