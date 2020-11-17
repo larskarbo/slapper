@@ -84,7 +84,7 @@ export default function () {
           from Spotify and Youtube in the same list.
         </TText>
 
-        <GetStarted style={{ marginTop: 20 }} />
+        <GetStarted style={{ marginTop: 20 }}>Go to app</GetStarted>
 
         <video
           style={{
@@ -111,7 +111,7 @@ export default function () {
           Sorry, your browser doesn't support embedded videos.
         </video>
 
-        <GetStarted />
+        <GetStarted>Get started</GetStarted>
 
         <img
           style={{
@@ -131,13 +131,13 @@ export default function () {
           }}
           src={segments}
         />
-        <GetStarted style={{ marginTop: 20 }} />
+        <GetStarted style={{ marginTop: 20 }}>Get started</GetStarted>
       </View>
     </View>
   );
 }
 
-const GetStarted = ({ style }) => {
+const GetStarted = ({ style, children }) => {
   let history = useHistory();
   return (
     <Link to="/login">
@@ -149,7 +149,7 @@ const GetStarted = ({ style }) => {
         }}
         variant="success"
       >
-        Get started
+        {children}
       </BButton>
     </Link>
   );
