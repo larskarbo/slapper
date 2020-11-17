@@ -20,7 +20,7 @@ export interface PlayIntent {
   to?: number;
 }
 
-let timer = setTimeout(()=>{})
+let timer = setTimeout(() => {});
 export default function Players({
   spotify,
   items,
@@ -35,17 +35,23 @@ export default function Players({
   [key: string]: any;
 }) {
   useEffect(() => {
-    if(playingNow?.state !== "playing"){
+    if (playingNow?.state !== "playing") {
       clearTimeout(timer);
-      return
+      return;
     }
-    if(playingNow?.position){
+    if (playingNow?.position) {
       if (playingNow.type == "clip") {
-        const realClip = items.find((i) => playingNow.item.id == i.id)?.clips.find(c => playingNow.clip.id == c.id)
-        const timeUntilPause =
-          realClip.to - playingNow.position;
+        const realClip = items
+          .find((i) => playingNow.item.id == i.id)
+          ?.clips.find((c) => playingNow.clip.id == c.id);
+        if (!realClip) {
+          // something wrong
+          clearTimeout(timer);
+          return;
+        }
+        const timeUntilPause = realClip.to - playingNow.position;
         clearTimeout(timer);
-        if(timeUntilPause > 0){
+        if (timeUntilPause > 0) {
           timer = setTimeout(() => {
             if (clipRepeat) {
               const playable = {
@@ -55,8 +61,7 @@ export default function Players({
               };
               onPlay(playable);
             } else {
-              
-              onPause()
+              onPause();
             }
           }, timeUntilPause);
         }
@@ -74,7 +79,12 @@ export default function Players({
     >
       <div>Players:</div>
       <div style={{ display: "flex" }}>
-        <SpotifyBox playingNow={playingNow} items={items} spotify={spotify} {...props} />
+        <SpotifyBox
+          playingNow={playingNow}
+          items={items}
+          spotify={spotify}
+          {...props}
+        />
         <YoutubeBox playingNow={playingNow} items={items} {...props} />
       </div>
     </View>
