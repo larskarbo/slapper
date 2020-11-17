@@ -30,7 +30,9 @@ exports.handler = async (req, res) => {
     eventType = event.type;
   } else {
 
-    return res.sendStatus(400);
+    res.status(400);
+    res.send("No webhook secret")
+    return
   }
 
   switch (eventType) {
@@ -56,8 +58,9 @@ exports.handler = async (req, res) => {
           })
       } catch (e) {
         console.log("error", e)
-        // Unhandled event type
-        return res.sendStatus(400);
+        res.status(400);
+        res.send("Error updating fauna db", e.message)
+        return
 
       }
 
@@ -77,7 +80,9 @@ exports.handler = async (req, res) => {
       break;
     default:
       // Unhandled event type
-      return res.sendStatus(400);
+      res.status(400);
+      res.send("Unhandled event type")
+      return
   }
 
   res.sendStatus(200);
