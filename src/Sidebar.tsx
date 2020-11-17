@@ -10,7 +10,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import { request } from "./utils/request";
-import netlifyIdentity from "netlify-identity-widget";
 import { TText } from "./utils/font";
 import { BButton } from "./comp/BButton";
 
@@ -28,7 +27,7 @@ const Sidebar = ({ user, loadingUser }) => {
 
 
   useEffect(() => {
-    if(user && !collectionId && slaps.length){
+    if(location.pathname == "/s" && user && !collectionId && slaps.length){
       const userSlaps = slaps.filter(slap => slap.user == user.id)
       if(userSlaps.length) {
         history.push("/s/" + userSlaps[0].id)
@@ -105,7 +104,7 @@ const Sidebar = ({ user, loadingUser }) => {
         })
         .map((u) => (
           <div key={u.data.id}>
-            <User id={u.data.id} />
+            <User isMe={u.data.id == user?.id}  id={u.data.id} />
             {slaps
               .filter((s) => s.user == u.data.id)
               .map((slap) => {
@@ -148,7 +147,7 @@ const Sidebar = ({ user, loadingUser }) => {
   );
 };
 
-const User = ({ id }) => {
+const User = ({ id, isMe }) => {
   const [user, setUser] = useState(null);
   useEffect(() => {
     request("GET", "fauna/users/find/" + id).then((asdf) => {
@@ -156,17 +155,12 @@ const User = ({ id }) => {
     });
   }, []);
 
-  return (
+  const content = (
     <div
       style={{
         paddingTop: 50,
       }}
       onClick={() => {
-        netlifyIdentity.open();
-
-        netlifyIdentity.on("logout", () => {
-          // location.reload();
-        });
       }}
     >
       <TText
@@ -180,7 +174,16 @@ const User = ({ id }) => {
         {user?.name}
       </TText>
     </div>
-  );
+  )
+  if(isMe){
+    return (
+      <Link to="/profile">
+      {content}
+      </Link>
+    );
+
+  }
+  return content
 };
 
 export default Sidebar;

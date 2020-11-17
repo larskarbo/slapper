@@ -2,7 +2,6 @@ import SpotifyApi from "spotify-web-api-js";
 import qs from "query-string";
 import delay from "delay"
 
-import { PARSE_SERVER_BASE } from "./Main";
 import { compare } from "js-deep-equals";
 
 export default class Spotify {

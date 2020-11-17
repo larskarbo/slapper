@@ -1,8 +1,12 @@
 import ky from "ky";
 
-const BASE = `/.netlify/functions/`;
+export const BASE = `/.netlify/functions/`;
+import Constants from 'expo-constants';
+console.log('Constants: ', Constants);
 
 let headers = {};
+
+export const stripe = window.Stripe(Constants.manifest.extra.STRIPE_PUB_KEY)
 
 export function generateHeaders(nUser) {
   return nUser

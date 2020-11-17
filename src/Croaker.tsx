@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Text, View } from "react-native";
 import KeyboardEventHandler from "react-keyboard-event-handler";
 import urlParser from "js-video-url-parser";
@@ -12,8 +12,10 @@ import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { FeedbackFish } from "@feedback-fish/react";
 import Authorize from "./Authorize";
+import Profile from "./Profile";
 import { sansSerif } from "./utils/font.tsx";
 import { CleanInput, TText } from "./utils/font";
+import Spotify from "./Spotify";
 
 import LinkShare from "./comp/LinkShare";
 import { BButton } from "./comp/BButton";
@@ -51,10 +53,11 @@ export interface Item {
   };
 }
 
-export default function Croaker({ spotify, loadingUser, user }) {
+export default function Croaker({ loadingUser, user }) {
   // const [input, setInput] = useState("spotify:track:0bXpmJyHHYPk6QBFj25bYF")
   const { collectionId } = useParams();
 
+  const spotify = useMemo(() => new Spotify(), []);
   const [input, setInput] = useState(
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
@@ -298,9 +301,17 @@ export default function Croaker({ spotify, loadingUser, user }) {
         <Sidebar loadingUser={loadingUser} user={user} />
         <div>
           <Switch>
-            <Route exact path="/s">
+          <Route exact path="/s">
               {!loadingUser && (
                 <h3>Select a collection or create one to get started.</h3>
+              )}
+            </Route>
+            <Route path="/profile">
+              {!user && (
+                <h3>No user.</h3>
+              )}
+              {user && (
+                <Profile user={user} />
               )}
             </Route>
             <Route path={`/s/:collectionId`}>

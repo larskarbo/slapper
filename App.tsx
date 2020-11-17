@@ -2,7 +2,8 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import Main from "./src/Main";
+import "./src/index.css";
+import "react-contexify/dist/ReactContexify.min.css";
 
 import {
   BrowserRouter as Router,
@@ -16,7 +17,8 @@ import netlifyIdentity from "netlify-identity-widget";
 import LoginPage from "./src/views/LoginPage";
 import IntroPage from "./src/views/IntroPage";
 import { request, generateHeaders } from "./src/utils/request";
-import Footer from "./src/Footer";
+import Croaker from "./src/Croaker";
+import { BButton } from "./src/comp/BButton";
 
 // You must run this once before trying to interact with the widget
 netlifyIdentity.init();
@@ -57,7 +59,7 @@ export default function App() {
 
   useEffect(() => {
     const nUser = netlifyIdentity.currentUser();
-    console.log('nUser: ', nUser);
+    console.log("nUser: ", nUser);
     if (!nUser) {
       setLoadingUser(false);
       return;
@@ -75,33 +77,11 @@ export default function App() {
             <IntroPage />
           </Route>
 
-          <Route path="/">
-            {/* <IntroPage /> */}
-            <>
-              <Switch>
-                <Route exact path="/login">
-                  <LoginPage user={user} />
-                </Route>
-                {(user || true) ? (
-                  <Route path={["/s/:collectionId", "/s"]}>
-                    <Main loadingUser={loadingUser} user={user} />
-                  </Route>
-                ) : (
-                  <Switch>
-                    <Route
-                      render={(props) => (
-                        <Redirect
-                          to={{
-                            pathname: "/login",
-                            state: { from: props.location },
-                          }}
-                        />
-                      )}
-                    />
-                  </Switch>
-                )}
-              </Switch>
-            </>
+          <Route exact path="/login">
+            <LoginPage user={user} />
+          </Route>
+          <Route path={["/s/:collectionId", "/s", "/profile"]}>
+            <Croaker loadingUser={loadingUser} user={user} />
           </Route>
           {/* <Switch>
             <Route path="/login">
