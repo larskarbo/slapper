@@ -1,12 +1,8 @@
-import React, { useState, } from "react";
+import React, { useState } from "react";
 import { TextInput, View } from "react-native";
 import SegmentView from "./SegmentView/SegmentView";
 
-import {
-  Menu,
-  Item as ContextItem,
-  MenuProvider,
-} from "react-contexify";
+import { Menu, Item as ContextItem, MenuProvider } from "react-contexify";
 import styled from "styled-components/native";
 import Play from "./comp/Play";
 import { Item, Clip } from "./Croaker";
@@ -59,150 +55,154 @@ export const SlapItem = ({
 
   return (
     <StyledView className="horse" style={{}}>
-      <MenuProvider id={item.id}>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+        }}
+      >
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "space-between",
           }}
         >
-          <View
-            style={{
-              flexDirection: "row",
-            }}
-          >
-            <Block>
-              {/* {children} */}
-              <Play
-                playing={songIsPlaying}
-                disabled={disabled}
-                onPress={() => {
-                  if(disabled){
-                    alert("You need to connect to Spotify to play this song.")
-                    return
-                  }
-                  const playable = {
-                    type: "item",
-                    item: item,
-                  };
-                  songIsPlaying ? onPause() : onPlay(playable);
-                }}
-              />
-            </Block>
-
-            <Block
-              style={{
-                width: 180,
-                justifyContent: "center",
+          <Block>
+            {/* {children} */}
+            <Play
+              playing={songIsPlaying}
+              disabled={disabled}
+              onPress={() => {
+                if (disabled) {
+                  alert("You need to connect to Spotify to play this song.");
+                  return;
+                }
+                const playable = {
+                  type: "item",
+                  item: item,
+                };
+                songIsPlaying ? onPause() : onPlay(playable);
               }}
-            >
-              <View style={{ flexDirection: "column", flex: 1 }}>
-                <TText
-                  style={{
-                    width: "100%",
-                    overflow: "hidden",
-                    whiteSpace: "nowrap",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {title}
-                </TText>
-                <TText
-                  style={{
-                    fontSize: 10,
-                  }}
-                >
-                  {item.videoId ? (
-                    <a
-                      target="_blank"
-                      href={"https://youtu.be/" + item.videoId}
-                    >
-                      <FaYoutube />
-                    </a>
-                  ) : (
-                    <a
-                      target="_blank"
-                      href={"https://open.spotify.com/track/" + item.trackId}
-                    >
-                      <FaSpotify />
-                    </a>
-                  )}
-                </TText>
-              </View>
-            </Block>
-            {clips.map((c) => {
-              const clipIsPlaying = isClipPlaying(playingNow, c)
-              return (
-                <MenuProvider id={c.id}>
-                  <Block
-                    key={c.id}
-                    style={{
-                      backgroundColor: "#E9E9E9",
-                    }}
-                  >
-                    <Play
-                      playing={clipIsPlaying}
-                      onPress={() => {
-                        const playable = {
-                          type: "clip",
-                          item: item,
-                          clip: c,
-                        };
-                        onUpdateClip(c, { state: "playing" });
-                        if (clipIsPlaying) {
-                          onPause();
-                        } else {
-                          onPlay(playable);
-                        }
-                      }}
-                    />
-                    <TText
-                      style={{
-                        paddingLeft: 6,
-                      }}
-                    >
-                      {c.title}
-                    </TText>
-                  </Block>
-                  <ClipContextMenu id={c.id} onDelete={() => onDeleteClip(c)} />
-                </MenuProvider>
-              );
-            })}
-          </View>
+            />
+          </Block>
 
-          <View
+          <Block
             style={{
-              flexDirection: "row",
+              width: 180,
+              justifyContent: "center",
             }}
           >
+            <View style={{ flexDirection: "column", flex: 1 }}>
+              <TText
+                style={{
+                  width: "100%",
+                  overflow: "hidden",
+                  whiteSpace: "nowrap",
+                  fontWeight: "bold",
+                }}
+              >
+                {title}
+              </TText>
+              <TText
+                style={{
+                  fontSize: 10,
+                }}
+              >
+                {item.videoId ? (
+                  <a target="_blank" href={"https://youtu.be/" + item.videoId}>
+                    <FaYoutube />
+                  </a>
+                ) : (
+                  <a
+                    target="_blank"
+                    href={"https://open.spotify.com/track/" + item.trackId}
+                  >
+                    <FaSpotify />
+                  </a>
+                )}
+              </TText>
+            </View>
+          </Block>
+          {clips.map((c) => {
+            const clipIsPlaying = isClipPlaying(playingNow, c);
+            return (
+              <Block
+                key={c.id}
+                style={{
+                  backgroundColor: "#E9E9E9",
+                }}
+              >
+                <Play
+                  playing={clipIsPlaying}
+                  onPress={() => {
+                    const playable = {
+                      type: "clip",
+                      item: item,
+                      clip: c,
+                    };
+                    onUpdateClip(c, { state: "playing" });
+                    if (clipIsPlaying) {
+                      onPause();
+                    } else {
+                      onPlay(playable);
+                    }
+                  }}
+                />
+                <TText
+                  style={{
+                    paddingLeft: 6,
+                  }}
+                >
+                  {c.title}
+                </TText>
+              </Block>
+            );
+          })}
+        </View>
+
+        <View
+          style={{
+            flexDirection: "row",
+          }}
+        >
+          <Block
+            style={{
+              flex: 1,
+              backgroundColor: "#FFFFD6",
+              borderLeft: "1px solid #3b3b3b",
+              borderRight: "1px solid #3b3b3b",
+              padding: 0,
+            }}
+          >
+            <TextInput
+              value={item.text}
+              multiline
+              onChange={(e) => onSetText(e.target.value)}
+              placeholder="Write notes here..."
+              style={{
+                padding: 0,
+                fontSize: 10,
+                width: 200,
+                flex: 1,
+                height: "100%",
+                outline: "none",
+                ...sansSerif,
+              }}
+            />
+          </Block>
+
+          <MenuProvider id={item.id} event="onClick">
             <Block
               style={{
                 flex: 1,
-                backgroundColor: "#FFFFD6",
-                borderLeft: "1px solid #3b3b3b",
-                borderRight: "1px solid #3b3b3b",
-                padding: 0
+                pointer: "default"
               }}
             >
-              <TextInput
-                value={item.text}
-                multiline
-                onChange={(e) => onSetText(e.target.value)}
-                placeholder="Write notes here..."
-                style={{
-                  padding: 0,
-                  fontSize: 10,
-                  width: 200,
-                  flex: 1,
-                  height: "100%",
-                  outline: "none",
-                  ...sansSerif
-                }}
-              />
+              ...
             </Block>
-          </View>
+          </MenuProvider>
         </View>
-      </MenuProvider>
+      </View>
+
       <SongContextMenu id={item.id} onDelete={onDeleteItem} />
     </StyledView>
   );
@@ -212,11 +212,5 @@ export const SlapItem = ({
 const SongContextMenu = ({ id, onDelete }) => (
   <Menu id={id}>
     <ContextItem onClick={onDelete}>Remove song</ContextItem>
-  </Menu>
-);
-
-const ClipContextMenu = ({ id, onDelete }) => (
-  <Menu id={id}>
-    <ContextItem onClick={onDelete}>Remove clip</ContextItem>
   </Menu>
 );
