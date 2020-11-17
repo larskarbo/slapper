@@ -29,32 +29,39 @@ exports.handler = async (req, res) => {
     data = event.data;
     eventType = event.type;
   } else {
-    // Webhook signing is recommended, but if the secret is not configured in `config.js`,
-    // retrieve the event data directly from the request body.
-    data = req.body.data;
-    eventType = req.body.type;
+
+    return res.sendStatus(400);
   }
 
   switch (eventType) {
     case 'checkout.session.completed':
       const { user_id } = data.object.metadata
       console.log('user_id: ', user_id);
-      client
-    .query(q.Get(q.Match(q.Index("users_index"), user_id)))
-    .then((response) => {
-      console.log("response: ", response.ref);
-      client
-        .query(
-          q.Update(
-            response.ref,
-            { data: { plan: "premium" } },
-          )
-        )
-        .then((response) => {
-          console.log("user: ", response.data);
-        })
-    })
-      
+
+      try {
+        client
+          .query(q.Get(q.Match(q.Index("users_index"), user_id)))
+          .then((response) => {
+            console.log("response: ", response.ref);
+            client
+              .query(
+                q.Update(
+                  response.ref,
+                  { data: { plan: "premium" } },
+                )
+              )
+              .then((response) => {
+                console.log("user: ", response.data);
+              })
+          })
+      } catch (e) {
+        console.log("error", e)
+        // Unhandled event type
+        return res.sendStatus(400);
+
+      }
+
+
       // Payment is successful and the subscription is created.
       // You should provision the subscription.
       break;
@@ -69,7 +76,8 @@ exports.handler = async (req, res) => {
       // customer portal to update their payment information.
       break;
     default:
-    // Unhandled event type
+      // Unhandled event type
+      return res.sendStatus(400);
   }
 
   res.sendStatus(200);
