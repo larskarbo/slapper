@@ -12,13 +12,17 @@ const NoButton = styled.Pressable`
   border: none;
 `;
 
-export default function CircleButton({ children, Icon, onPress, small=false, disabled, style }) {
+export default function CircleButton({ children, Icon, onPress, small=false, disabled, style, inverted=false }) {
   const myRef = useRef(null);
   const isHovering = disabled ? false : useHover(myRef);
 
   const iconProps = {
     size: small ? 8 : 12,
     color: disabled ? "#5a5a5a" : DEFAULT_BLACK
+  }
+
+  if(inverted){
+    iconProps.color = "white"
   }
 
   return (
@@ -29,6 +33,7 @@ export default function CircleButton({ children, Icon, onPress, small=false, dis
         borderStyle: "solid",
         borderColor: isHovering ? DEFAULT_BLACK : "#5a5a5a",
         ...(disabled && {borderColor: "#5a5a5a"}),
+        ...(inverted && {backgroundColor: DEFAULT_BLACK}),
         borderWidth: isHovering ? 2 : 1,
         borderRadius: "100%",
         width: small ? 15 : 30,

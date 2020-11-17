@@ -71,7 +71,6 @@ const YoutubeVideo = ({
   const [youtubeElement, setYoutubeElement] = useState(null);
   const [playbackRates, setPlaybackRates] = useState([]);
   const [playbackRate, setPlaybackRate] = useState(1);
-  console.log("playbackRates: ", playbackRates);
   const playingHere = playingNow?.item.id == item.id && playingNow;
   const playIntentVideo =
     (playIntent?.item?.id == item.id || playingHere) && playIntent;

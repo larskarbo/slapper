@@ -5,15 +5,20 @@ import MarqueeText from "react-native-marquee";
 import useHover from "@react-hook/hover";
 import { TText } from "./utils/font";
 import Play from "./comp/Play";
+import CircleButton from "./comp/CircleButton";
+import { RiRepeatFill } from "react-icons/ri";
+import { AiFillSound } from "react-icons/ai";
+import { ImPause2, ImPlay3 } from "react-icons/im";
 
 const Footer = ({
   onAddClip,
   onDeleteClip,
   playingNow,
   onPause,
-  children,
+  children,clipRepeat,setClipRepeat,
   onUpdateClip,
   onScrub,
+  onSetPlayingNow,
   items,
   onPlay,
 }) => {
@@ -101,16 +106,54 @@ const Footer = ({
           {playingNow?.item.metaInfo.artist}
         </TText>
       </View>
-      
-      <View 
-        style={{
-          justifyContent: "center",
-          paddingHorizontal: 5
-        }}>
-      {playingNow?.item && (
-        <Play playing={playingNow?.state == "playing"} onPress={playOrPause} />
-      )}
 
+      <View
+        style={{
+          alignItems: "center",
+          paddingHorizontal: 5,
+          flexDirection: "row",
+        }}
+      >
+        {playingNow?.item && (
+          <Play
+            playing={playingNow?.state == "playing"}
+            onPress={playOrPause}
+          />
+        )}
+
+        {playingNow?.type == "clip" && (
+          <View
+            style={{
+              border: "solid 2px black",
+              padding: 5,
+              marginLeft: 5,
+            }}
+          >
+            <TText>
+              {playingNow.state == "playing" ? <AiFillSound /> : <ImPause2 />}
+
+              {playingNow.clip.title}
+            </TText>
+            <View
+              style={{
+                flexDirection: "row",
+              }}
+            >
+              <CircleButton Icon={ImPlay3} onPress={() => {
+                
+                const playable = {
+                  type: "clip",
+                  item: playingNow.item,
+                  clip: playingNow.clip,
+                };
+                onPlay(playable);
+              }} />
+              <CircleButton inverted={clipRepeat} Icon={RiRepeatFill} onPress={() => {
+                setClipRepeat(!clipRepeat)
+              }} />
+            </View>
+          </View>
+        )}
       </View>
 
       <View

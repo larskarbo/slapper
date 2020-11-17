@@ -18,6 +18,7 @@ import { CleanInput, TText } from "./utils/font";
 import LinkShare from "./comp/LinkShare";
 import { BButton } from "./comp/BButton";
 import { Helmet } from "react-helmet";
+import useLocalStorage from "use-localstorage-hook";
 
 export const FOOTER_HEIGHT = 120;
 const itemsForServer = (items) => {
@@ -58,8 +59,11 @@ export default function Croaker({ spotify, loadingUser, user }) {
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
   );
+
   const [playingNow, setPlayingNow] = useState<PlayingNow>(null);
   const [playIntent, setPlayIntent] = useState<PlayIntent>(null);
+
+  const [clipRepeat, setClipRepeat] =  useLocalStorage("clipRepeat", true)
 
   const [items, setItems] = useState<Item[]>([]);
   const [slapUserId, setSlapUserId] = useState(null);
@@ -427,13 +431,19 @@ export default function Croaker({ spotify, loadingUser, user }) {
           onScrub={scrub}
           onPlay={play}
           onPause={() => pause()}
+          onSetPlayingNow={(pn) => setPlayingNow({ ...playingNow, ...pn })}
           onAddClip={addClip}
           onDeleteClip={deleteClip}
+          clipRepeat={clipRepeat}
+          setClipRepeat={setClipRepeat}
         >
           <Players
             spotify={spotify}
             playingNow={playingNow}
             playIntent={playIntent}
+            clipRepeat={clipRepeat}
+            onPlay={play}
+            onPause={() => pause()}
             items={items}
             onSetMetaInfo={(item, metaInfo) =>
               updateItem(item, { metaInfo: metaInfo })

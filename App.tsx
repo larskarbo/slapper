@@ -57,6 +57,7 @@ export default function App() {
 
   useEffect(() => {
     const nUser = netlifyIdentity.currentUser();
+    console.log('nUser: ', nUser);
     if (!nUser) {
       setLoadingUser(false);
       return;

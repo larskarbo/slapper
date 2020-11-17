@@ -36,7 +36,6 @@ export const SpotifyBox = ({
     
     if(!playIntent){
       if(spotify.playbackState){
-        console.log('1')
         spotify.pause()
       }
       return
@@ -45,7 +44,6 @@ export const SpotifyBox = ({
       if (playIntent.action == "pause") {
         if(spotifyWasPlaying){
           const position = spotify.estimatePosition();
-          console.log('2')
           await spotify.pause();
           onSetPlayingNow({
             state: "paused",
@@ -55,7 +53,6 @@ export const SpotifyBox = ({
       } else if (playIntent.action == "play") {
         if(playIntent.item?.videoId){
           if(spotifyWasPlaying){
-            console.log('3')
             await spotify.pause();
           }
           return
