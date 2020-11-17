@@ -21,9 +21,13 @@ exports.handler = async (req, res) => {
         process.env.STRIPE_WEBHOOK_SECRET
       );
     } catch (err) {
-
-
-      return res.sendStatus(400);
+      res.status(400);
+      res.send({
+        error: {
+          message:"Error verifying stripe webhook",
+        }
+      })
+      return
     }
     // Extract the object from the event.
     data = event.data;
@@ -31,7 +35,11 @@ exports.handler = async (req, res) => {
   } else {
 
     res.status(400);
-    res.send("No webhook secret")
+    res.send({
+      error: {
+        message:"No webhook secret",
+      }
+    })
     return
   }
 
@@ -59,7 +67,11 @@ exports.handler = async (req, res) => {
       } catch (e) {
         console.log("error", e)
         res.status(400);
-        res.send("Error updating fauna db", e.message)
+        res.send({
+          error: {
+            message:"Error updating fauna db", e.message,
+          }
+        })
         return
 
       }
@@ -81,7 +93,11 @@ exports.handler = async (req, res) => {
     default:
       // Unhandled event type
       res.status(400);
-      res.send("Unhandled event type")
+      res.send({
+        error: {
+          message:"Unhandled event type",
+        }
+      })
       return
   }
 

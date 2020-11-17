@@ -4,8 +4,6 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 exports.handler = async (req, res) => {
   const { priceId } = req.body;
   const { user } = req.clientContext;
-  console.log("user: ", user);
-  console.log('process.env.STRIPE_SECRET_KEY: ', process.env.STRIPE_SECRET_KEY);
 
   // See https://stripe.com/docs/api/checkout/sessions/create
   // for additional parameters to pass.

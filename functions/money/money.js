@@ -12,6 +12,7 @@ const router = express.Router();
 
 router.post("/checkout", require("./checkout").handler);
 router.post("/webhook", require("./webhook").handler);
+router.post("/testerror", require("./testerror").handler);
 
 // router.get('/collections', (req, res) => {
 //   res.json({foo: "bars"});
