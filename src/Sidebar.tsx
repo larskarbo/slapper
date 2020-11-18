@@ -52,6 +52,7 @@ const Sidebar = ({ user, loadingUser }) => {
       description: "",
       items: [],
       user: user.id,
+      visibility: "public"
     }).then((res) => {
       history.replace({ pathname: "/s/" + res.ref["@ref"].id });
       setUpdateCounter(updateCounter + 1);

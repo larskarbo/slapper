@@ -79,6 +79,7 @@ export default function Croaker({ loadingUser, user }) {
   const throttledTitle = useThrottle(title, 1000);
   const [description, setDescription] = useState([]);
   const throttledDescription = useThrottle(description, 1000);
+  const [visibility, setVisibility] = useState("unlisted");
 
   useEffect(() => {
     if (!collectionId) {
@@ -115,6 +116,7 @@ export default function Croaker({ loadingUser, user }) {
       setDescription(res.data.description);
       setTitle(res.data.title);
       setSlapUserId(res.data.user);
+      setVisibility(res.data.visibility || "unlisted")
       setLoaded(true);
     });
   }, [collectionId]);
@@ -131,8 +133,9 @@ export default function Croaker({ loadingUser, user }) {
       description,
       items: itemsForServer(items),
       user: user.id,
+      visibility: visibility
     }).then((res) => {});
-  }, [throttledItems, throttledDescription, throttledTitle]);
+  }, [throttledItems, throttledDescription, throttledTitle, visibility]);
 
   const go = () => {
     let trackId;
@@ -335,6 +338,7 @@ export default function Croaker({ loadingUser, user }) {
                           You don't own this slap, so it won't be saved.
                         </TText>
                       )}
+                      <VisibilitySwitcher visibility={visibility} setVisibility={setVisibility} />
                       <LinkShare
                         link={"https://slapper.io/s/" + collectionId}
                       />
@@ -598,4 +602,22 @@ export default function Croaker({ loadingUser, user }) {
       </div>
     </div>
   );
+}
+
+function VisibilitySwitcher({ setVisibility, visibility }) {
+  return (
+    <View style={{
+      marginBottom: 10
+    }}>
+      {visibility == "public" ? 
+      <TText style={{
+        fontSize: 12
+      }}>This slap is public. <a onClick={() => setVisibility("unlisted")} href="#">Change to "unlisted"</a></TText> : 
+      <TText style={{
+        fontSize: 12
+      }}>This slap can only be accessed by link. <a onClick={() => setVisibility("public")} href="#">Change to "public"</a></TText>
+       }
+
+    </View>
+  )
 }
