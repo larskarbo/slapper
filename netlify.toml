@@ -13,6 +13,10 @@
   targetPort = 19006
 
 [[redirects]]
+  from = "/discord"
+  to = "https://discord.gg/A4BGVFKwJv"
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
