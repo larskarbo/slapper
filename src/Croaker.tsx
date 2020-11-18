@@ -421,10 +421,11 @@ export default function Croaker({ loadingUser, user }) {
                                 style={{
                                   ...sansSerif,
                                   outline: "none",
-                                  fontSize: 15,
+                                  fontSize: input.length ? 10 : 15,
                                   width: "100%",
                                   padding: "10px 20px",
                                   borderWidth: 1,
+                                  height: 45,
                                   borderColor: DEFAULT_BLACK,
                                 }}
                                 placeholder="Paste youtube or spotify link here"
