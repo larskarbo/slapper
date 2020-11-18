@@ -52,7 +52,7 @@ const Sidebar = ({ user, loadingUser }) => {
       description: "",
       items: [],
       user: user.id,
-      visibility: "public"
+      visibility: "public",
     }).then((res) => {
       history.replace({ pathname: "/s/" + res.ref["@ref"].id });
       setUpdateCounter(updateCounter + 1);
@@ -69,6 +69,25 @@ const Sidebar = ({ user, loadingUser }) => {
     >
       <div style={{ paddingTop: 100 }}></div>
       <Logo />
+
+      <Link to={"/s/browse"}>
+        <View
+          style={{
+            paddingVertical: 6,
+            backgroundColor: false && "#dddddd",
+          }}
+        >
+          <TText
+            style={{
+              fontSize: 12,
+              paddingLeft: 20,
+              fontWeight: false ? 700 : 400,
+            }}
+          >
+            Browse popular slaps
+          </TText>
+        </View>
+      </Link>
 
       {!loadingUser && !user && (
         <View

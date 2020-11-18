@@ -13,6 +13,7 @@ import Footer from "./Footer";
 import { FeedbackFish } from "@feedback-fish/react";
 import Authorize from "./Authorize";
 import Profile from "./Profile";
+import Browse from "./Browse";
 import { sansSerif } from "./utils/font.tsx";
 import { CleanInput, DEFAULT_BLACK, TText } from "./utils/font";
 import Spotify from "./Spotify";
@@ -116,7 +117,7 @@ export default function Croaker({ loadingUser, user }) {
       setDescription(res.data.description);
       setTitle(res.data.title);
       setSlapUserId(res.data.user);
-      setVisibility(res.data.visibility || "unlisted")
+      setVisibility(res.data.visibility || "unlisted");
       setLoaded(true);
     });
   }, [collectionId]);
@@ -133,7 +134,7 @@ export default function Croaker({ loadingUser, user }) {
       description,
       items: itemsForServer(items),
       user: user.id,
-      visibility: visibility
+      visibility: visibility,
     }).then((res) => {});
   }, [throttledItems, throttledDescription, throttledTitle, visibility]);
 
@@ -319,6 +320,9 @@ export default function Croaker({ loadingUser, user }) {
               {!user && <h3>No user.</h3>}
               {user && <Profile user={user} />}
             </Route>
+            <Route path="/s/browse">
+              <Browse />
+            </Route>
             <Route path={`/s/:collectionId`}>
               <View
                 style={{
@@ -333,12 +337,17 @@ export default function Croaker({ loadingUser, user }) {
                         paddingTop: 100,
                       }}
                     >
-                      {user?.id != slapUserId && (
+                      {user?.id != slapUserId ? (
                         <TText style={{ color: "red" }}>
                           You don't own this slap, so it won't be saved.
                         </TText>
+                      ) : (
+                        <VisibilitySwitcher
+                          visibility={visibility}
+                          setVisibility={setVisibility}
+                        />
                       )}
-                      <VisibilitySwitcher visibility={visibility} setVisibility={setVisibility} />
+                      
                       <LinkShare
                         link={"https://slapper.io/s/" + collectionId}
                       />
@@ -420,7 +429,7 @@ export default function Croaker({ loadingUser, user }) {
                               }}
                             >
                               <input
-                              ref={myInputRef}
+                                ref={myInputRef}
                                 type="text"
                                 style={{
                                   ...sansSerif,
@@ -437,7 +446,7 @@ export default function Croaker({ loadingUser, user }) {
                                 onChange={(e) => setInput(e.target.value)}
                               />
 
-                              {(input.length > 0) && (
+                              {input.length > 0 && (
                                 <View
                                   style={{
                                     position: "absolute",
@@ -475,7 +484,7 @@ export default function Croaker({ loadingUser, user }) {
                                 setInput(
                                   "https://www.youtube.com/watch?v=Ob7vObnFUJc"
                                 );
-                                myInputRef.current.focus()
+                                myInputRef.current.focus();
                               }}
                             >
                               https://www.youtube.com/watch?v=Ob7vObnFUJc
@@ -494,7 +503,7 @@ export default function Croaker({ loadingUser, user }) {
                                 setInput(
                                   "spotify:track:698ItKASDavgwZ3WjaWjtz"
                                 );
-                                myInputRef.current.focus()
+                                myInputRef.current.focus();
                               }}
                             >
                               spotify:track:698ItKASDavgwZ3WjaWjtz
@@ -513,7 +522,7 @@ export default function Croaker({ loadingUser, user }) {
                                 setInput(
                                   "https://open.spotify.com/track/698ItKASDavgwZ3WjaWjtz?si=PAypRLZDRyyS9-AUP_P6oQ"
                                 );
-                                myInputRef.current.focus()
+                                myInputRef.current.focus();
                               }}
                             >
                               https://open.spotify.com/track/698It...RLZDRyyS9-AUP_P6oQ
@@ -606,18 +615,34 @@ export default function Croaker({ loadingUser, user }) {
 
 function VisibilitySwitcher({ setVisibility, visibility }) {
   return (
-    <View style={{
-      marginBottom: 10
-    }}>
-      {visibility == "public" ? 
-      <TText style={{
-        fontSize: 12
-      }}>This slap is public. <a onClick={() => setVisibility("unlisted")} href="#">Change to "unlisted"</a></TText> : 
-      <TText style={{
-        fontSize: 12
-      }}>This slap can only be accessed by link. <a onClick={() => setVisibility("public")} href="#">Change to "public"</a></TText>
-       }
-
+    <View
+      style={{
+        marginBottom: 10,
+      }}
+    >
+      {visibility == "public" ? (
+        <TText
+          style={{
+            fontSize: 12,
+          }}
+        >
+          This slap is public.{" "}
+          <a onClick={() => setVisibility("unlisted")} href="#">
+            Change to "unlisted"
+          </a>
+        </TText>
+      ) : (
+        <TText
+          style={{
+            fontSize: 12,
+          }}
+        >
+          This slap can only be accessed by link.{" "}
+          <a onClick={() => setVisibility("public")} href="#">
+            Change to "public"
+          </a>
+        </TText>
+      )}
     </View>
-  )
+  );
 }
