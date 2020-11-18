@@ -14,7 +14,6 @@ import { TText } from "./utils/font";
 import { BButton } from "./comp/BButton";
 
 const Sidebar = ({ user, loadingUser }) => {
-  
   let history = useHistory();
   let location = useLocation();
   const { collectionId } = useParams();
@@ -23,20 +22,17 @@ const Sidebar = ({ user, loadingUser }) => {
 
   const [slaps, setSlaps] = useState([]);
   const [updateCounter, setUpdateCounter] = useState(0);
-  const [allUsers, setAllUsers] = useState([]);
-
 
   useEffect(() => {
-    if(location.pathname == "/s" && user && !collectionId && slaps.length){
-      const userSlaps = slaps.filter(slap => slap.user == user.id)
-      if(userSlaps.length) {
-        history.push("/s/" + userSlaps[0].id)
+    if (location.pathname == "/s" && user && !collectionId && slaps.length) {
+      const userSlaps = slaps.filter((slap) => slap.user == user.id);
+      if (userSlaps.length) {
+        history.push("/s/" + userSlaps[0].id);
       } else {
-        newSlapCollection()
+        newSlapCollection();
       }
     }
-    
-  },[collectionId, user, slaps])
+  }, [collectionId, user, slaps]);
 
   useEffect(() => {
     request("GET", "fauna/collections").then((res) => {
@@ -62,12 +58,6 @@ const Sidebar = ({ user, loadingUser }) => {
     });
   };
 
-  useEffect(() => {
-    request("GET", "fauna/users/findAll").then((asdf) => {
-      setAllUsers(asdf);
-    });
-  }, []);
-
   return (
     <div
       style={{
@@ -79,70 +69,67 @@ const Sidebar = ({ user, loadingUser }) => {
       <div style={{ paddingTop: 100 }}></div>
       <Logo />
 
-      {(!loadingUser && !user) &&
-      <View style={{
-        paddingTop: 20,
-        paddingHorizontal: 10
-      }}>
-        <Text>With a slapper account you can create your own shareable collections!</Text>
-        <BButton
-        variant="secondary"
-          onClick={() => {
-            history.push("/login", { from: location });
+      {!loadingUser && !user && (
+        <View
+          style={{
+            paddingTop: 20,
+            paddingHorizontal: 10,
           }}
         >
-          Login/sign up
-        </BButton>
-      </View>
-      }
+          <Text>
+            With a slapper account you can create your own shareable
+            collections!
+          </Text>
+          <BButton
+            variant="secondary"
+            onClick={() => {
+              history.push("/login", { from: location });
+            }}
+          >
+            Login/sign up
+          </BButton>
+        </View>
+      )}
 
-      {allUsers
-        .sort((a, b) => {
-          if (a.data.id == user?.id) {
-            return -10;
-          }
-        })
-        .map((u) => (
-          <div key={u.data.id}>
-            <User isMe={u.data.id == user?.id}  id={u.data.id} />
-            {slaps
-              .filter((s) => s.user == u.data.id)
-              .map((slap) => {
-                const active = slap.id == activeSlap;
+      {user && (
+        <div>
+          <User isMe={true} id={user.id} />
+          {slaps
+            .filter((s) => s.user == user.id)
+            .map((slap) => {
+              const active = slap.id == activeSlap;
 
-                return (
-                  <Link key={slap.id} to={"/s/" + slap.id}>
-                    <View
+              return (
+                <Link key={slap.id} to={"/s/" + slap.id}>
+                  <View
+                    style={{
+                      paddingVertical: 6,
+                      backgroundColor: active && "#dddddd",
+                    }}
+                  >
+                    <TText
                       style={{
-                        paddingVertical: 6,
-                        backgroundColor: active && "#dddddd",
+                        fontSize: 12,
+                        paddingLeft: 20,
+                        fontWeight: active ? 700 : 400,
                       }}
                     >
-                      <TText
-                        style={{
-                          fontSize: 12,
-                          paddingLeft: 20,
-                          fontWeight: active ? 700 : 400,
-                        }}
-                      >
-                        {slap.title.length ? slap.title : "Untitled"}
-                      </TText>
-                    </View>
-                  </Link>
-                );
-              })}
+                      {slap.title.length ? slap.title : "Untitled"}
+                    </TText>
+                  </View>
+                </Link>
+              );
+            })}
 
-            {u.data.id == user?.id && (
-              <div
-                style={{
-                  paddingTop: 10,
-                }}
-              >
-                <button onClick={newSlapCollection}>New collection +</button>
-              </div>
-            )}
+          <div
+            style={{
+              paddingTop: 10,
+            }}
+          >
+            <button onClick={newSlapCollection}>New collection +</button>
           </div>
-        ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -160,8 +147,7 @@ const User = ({ id, isMe }) => {
       style={{
         paddingTop: 50,
       }}
-      onClick={() => {
-      }}
+      onClick={() => {}}
     >
       <TText
         style={{
@@ -174,34 +160,30 @@ const User = ({ id, isMe }) => {
         {user?.name}
       </TText>
     </div>
-  )
-  if(isMe){
-    return (
-      <Link to="/profile">
-      {content}
-      </Link>
-    );
-
+  );
+  if (isMe) {
+    return <Link to="/profile">{content}</Link>;
   }
-  return content
+  return content;
 };
 
 export default Sidebar;
 
-
-export const Logo = () => <TText
-style={{
-  fontSize: 20,
-  fontWeight: 200,
-  paddingLeft: 20,
-}}
->
-<span
-  style={{
-    fontWeight: 700,
-  }}
->
-  Slapper
-</span>
-.io
-</TText>
+export const Logo = () => (
+  <TText
+    style={{
+      fontSize: 20,
+      fontWeight: 200,
+      paddingLeft: 20,
+    }}
+  >
+    <span
+      style={{
+        fontWeight: 700,
+      }}
+    >
+      Slapper
+    </span>
+    .io
+  </TText>
+);

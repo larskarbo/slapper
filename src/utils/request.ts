@@ -24,5 +24,10 @@ export function request(method, functionName, data?) {
     method: method,
     json: data,
     headers,
-  }).json();
+  }).json()
+  .catch(async error => {
+  
+    throw new Error(error.response.status + ": " + error.message + " " + (await error.response.json())?.error?.message);
+
+  })
 }

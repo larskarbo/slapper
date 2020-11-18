@@ -9,6 +9,12 @@ const client = new faunadb.Client({
 /* export our lambda function as named "handler" export */
 exports.handler = async (req, res) => {
   
+  return res.json(401, {
+    error: {
+      message: "All users is not open anymore"
+    }
+  });
+
   const id = req.params.id
   return client
     .query(
