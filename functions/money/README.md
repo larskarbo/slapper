@@ -1,6 +1,7 @@
 
 ```
 stripe trigger checkout.session.completed
+stripe events resend evt_1HoZa1AtEfCrIWZM8jjB7Ni0
 ```
 
 ```

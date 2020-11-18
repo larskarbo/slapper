@@ -24,7 +24,7 @@ exports.handler = async (req, res) => {
       res.status(400);
       res.send({
         error: {
-          message:"Error verifying stripe webhook",
+          message: "Error verifying stripe webhook",
         }
       })
       return
@@ -37,7 +37,7 @@ exports.handler = async (req, res) => {
     res.status(400);
     res.send({
       error: {
-        message:"No webhook secret",
+        message: "No webhook secret",
       }
     })
     return
@@ -49,11 +49,11 @@ exports.handler = async (req, res) => {
       console.log('user_id: ', user_id);
 
       try {
-        client
+        await client
           .query(q.Get(q.Match(q.Index("users_index"), user_id)))
-          .then((response) => {
+          .then(async (response) => {
             console.log("response: ", response.ref);
-            client
+            await client
               .query(
                 q.Update(
                   response.ref,
@@ -66,10 +66,10 @@ exports.handler = async (req, res) => {
           })
       } catch (e) {
         console.log("error", e)
-        res.status(400);
+        res.status(500);
         res.send({
           error: {
-            message:"Error updating fauna db", e.message,
+            message: "Error updating fauna db" + e.message,
           }
         })
         return
@@ -95,7 +95,7 @@ exports.handler = async (req, res) => {
       res.status(400);
       res.send({
         error: {
-          message:"Unhandled event type",
+          message: "Unhandled event type",
         }
       })
       return
