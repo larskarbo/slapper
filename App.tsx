@@ -80,7 +80,7 @@ export default function App() {
           <Route exact path="/login">
             <LoginPage user={user} />
           </Route>
-          <Route path={["/s/:collectionId", "/s", "/profile"]}>
+          <Route path={["/s/profile", "/s/:collectionId", "/s"]}>
             <Croaker loadingUser={loadingUser} user={user} />
           </Route>
           {/* <Switch>

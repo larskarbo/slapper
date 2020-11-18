@@ -23,7 +23,7 @@ export default function LinkShare({ link }) {
       </InputGroup.Prepend>
       <FormControl style={{
         fontSize: 10
-      }} value={link} />
+      }} value={link} onChange={() => {}} />
 
       <InputGroup.Append>
         <RBButton  style={{

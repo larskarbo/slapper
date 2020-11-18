@@ -66,7 +66,7 @@ export default function Croaker({ loadingUser, user }) {
   const [playingNow, setPlayingNow] = useState<PlayingNow>(null);
   const [playIntent, setPlayIntent] = useState<PlayIntent>(null);
 
-  const [clipRepeat, setClipRepeat] =  useLocalStorage("clipRepeat", true)
+  const [clipRepeat, setClipRepeat] = useLocalStorage("clipRepeat", true);
 
   const [items, setItems] = useState<Item[]>([]);
   const [slapUserId, setSlapUserId] = useState(null);
@@ -79,7 +79,11 @@ export default function Croaker({ loadingUser, user }) {
   const throttledDescription = useThrottle(description, 1000);
 
   useEffect(() => {
+    if (!collectionId) {
+      return;
+    }
     setLoaded(false);
+
     request("GET", "fauna/collection/" + collectionId).then((res) => {
       setItems(
         res.data.items.map((i) => {
@@ -301,18 +305,14 @@ export default function Croaker({ loadingUser, user }) {
         <Sidebar loadingUser={loadingUser} user={user} />
         <div>
           <Switch>
-          <Route exact path="/s">
+            <Route exact path="/s">
               {!loadingUser && (
                 <h3>Select a collection or create one to get started.</h3>
               )}
             </Route>
-            <Route path="/profile">
-              {!user && (
-                <h3>No user.</h3>
-              )}
-              {user && (
-                <Profile user={user} />
-              )}
+            <Route path="/s/profile">
+              {!user && <h3>No user.</h3>}
+              {user && <Profile user={user} />}
             </Route>
             <Route path={`/s/:collectionId`}>
               <View
@@ -400,23 +400,55 @@ export default function Croaker({ loadingUser, user }) {
                         />
                       ))}
 
-                      <KeyboardEventHandler
-                        handleKeys={["Enter"]}
-                        onKeyEvent={go}
-                      >
-                        <CleanInput
+                      {user?.plan == "premium" || items.length < 5 ? (
+                        <KeyboardEventHandler
+                          handleKeys={["Enter"]}
+                          onKeyEvent={go}
+                        >
+                          <CleanInput
+                            style={{
+                              fontSize: input.length ? 12 : 25,
+                              height: 60,
+                              width: 500,
+                              padding: 20,
+                            }}
+                            placeholder="Paste youtube or spotify link here"
+                            value={input}
+                            onChange={(value) => setInput(value)}
+                          />
+                        </KeyboardEventHandler>
+                      ) : (
+                        <View
                           style={{
-                            fontSize: input.length ? 12 : 25,
-                            height: 60,
-                            width: 500,
                             padding: 20,
+                            backgroundColor: "#FFDCA8",
                           }}
-                          placeholder="Paste youtube or spotify link here"
-                          value={input}
-                          onChange={(value) => setInput(value)}
-                        />
-                      </KeyboardEventHandler>
-                      <FeedbackFish projectId="84e4f29205e0f4">
+                        >
+                          <TText
+                            style={{
+                              fontWeight: 700,
+                            }}
+                          >
+                            5 songs per slap is the maximum for the Standard
+                            plan
+                          </TText>
+                          <TText style={{
+                            marginBottom: 20
+                          }}>
+                            Upgrade to premium to get the full Slapper
+                            experience, and support the development of the app!
+                          </TText>
+                          <Link to="/s/profile">
+                            <BButton variant="primary">
+                              Upgrade to premium
+                            </BButton>
+                          </Link>
+                        </View>
+                      )}
+                      <FeedbackFish
+                        projectId="84e4f29205e0f4"
+                        userId={user?.email}
+                      >
                         <BButton style={{ marginTop: 150 }}>
                           Send instant feedback ⚡
                         </BButton>

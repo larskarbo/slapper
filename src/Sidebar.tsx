@@ -162,7 +162,7 @@ const User = ({ id, isMe }) => {
     </div>
   );
   if (isMe) {
-    return <Link to="/profile">{content}</Link>;
+    return <Link to="/s/profile">{content}</Link>;
   }
   return content;
 };

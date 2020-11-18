@@ -95,7 +95,9 @@ const Profile = ({ user }) => {
             </TText>
           ))}
           {isPremium ? (
-            <BButton variant="light">Downgrade</BButton>
+            <BButton variant="light" onPress={() => {
+              alert("Still a bit early in development, but just shoot me a message on mail@larskarbo.no or DM me at Twitter, and I will fix it!")
+            }}>Downgrade</BButton>
           ) : (
             <BButton variant="secondary">Current plan</BButton>
           )}

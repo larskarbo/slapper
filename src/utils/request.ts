@@ -27,7 +27,7 @@ export function request(method, functionName, data?) {
   }).json()
   .catch(async error => {
   
-    throw new Error(error.response.status + ": " + error.message + " " + (await error.response.json())?.error?.message);
+    throw new Error(`${functionName} statusCode:${error.response?.status} ${error.message} ${(await error.response?.json())?.error?.message}`);
 
   })
 }
