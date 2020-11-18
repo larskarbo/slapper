@@ -14,7 +14,7 @@ import { FeedbackFish } from "@feedback-fish/react";
 import Authorize from "./Authorize";
 import Profile from "./Profile";
 import { sansSerif } from "./utils/font.tsx";
-import { CleanInput, TText } from "./utils/font";
+import { CleanInput, DEFAULT_BLACK, TText } from "./utils/font";
 import Spotify from "./Spotify";
 
 import LinkShare from "./comp/LinkShare";
@@ -62,6 +62,8 @@ export default function Croaker({ loadingUser, user }) {
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
   );
+
+  const myInputRef = useRef(null);
 
   const [playingNow, setPlayingNow] = useState<PlayingNow>(null);
   const [playIntent, setPlayIntent] = useState<PlayIntent>(null);
@@ -401,22 +403,118 @@ export default function Croaker({ loadingUser, user }) {
                       ))}
 
                       {user?.plan == "premium" || items.length < 5 ? (
-                        <KeyboardEventHandler
-                          handleKeys={["Enter"]}
-                          onKeyEvent={go}
-                        >
-                          <CleanInput
+                        <>
+                          <KeyboardEventHandler
+                            handleKeys={["Enter"]}
+                            onKeyEvent={go}
+                          >
+                            <View
+                              style={{
+                                position: "relative",
+                                marginTop: 20,
+                                width: 500,
+                              }}
+                            >
+                              <input
+                              ref={myInputRef}
+                                type="text"
+                                style={{
+                                  ...sansSerif,
+                                  outline: "none",
+                                  fontSize: 15,
+                                  width: "100%",
+                                  padding: "10px 20px",
+                                  borderWidth: 1,
+                                  borderColor: DEFAULT_BLACK,
+                                }}
+                                placeholder="Paste youtube or spotify link here"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                              />
+
+                              {(input.length > 0) && (
+                                <View
+                                  style={{
+                                    position: "absolute",
+                                    right: 10,
+                                    top: 10,
+                                    bottom: 10,
+                                    backgroundColor: "white",
+                                    justifyContent: "center",
+                                    paddingLeft: 20,
+                                  }}
+                                >
+                                  <TText>Press enter to add</TText>
+                                </View>
+                              )}
+                            </View>
+                          </KeyboardEventHandler>
+                          <TText
                             style={{
-                              fontSize: input.length ? 12 : 25,
-                              height: 60,
-                              width: 500,
-                              padding: 20,
+                              fontSize: 10,
+                              fontStyle: "italic",
                             }}
-                            placeholder="Paste youtube or spotify link here"
-                            value={input}
-                            onChange={(value) => setInput(value)}
-                          />
-                        </KeyboardEventHandler>
+                          >
+                            ↑ Examples: ↑
+                          </TText>
+                          <TText
+                            style={{
+                              fontSize: 10,
+                              color: "blue",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            <a
+                              href="#"
+                              onClick={() => {
+                                setInput(
+                                  "https://www.youtube.com/watch?v=Ob7vObnFUJc"
+                                );
+                                myInputRef.current.focus()
+                              }}
+                            >
+                              https://www.youtube.com/watch?v=Ob7vObnFUJc
+                            </a>
+                          </TText>
+                          <TText
+                            style={{
+                              fontSize: 10,
+                              color: "blue",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            <a
+                              href="#"
+                              onClick={() => {
+                                setInput(
+                                  "spotify:track:698ItKASDavgwZ3WjaWjtz"
+                                );
+                                myInputRef.current.focus()
+                              }}
+                            >
+                              spotify:track:698ItKASDavgwZ3WjaWjtz
+                            </a>
+                          </TText>
+                          <TText
+                            style={{
+                              fontSize: 10,
+                              color: "blue",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            <a
+                              href="#"
+                              onClick={() => {
+                                setInput(
+                                  "https://open.spotify.com/track/698ItKASDavgwZ3WjaWjtz?si=PAypRLZDRyyS9-AUP_P6oQ"
+                                );
+                                myInputRef.current.focus()
+                              }}
+                            >
+                              https://open.spotify.com/track/698It...RLZDRyyS9-AUP_P6oQ
+                            </a>
+                          </TText>
+                        </>
                       ) : (
                         <View
                           style={{
@@ -432,9 +530,11 @@ export default function Croaker({ loadingUser, user }) {
                             5 songs per slap is the maximum for the Standard
                             plan
                           </TText>
-                          <TText style={{
-                            marginBottom: 20
-                          }}>
+                          <TText
+                            style={{
+                              marginBottom: 20,
+                            }}
+                          >
                             Upgrade to premium to get the full Slapper
                             experience, and support the development of the app!
                           </TText>

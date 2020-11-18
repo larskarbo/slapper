@@ -1,11 +1,7 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import React, { useEffect } from "react";
 import netlifyIdentity from "netlify-identity-widget";
 import { useHistory, useLocation, Route, Switch, Redirect } from "react-router-dom";
-import termsFrPath from "../../src/welcome.md";
-import marked from "marked";
-import {request} from "../utils/request";
 
 export default function ({user}) {
   let history = useHistory();
