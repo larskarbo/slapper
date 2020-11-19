@@ -347,7 +347,7 @@ export default function Croaker({ loadingUser, user }) {
                           setVisibility={setVisibility}
                         />
                       )}
-                      
+
                       <LinkShare
                         link={"https://slapper.io/s/" + collectionId}
                       />
@@ -563,7 +563,7 @@ export default function Croaker({ loadingUser, user }) {
                         projectId="84e4f29205e0f4"
                         userId={user?.email}
                       >
-                        <BButton style={{ marginTop: 150 }}>
+                        <BButton style={{ marginTop: 100, marginBottom: 100 }}>
                           Send instant feedback ⚡
                         </BButton>
                       </FeedbackFish>
