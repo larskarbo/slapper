@@ -17,7 +17,10 @@ exports.handler = async (req, res) => {
       // then query the refs
       client.query(getAllItemsDataQuery).then(ret => {
         console.log('ret: ', ret);
-        res.json(ret.filter(r => r.data.visibility == "public"))
+        res.json(ret
+          .filter(r => r.data.visibility == "public")
+          .filter(r => r.data.title.length > 0)
+          )
       })
     })
     .catch(error => {

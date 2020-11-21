@@ -76,9 +76,9 @@ export default function Croaker({ loadingUser, user }) {
   const [loaded, setLoaded] = useState(false);
 
   const throttledItems = useThrottle(items, 1000);
-  const [title, setTitle] = useState([]);
+  const [title, setTitle] = useState("");
   const throttledTitle = useThrottle(title, 1000);
-  const [description, setDescription] = useState([]);
+  const [description, setDescription] = useState("");
   const throttledDescription = useThrottle(description, 1000);
   const [visibility, setVisibility] = useState("unlisted");
 
