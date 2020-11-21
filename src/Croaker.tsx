@@ -308,12 +308,22 @@ export default function Croaker({ loadingUser, user }) {
             <meta name="description" content={description} />
           )}
           {collectionId && (
-            <meta
-              property="og:image"
-              content={
-                "https://slapper.io/.netlify/functions/ogimage/" + collectionId
-              }
-            />
+            <>
+              <meta
+                property="og:image"
+                content={
+                  "https://slapper.io/.netlify/functions/ogimage/" +
+                  collectionId
+                }
+              />
+              <meta
+                property="twitter:image"
+                content={
+                  "https://slapper.io/.netlify/functions/ogimage/" +
+                  collectionId
+                }
+              />
+            </>
           )}
         </Helmet>
         <Sidebar loadingUser={loadingUser} user={user} />
