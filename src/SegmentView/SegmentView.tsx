@@ -45,8 +45,10 @@ export default function SegmentView({
     const INTERVAL = 100;
     if (playing) {
       const interval = setInterval(() => {
-        setPointerAtRolling((pointerAt) =>
-          Math.min(pointerAt + INTERVAL, duration)
+        setPointerAtRolling((pointerAt) =>{
+          window.guessingPosition = Math.min(pointerAt + INTERVAL, duration)
+         return Math.min(pointerAt + INTERVAL, duration)
+        }
         );
       }, INTERVAL);
       return () => clearInterval(interval);

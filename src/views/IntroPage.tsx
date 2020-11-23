@@ -47,7 +47,7 @@ export default function () {
           🚀 Live on <a
           style={{
             color: "white",
-          }} href="https://www.producthunt.com/">Product hunt</a>
+          }} target="_blank" href="https://www.producthunt.com/">Product hunt</a>
         </TText>
       </View>
       <View
@@ -164,7 +164,7 @@ export default function () {
 const GetStarted = ({ style, children }) => {
   let history = useHistory();
   return (
-    <Link to="/login">
+    <Link to="/register">
       <BButton
         style={{
           marginTop: 50,

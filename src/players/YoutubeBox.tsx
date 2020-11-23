@@ -1,6 +1,6 @@
 import Authorize from "../Authorize";
 import DeviceSelector from "../DeviceSelector";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import YouTube from "react-youtube";
 import { Item, Clip } from "./Croaker";
 import { FOOTER_HEIGHT } from "../Croaker";
@@ -87,6 +87,7 @@ const YoutubeVideo = ({
     }
   }, [youtubeElement]);
 
+
   useEffect(() => {
     if (!youtubeElement) return;
     if (!playIntentVideo) {
@@ -155,12 +156,10 @@ const YoutubeVideo = ({
         // display: "none",
       }}
     >
-      
-
       <View
         style={{
           justifyContent: "space-between",
-          flexDirection: "row"
+          flexDirection: "row",
         }}
       >
         <div></div>
@@ -185,14 +184,14 @@ const YoutubeVideo = ({
         onClick={onToggleSize}
       >
         <div
-        style={{
-          position: "absolute",
-          top: 0,
-          right: 0,
-          left: 0,
-          bottom: 0,
-        }}
-      ></div>
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            left: 0,
+            bottom: 0,
+          }}
+        ></div>
         <YouTube
           videoId={item.videoId}
           opts={{

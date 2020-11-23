@@ -611,7 +611,7 @@ export default function Croaker({ loadingUser, user }) {
           onDeleteClip={deleteClip}
           clipRepeat={clipRepeat}
           setClipRepeat={setClipRepeat}
-        >
+          >
           <Players
             spotify={spotify}
             playingNow={playingNow}
@@ -624,6 +624,7 @@ export default function Croaker({ loadingUser, user }) {
               updateItem(item, { metaInfo: metaInfo })
             }
             onSetPlayingNow={(pn) => setPlayingNow({ ...playingNow, ...pn })}
+            removePlayingNow={() => setPlayingNow(null)}
           />
         </Footer>
       </div>

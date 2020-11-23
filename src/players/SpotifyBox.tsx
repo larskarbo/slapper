@@ -10,6 +10,7 @@ export const SpotifyBox = ({
   playIntent,
   onSetMetaInfo,
   onSetPlayingNow,
+  removePlayingNow
 }: {
   items: Item[];
   [key: string]: any;
@@ -22,12 +23,18 @@ export const SpotifyBox = ({
   useEffect(() => {
     spotify.onUpdatePlaybackState = (playbackState) => {
       if (
-        playingNowTrack &&
-        playingNowTrack.item.trackId == playbackState?.item?.id
+        playingNowTrack
+        
       ) {
-        onSetPlayingNow({
-          position: playbackState.progress_ms,
-        });
+        console.log('here')
+        if(playingNowTrack.item.trackId == playbackState?.item?.id){
+          onSetPlayingNow({
+            position: playbackState.progress_ms,
+          });
+        } else  {
+          console.log('spotify takeover')
+          removePlayingNow();
+        }
       }
     };
   }, [spotify, playingNowTrack]);

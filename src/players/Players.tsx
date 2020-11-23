@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { View } from "react-native";
 import { SpotifyBox } from "./SpotifyBox";
 import { YoutubeBox } from "./YoutubeBox";
 import { Item, Clip } from "../Croaker";
+import { TimerMan } from "./TimerMan";
 
 export interface PlayingNow {
   type: "item" | "clip";
@@ -20,7 +21,6 @@ export interface PlayIntent {
   to?: number;
 }
 
-let timer = setTimeout(() => {});
 export default function Players({
   spotify,
   items,
@@ -34,40 +34,17 @@ export default function Players({
   items: Item[];
   [key: string]: any;
 }) {
+  const [timerState, setTimerState] = useState("")
+  const timerMan = useMemo(() => new TimerMan(clipRepeat, onPlay, onPause), []);
+
   useEffect(() => {
-    if (playingNow?.state !== "playing") {
-      clearTimeout(timer);
-      return;
-    }
-    if (playingNow?.position) {
-      if (playingNow.type == "clip") {
-        const realClip = items
-          .find((i) => playingNow.item.id == i.id)
-          ?.clips.find((c) => playingNow.clip.id == c.id);
-        if (!realClip) {
-          // something wrong
-          clearTimeout(timer);
-          return;
-        }
-        const timeUntilPause = realClip.to - playingNow.position;
-        clearTimeout(timer);
-        if (timeUntilPause > 0) {
-          timer = setTimeout(() => {
-            if (clipRepeat) {
-              const playable = {
-                type: "clip",
-                item: playingNow.item,
-                clip: realClip,
-              };
-              onPlay(playable);
-            } else {
-              onPause();
-            }
-          }, timeUntilPause);
-        }
-      }
-    }
-  }, [playingNow?.position, playingNow?.state]);
+    timerMan.clipRepeat = clipRepeat
+  }, [clipRepeat])
+  
+  useEffect(() => {
+    console.log('playingNow: ', playingNow?.position);
+    timerMan.whatToDo(playingNow, items)
+  }, [playingNow, items]);
 
   return (
     <View
@@ -78,6 +55,7 @@ export default function Players({
       }
     >
       <div>Players:</div>
+      {timerState}
       <div style={{ display: "flex" }}>
         <SpotifyBox
           playingNow={playingNow}

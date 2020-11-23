@@ -24,7 +24,7 @@ const Sidebar = ({ user, loadingUser }) => {
   const [updateCounter, setUpdateCounter] = useState(0);
 
   useEffect(() => {
-    if (location.pathname == "/s" && user && !collectionId && slaps.length) {
+    if ((location.pathname == "/s" || location.pathname == "/s/") && user && !collectionId && slaps.length) {
       const userSlaps = slaps.filter((slap) => slap.user == user.id);
       if (userSlaps.length) {
         history.push("/s/" + userSlaps[0].id);

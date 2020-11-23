@@ -24,6 +24,7 @@ export default function ({ user, register = false }) {
     isConfirmedUser,
     loginUser,
     signupUser,
+    loginProvider,
     user: nUser,
   } = useIdentityContext();
   console.log("nUser: ", nUser);
@@ -155,7 +156,9 @@ export default function ({ user, register = false }) {
               </form>
 
               <hr />
-              <BButton>
+              <BButton onPress={() => {
+                loginProvider("google")
+              }}>
                 <View
                   style={{
                     justifyContent: "space-between",
