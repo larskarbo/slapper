@@ -37,7 +37,7 @@ export default function ({ user, register = false }) {
     }
     // const password = formRef.current.password.value;
 
-    request("POST", "/fauna/users/setMe", {
+    request("POST", "sfauna/users/setMe", {
       username:username,
       emailUpdates:emailUpdates,
     })
