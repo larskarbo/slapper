@@ -177,7 +177,7 @@ const User = ({ id, isMe }) => {
           letterSpacing: "-1px",
         }}
       >
-        {user?.name}
+        {user?.username}
       </TText>
     </div>
   );

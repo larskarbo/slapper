@@ -8,15 +8,11 @@ let headers = {};
 
 export const stripe = window.Stripe(Constants.manifest.extra.STRIPE_PUB_KEY)
 
-export function generateHeaders(nUser) {
-  return nUser
-    .jwt()
-    .then((token) => {
-      headers = {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      };
-    });
+export function generateHeaders(token) {
+  headers = {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
 }
 
 export function request(method, functionName, data?) {
@@ -26,6 +22,7 @@ export function request(method, functionName, data?) {
     headers,
   }).json()
   .catch(async error => {
+    console.log('error: ', error);
   
     throw new Error(`${functionName} statusCode:${error.response?.status} ${error.message} ${(await error.response?.json())?.error?.message}`);
 

@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import netlifyIdentity from "netlify-identity-widget";
-import { useHistory, useLocation, Link, Route, Switch } from "react-router-dom";
+import { useHistory, useLocation, Link, Route, Switch, Redirect } from "react-router-dom";
 
 import marked from "marked";
 import YouTube from "react-youtube";
@@ -16,6 +16,10 @@ import { Logo } from "../Sidebar";
 import { Helmet } from "react-helmet";
 
 export default function () {
+  const location = useLocation()
+  if(location.hash?.includes("confirmation_token")){
+    return <Redirect to={"/onboarding"+location.hash} />
+  }
   return (
     <View
       style={{
@@ -26,6 +30,26 @@ export default function () {
         backgroundColor: "oldlace",
       }}
     >
+      <View
+        style={{
+          height: 40,
+          backgroundColor: "#008aff",
+          justifyContent: "center",
+          width: "100%"
+        }}
+      >
+        <TText
+          style={{
+            color: "white",
+            textAlign: "center",
+          }}
+        >
+          🚀 Live on <a
+          style={{
+            color: "white",
+          }} href="https://www.producthunt.com/">Product hunt</a>
+        </TText>
+      </View>
       <View
         style={{
           flexDirection: "column",

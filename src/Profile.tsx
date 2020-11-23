@@ -154,7 +154,7 @@ const Profile = ({ user }) => {
           marginTop: 25,
         }}
         onClick={() => {
-          netlifyIdentity.open();
+          window.location.href = "/logout"
         }}
       >
         Log out

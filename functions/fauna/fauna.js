@@ -13,6 +13,7 @@ router.put("/collection/:id", require("./update").handler);
 router.post("/collection", require("./create").handler);
 
 router.post("/users/getMe", require("./users/getMe").handler);
+router.post("/users/setMe", require("./users/setMe").handler);
 router.get("/users/find/:id", require("./users/findUser").handler);
 router.get("/users/findAll", require("./users/allUsers").handler);
 

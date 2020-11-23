@@ -17,9 +17,6 @@ exports.handler = async (req, res) => {
     })
     .catch(error => {
       console.log('error', error)
-      return {
-        statusCode: 400,
-        body: JSON.stringify(error),
-      }
+      return res.json(400, error);
     })
 }

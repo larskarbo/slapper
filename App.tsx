@@ -20,16 +20,39 @@ import { request, generateHeaders } from "./src/utils/request";
 import Croaker from "./src/Croaker";
 import { Helmet } from "react-helmet";
 import { BButton } from "./src/comp/BButton";
+import { TText } from "./src/utils/font";
+
+import {
+  IdentityContextProvider,
+  useIdentityContext,
+} from "react-netlify-identity";
+import OnBoard from "./src/views/OnBoard";
+const url = "https://slapper.io";
 
 // You must run this once before trying to interact with the widget
-netlifyIdentity.init();
+// netlifyIdentity.init();
 
 export default function App() {
+  return (
+    <IdentityContextProvider url={url}>
+      <Routing />
+    </IdentityContextProvider>
+  );
+}
+
+function Routing() {
+  const {
+    isConfirmedUser,
+    authedFetch,
+    getFreshJWT,
+    user: nUser,
+  } = useIdentityContext();
   const [user, setUser] = useState(null);
+  console.log("user: ", user);
   const [loadingUser, setLoadingUser] = useState(true);
 
-  const getUserFromServer = async (nUser) => {
-    await generateHeaders(nUser);
+  const getUserFromServer = async () => {
+    generateHeaders(await getFreshJWT());
     await request("POST", "fauna/users/getMe")
       .then((res: any) => {
         if (res.id) {
@@ -45,29 +68,36 @@ export default function App() {
   };
 
   useEffect(() => {
-    netlifyIdentity.on("login", (user) => {
-      netlifyIdentity.close();
-      getUserFromServer(user);
-    });
-  }, []);
-
-  useEffect(() => {
-    netlifyIdentity.on("logout", (user) => {
-      console.log("logging out");
-      setUser(null);
-    });
-  }, []);
-
-  useEffect(() => {
-    const nUser = netlifyIdentity.currentUser();
-    console.log("nUser: ", nUser);
-    if (!nUser) {
-      setLoadingUser(false);
-      return;
+    if (nUser && isConfirmedUser) {
+      console.log("nUser: ", nUser);
+      getUserFromServer();
     }
-    getUserFromServer(nUser).finally(() => {
-      setLoadingUser(false);
-    });
+  }, [nUser, isConfirmedUser]);
+
+  // useEffect(() => {
+  //   netlifyIdentity.on("login", (user) => {
+  //     netlifyIdentity.close();
+  //     getUserFromServer(user);
+  //   });
+  // }, []);
+
+  // useEffect(() => {
+  //   netlifyIdentity.on("logout", (user) => {
+  //     console.log("logging out");
+  //     setUser(null);
+  //   });
+  // }, []);
+
+  useEffect(() => {
+    // const nUser = netlifyIdentity.currentUser();
+    // console.log("nUser: ", nUser);
+    // if (!nUser) {
+    //   setLoadingUser(false);
+    //   return;
+    // }
+    // getUserFromServer(nUser).finally(() => {
+    //   setLoadingUser(false);
+    // });
   }, []);
 
   return (
@@ -86,17 +116,31 @@ export default function App() {
           content="https://res.cloudinary.com/dfzqjzusj/image/upload/c_fill,g_north,h_630,w_1200/v1605177986/CleanShot_2020-11-12_at_11.45.29_2x.png"
         />
       </Helmet>
+
       <Router>
         <Switch>
           <Route exact path="/">
             <IntroPage />
           </Route>
 
+          <Route exact path="/logout">
+            <LogOut />
+          </Route>
           <Route exact path="/login">
             <LoginPage user={user} />
           </Route>
+          <Route exact path="/register">
+            <LoginPage user={user} register />
+          </Route>
+          <Route exact path="/onboarding">
+            <OnBoard user={user} />
+          </Route>
           <Route path={["/s/profile", "/s/browse", "/s/:collectionId", "/s"]}>
-            <Croaker loadingUser={loadingUser} user={user} />
+            {user && !user.username ? (
+              <Redirect to="/onboarding" />
+            ) : (
+              <Croaker loadingUser={loadingUser} user={user} />
+            )}
           </Route>
           {/* <Switch>
             <Route path="/login">
@@ -138,6 +182,14 @@ function PrivateRoute({ children, user, ...rest }) {
 
 const NotFound = () => <Text>404 not found</Text>;
 
+const LogOut = () => {
+  const { logoutUser } = useIdentityContext();
+
+  useEffect(() => {
+    logoutUser();
+  });
+  return <Text>Logged out</Text>;
+};
 const styles = StyleSheet.create({
   container: {
     flex: 1,

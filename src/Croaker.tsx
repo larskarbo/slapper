@@ -308,7 +308,7 @@ export default function Croaker({ loadingUser, user }) {
             <meta name="description" content={description} />
           )}
           {collectionId && (
-            <>
+            <Helmet>
               <meta
                 property="og:image"
                 content={
@@ -323,7 +323,7 @@ export default function Croaker({ loadingUser, user }) {
                   collectionId
                 }
               />
-            </>
+            </Helmet>
           )}
         </Helmet>
         <Sidebar loadingUser={loadingUser} user={user} />
