@@ -2,7 +2,13 @@ const { q, client } = require("../faunaClient");
 
 exports.handler = async (req, res) => {
   const { user } = req.clientContext;
-  console.log("user: ", user);
+  if (!user) {
+    return res.status(400).json({
+      error: {
+        message: "no user"
+      }
+    })
+  }
 
   return client
     .query(q.Get(q.Match(q.Index("users_index"), user.sub)))

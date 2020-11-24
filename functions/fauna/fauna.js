@@ -6,7 +6,7 @@ app.use(bodyParser.json());
 
 const router = express.Router();
 
-router.get("/collections", require("./collections").handler);
+router.post("/myCollections", require("./myCollections").handler);
 router.get("/popularCollections", require("./popularCollections").handler);
 router.get("/collection/:id", require("./read").handler);
 router.put("/collection/:id", require("./update").handler);

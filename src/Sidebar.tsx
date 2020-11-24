@@ -35,16 +35,22 @@ const Sidebar = ({ user, loadingUser }) => {
   }, [collectionId, user, slaps]);
 
   useEffect(() => {
-    request("GET", "fauna/collections").then((res) => {
-      setSlaps(
-        res.map((r) => ({
-          ...r.data,
-          id: r.ref["@ref"].id,
-        }))
-      );
-      // setActiveSlap(279439751993360901);
-    });
-  }, [updateCounter]);
+    if(user){
+      request("POST", "fauna/myCollections").then((res) => {
+        setSlaps(
+          res.map((r) => ({
+            ...r.data,
+            id: r.ref["@ref"].id,
+          }))
+        );
+        // setActiveSlap(279439751993360901);
+      }).catch((error) => {
+        console["error"]('error: ', error);
+  
+      })
+
+    }
+  }, [user, updateCounter]);
 
   const newSlapCollection = () => {
     request("POST", "fauna/collection", {
@@ -68,6 +74,7 @@ const Sidebar = ({ user, loadingUser }) => {
       }}
     >
       <div style={{ paddingTop: 100 }}></div>
+      <BButton onPress={() => setUpdateCounter(updateCounter + 1)}>ja</BButton>
       <Logo />
 
       <Link to={"/s/browse"}>

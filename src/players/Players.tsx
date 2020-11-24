@@ -55,7 +55,6 @@ export default function Players({
       }
     >
       <div>Players:</div>
-      {timerState}
       <div style={{ display: "flex" }}>
         <SpotifyBox
           playingNow={playingNow}

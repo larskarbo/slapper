@@ -30,7 +30,7 @@ export default function () {
         backgroundColor: "oldlace",
       }}
     >
-      <View
+      {/* <View
         style={{
           height: 40,
           backgroundColor: "#008aff",
@@ -49,7 +49,7 @@ export default function () {
             color: "white",
           }} target="_blank" href="https://www.producthunt.com/">Product hunt</a>
         </TText>
-      </View>
+      </View> */}
       <View
         style={{
           flexDirection: "column",

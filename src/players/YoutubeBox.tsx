@@ -87,7 +87,6 @@ const YoutubeVideo = ({
     }
   }, [youtubeElement]);
 
-
   useEffect(() => {
     if (!youtubeElement) return;
     if (!playIntentVideo) {
@@ -166,6 +165,7 @@ const YoutubeVideo = ({
         <ButtonGroup size="sm" aria-label="Basic example">
           {playbackRates.map((rate) => (
             <Button
+              key={rate}
               variant={playbackRate == rate ? "secondary" : "light"}
               onClick={() => youtubeElement.target.setPlaybackRate(rate)}
             >
