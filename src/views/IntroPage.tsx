@@ -1,24 +1,21 @@
-import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import netlifyIdentity from "netlify-identity-widget";
+import React from "react";
+import { View } from "react-native";
 import { useHistory, useLocation, Link, Route, Switch, Redirect } from "react-router-dom";
 
-import marked from "marked";
-import YouTube from "react-youtube";
 import { TText } from "../utils/font";
 import { BButton } from "../comp/BButton";
 import annotate from "./annotate.png";
 import segments from "./segments.png";
 import songs from "./songs.png";
-import Typist from "react-typist";
 import { Logo } from "../Sidebar";
-import { Helmet } from "react-helmet";
 
 export default function () {
   const location = useLocation()
   if(location.hash?.includes("confirmation_token")){
     return <Redirect to={"/onboarding"+location.hash} />
+  }
+  if(location.hash?.includes("access_token")){
+    return <Redirect to={"/s"+location.hash} />
   }
   return (
     <View

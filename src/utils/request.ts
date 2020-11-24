@@ -2,7 +2,7 @@ import ky from "ky";
 
 export const BASE = `/.netlify/functions/`;
 import Constants from 'expo-constants';
-console.log('Constants: ', Constants);
+
 
 let headers = {};
 
@@ -22,7 +22,7 @@ export function request(method, functionName, data?) {
     headers,
   }).json()
   .catch(async error => {
-    console.log('error: ', error);
+    
   
     throw new Error(`${functionName} statusCode:${error.response?.status} ${error.message} ${(await error.response?.json())?.error?.message}`);
 

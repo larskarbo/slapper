@@ -15,19 +15,19 @@ export class TimerMan {
   whatToDo = (playingNow, items) => {
     if (!playingNow || playingNow?.state !== "playing") {
       clearTimeout(this.timer);
-      console.log("canceled");
+      
       return;
     }
 
     if (playingNow.type != "clip") {
       clearTimeout(this.timer);
-      console.log("not clip");
+      
       return;
     }
 
     if (!playingNow?.position) {
       clearTimeout(this.timer);
-      console.log("no position");
+      
       return;
     }
 
@@ -38,7 +38,7 @@ export class TimerMan {
     if (!realClip) {
       // something wrong
       clearTimeout(this.timer);
-      console.log("something wrong, couldn't find clip");
+      
       return;
     }
 
@@ -50,16 +50,16 @@ export class TimerMan {
       this.realClip = realClip
       this.timer = setTimeout(this.stopOrLoop, timeUntilPause);
 
-      console.log(timeUntilPause + "");
+      
     } else {
-      console.log(timeUntilPause)
+      
     }
   };
 
   stopOrLoop = () => {
     // if (lastId != playingNow.item.id) {
     //   clearTimeout(this.timer);
-    //   console.log("wrong id");
+    //   
     //   return;
     // }
     if (this.clipRepeat) {

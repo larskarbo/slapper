@@ -49,7 +49,7 @@ function Routing() {
     user: nUser,
   } = useIdentityContext();
   const [user, setUser] = useState(null);
-  console.log("user: ", user);
+  
   const [loadingUser, setLoadingUser] = useState(true);
 
   const getUserFromServer = async () => {
@@ -57,11 +57,11 @@ function Routing() {
     await request("GET", "fauna/users/getMe")
       .then((res: any) => {
         if (res.id) {
-          console.log("res.id: ", res.id);
+          
           setUser(res);
         } else {
-          console.log("here");
-          console.log("res: ", res);
+          
+          
           throw new Error("No res.id");
         }
       })
@@ -70,7 +70,7 @@ function Routing() {
 
   useEffect(() => {
     if (nUser && isConfirmedUser) {
-      console.log("nUser: ", nUser);
+      
       getUserFromServer();
     }
   }, [nUser, isConfirmedUser]);
@@ -84,14 +84,14 @@ function Routing() {
 
   // useEffect(() => {
   //   netlifyIdentity.on("logout", (user) => {
-  //     console.log("logging out");
+  //     
   //     setUser(null);
   //   });
   // }, []);
 
   useEffect(() => {
     // const nUser = netlifyIdentity.currentUser();
-    // console.log("nUser: ", nUser);
+    // 
     // if (!nUser) {
     //   setLoadingUser(false);
     //   return;

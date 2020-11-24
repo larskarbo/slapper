@@ -42,7 +42,7 @@ export default function Players({
   }, [clipRepeat])
   
   useEffect(() => {
-    console.log('playingNow: ', playingNow?.position);
+    
     timerMan.whatToDo(playingNow, items)
   }, [playingNow, items]);
 

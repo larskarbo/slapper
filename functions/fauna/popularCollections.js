@@ -20,7 +20,7 @@ exports.handler = async (req, res) => {
         res.json(ret
           .filter(r => r.data.visibility == "public")
           .filter(r => r.data.title.length > 0)
-          )
+        )
       })
     })
     .catch(error => {
