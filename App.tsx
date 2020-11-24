@@ -27,6 +27,7 @@ import {
   useIdentityContext,
 } from "react-netlify-identity";
 import OnBoard from "./src/views/OnBoard";
+import Admin from "./src/views/Admin";
 const url = "https://slapper.io";
 
 // You must run this once before trying to interact with the widget
@@ -53,7 +54,7 @@ function Routing() {
 
   const getUserFromServer = async () => {
     generateHeaders(await getFreshJWT());
-    await request("POST", "fauna/users/getMe")
+    await request("GET", "fauna/users/getMe")
       .then((res: any) => {
         if (res.id) {
           console.log("res.id: ", res.id);
@@ -134,6 +135,9 @@ function Routing() {
           </Route>
           <Route exact path="/onboarding">
             <OnBoard user={user} />
+          </Route>
+          <Route exact path="/admin">
+            <Admin user={user} />
           </Route>
           <Route path={["/s/profile", "/s/browse", "/s/:collectionId", "/s"]}>
             {user && !user.username ? (

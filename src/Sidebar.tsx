@@ -36,7 +36,7 @@ const Sidebar = ({ user, loadingUser }) => {
 
   useEffect(() => {
     if(user){
-      request("POST", "fauna/myCollections").then((res) => {
+      request("GET", "fauna/myCollections").then((res) => {
         setSlaps(
           res.map((r) => ({
             ...r.data,
@@ -74,7 +74,6 @@ const Sidebar = ({ user, loadingUser }) => {
       }}
     >
       <div style={{ paddingTop: 100 }}></div>
-      <BButton onPress={() => setUpdateCounter(updateCounter + 1)}>ja</BButton>
       <Logo />
 
       <Link to={"/s/browse"}>
