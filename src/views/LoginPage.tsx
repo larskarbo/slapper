@@ -28,8 +28,8 @@ export default function ({ user, register = false }) {
     user: nUser,
   } = useIdentityContext();
   console.log("nUser: ", nUser);
-  const formRef = useRef();
-  const [msg, setMsg] = useState("");
+    const formRef = useRef();
+    const [msg, setMsg] = useState("");
 
   useEffect(() => {
     setMsg("");
