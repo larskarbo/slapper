@@ -21,6 +21,7 @@ var redirectToCookie = 'redirect_to_cookie';
 var client_id = '13f5eb87218a47ed87ce06e45329bd6c'; // Your client id
 var client_secret = process.env.SLAPPER_SPOTIFY_SECRET; // Your secret
 var redirect_uri = process.env.SLAPPER_ORIGIN + '/.netlify/functions/spotify-auth/callback'; // Your redirect uri
+console.log('redirect_uri: ', redirect_uri);
 
 const scopes = [
   "user-read-currently-playing",

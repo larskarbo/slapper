@@ -15,6 +15,9 @@ yarn-debug.log*
 build/
 web-build/
 samplex.xcworkspace
+
+public
+
 Podfile.lock# Logs
 logs
 *.log
