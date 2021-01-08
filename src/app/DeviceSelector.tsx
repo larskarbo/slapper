@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import { MdComputer, MdDevices } from "react-icons/md";
+import { MdComputer, MdDevices, MdPhone, MdPhoneIphone } from "react-icons/md";
 import useClickOutside from "use-click-outside";
+import { usePlayingNowState } from "./players/player-context";
 import { useSpotify } from "./players/spotify-context";
 
 export default function DeviceSelector({ }) {
@@ -8,14 +9,12 @@ export default function DeviceSelector({ }) {
   const [loading, setLoading] = useState(true);
   const [devices, setDevices] = useState([]);
   const ref = useRef();
-  useClickOutside(ref, () => setContextMenu(false));
-  const spotify = useSpotify();
-  // const spotify = useSpotify();
+  const { spotify } = usePlayingNowState();
 
   useEffect(() => {
     if (contextMenu) {
       setLoading(true)
-      console.log('spotify: ', spotify);
+      console.log('contextMenuShit: ', spotify);
       spotify.pollDevices().then(devices => {
         setDevices(devices)
         setLoading(false)
@@ -26,9 +25,10 @@ export default function DeviceSelector({ }) {
 
   useEffect(() => {
     spotify.mustOpenMenu = () => {
+      console.log("hei")
       setContextMenu(true)
       spotify.mustOpenDevices = false
-		}
+    }
   }, [spotify])
 
 
@@ -38,6 +38,7 @@ export default function DeviceSelector({ }) {
     <>
       {contextMenu &&
         <div
+          onClick={() => setContextMenu(false)}
           className="absolute top-0 left-0 right-0 bottom-0 bg-black bg-opacity-40"
         ></div>
       }
@@ -59,7 +60,7 @@ export default function DeviceSelector({ }) {
         </button>
         {contextMenu && (
           <div
-            className="origin-top-right absolute right-4 border-2 py-8 bottom-12 border-gray-700 mt-2 w-80 h-96 rounded-md  shadow-xl 
+            className="origin-top-right overflow-y-scroll absolute right-4 border-2 py-8 bottom-12 border-gray-700 mt-2 w-80 h-96 rounded-md  shadow-xl 
 		  bg-white"
             role="menu"
             aria-orientation="vertical"
@@ -74,11 +75,11 @@ export default function DeviceSelector({ }) {
                   <button
                     onClick={async () => {
                       await spotify.api.transferMyPlayback([device.id]);
+                      setContextMenu(false)
+                      spotify.pollDevices()
                       setTimeout(() => {
-                        spotify.pollDevices().then(devices => {
-                          setDevices(devices)
-                        })
-                      }, 2000)
+                        spotify.pollDevices()
+                      }, 500)
                     }}
                     key={device.id}
                     className={
@@ -87,7 +88,11 @@ export default function DeviceSelector({ }) {
                     }
                   >
                     <div className="p-6 ">
+                      {device.type == "Computer" ? 
                       <MdComputer size={30} />
+                      :
+                      <MdPhoneIphone size={30} />
+                      }
                     </div>
                     <div>
                       <div className="text font-bold">{device.name}</div>

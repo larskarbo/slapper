@@ -2,9 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import { request } from "../utils/request";
 import { Link } from 'gatsby';
 import { useSpotify } from "../players/spotify-context";
+import { usePlayingNowState } from "../players/player-context";
 
 export default function Settings({ user }) {
-  const spotify = useSpotify()
+  const {spotify} = usePlayingNowState()
   console.log('spotify: ', spotify);
   spotify.api.getMe().then(asdf => {
     console.log('asdf: ', asdf);

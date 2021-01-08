@@ -25,7 +25,8 @@ import { Link } from 'gatsby';
 import { FaPlay } from "react-icons/fa";
 import { AiFillAccountBook, AiFillPlayCircle, AiFillSave, AiOutlinePlayCircle } from "react-icons/ai";
 import { IoPlay, IoPlaySharp } from "react-icons/io5";
-import { useSpotify } from "./players/spotify-context";
+import { usePlayingNowState } from "./players/player-context";
+import { useUser } from "./user-context";
 
 export const FOOTER_HEIGHT = 120;
 const itemsForServer = (items) => {
@@ -61,7 +62,8 @@ export interface Item {
 }
 
 
-export default function Croaker({ loadingUser, user, collectionId, type }) {
+export default function Croaker({ collectionId, type }) {
+  const user = useUser()
   const [collectedProps, drop] = useDrop({
     accept: "nothing",
     drop: (asdf) => {
@@ -69,7 +71,7 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
 
     }
   })
-  const spotify = useSpotify()
+  const { spotify } = usePlayingNowState()
   const [input, setInput] = useState(
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
@@ -181,21 +183,46 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
 
   }, [collectionId]);
 
+  const importToSlap = () => {
+    request("POST", "fauna/collection", {
+      title: listInfo.title,
+      description: listInfo.description,
+      items: itemsForServer(items),
+      user: user.id,
+      visibility: visibility,
+      spotifyLinked: collectionId
+    }).then((res: any) => {
+      console.log('res: ', res.ref["@ref"].id);
+      console.log("saved")
+    });
+
+    // request("POST", "fauna/collection", {
+    //   title: "",
+    //   description: "",
+    //   items: [],
+    //   user: user.id,
+    //   visibility: "public",
+    // }).then((res:any) => {
+    //   history.replace({ pathname: "/s/" + res.ref["@ref"].id });
+    //   setUpdateCounter(updateCounter + 1);
+    // });
+  }
+
 
   // useEffect(() => {
-    // if (!loaded) {
-    //   return;
-    // }
-    // if (user?.id != slapUserId) {
-    //   return;
-    // }
-    // request("PUT", "fauna/collection/" + collectionId, {
-    //   title,
-    //   description,
-    //   items: itemsForServer(items),
-    //   user: user.id,
-    //   visibility: visibility,
-    // }).then((res: any) => { });
+  // if (!loaded) {
+  //   return;
+  // }
+  // if (user?.id != slapUserId) {
+  //   return;
+  // }
+  // request("PUT", "fauna/collection/" + collectionId, {
+  //   title,
+  //   description,
+  //   items: itemsForServer(items),
+  //   user: user.id,
+  //   visibility: visibility,
+  // }).then((res: any) => { });
   // }, [throttledItems, throttledDescription, throttledTitle, visibility]);
 
   const go = () => {
@@ -344,16 +371,16 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
   const moveItem = useCallback((itemIndex, item, newIndex) => {
     console.log('itemIndex, item, newIndex: ', itemIndex, item, newIndex);
     let newIndexAdjusted = newIndex
-    if(itemIndex < newIndex){
-      newIndexAdjusted-=1
+    if (itemIndex < newIndex) {
+      newIndexAdjusted -= 1
     }
     setItems(update(items, {
-        $splice: [
-            [itemIndex, 1],
-            [newIndexAdjusted, 0, item],
-        ],
+      $splice: [
+        [itemIndex, 1],
+        [newIndexAdjusted, 0, item],
+      ],
     }));
-}, [items]);
+  }, [items]);
 
   const refreshMetaInfo = () => {
     console.log('items: ', items);
@@ -369,10 +396,10 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
           })
           setItems(items => (
             items.map(i => {
-              if(i.trackId == item.trackId){
+              if (i.trackId == item.trackId) {
                 return {
                   ...i,
-                  metaInfo:{
+                  metaInfo: {
                     duration: track.duration_ms,
                     title: track.name,
                     image: track.album.images[0].url,
@@ -396,12 +423,12 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
 
   const save = () => {
     if (user?.id != slapUserId) {
-      console.log('slapUserId: ', slapUserId);
+      console.log('NOT YOUR SLAP slapUserId: ', user?.id, slapUserId);
       return;
     }
     request("PUT", "fauna/collection/" + collectionId, {
-      title,
-      description,
+      title: listInfo.title,
+      description: listInfo.description,
       items: itemsForServer(items),
       user: user.id,
       visibility: visibility,
@@ -422,13 +449,13 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
           {listInfo.coverImage &&
             <img src={listInfo.coverImage}
               className="w-60 h-60 bg-gray-600 rounded shadow-lg"></img>}
-          <div className="pl-8 pt-4 flex flex-col justify-between">
+          <div className="pl-8 pt-4 flex flex-grow flex-col justify-between">
             <div>
               <CleanInput
-                className="text-3xl font-bold"
+                className="text-3xl font-bold overflow-visible"
                 placeholder="Untitled"
                 value={listInfo.title}
-                onChange={(value) => setTitle(value)}
+                onChange={(value) => setListInfo({ ...listInfo, title: value })}
               />
               <div className="flex items-center my-4  text-gray-900">
                 <img className="rounded-full w-7 h-7 mr-1 shadow" src="https://s.gravatar.com/avatar/4579b299730ddc53e3d523ec1cd5482a?s=200" />
@@ -441,7 +468,7 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
                 }}
                 placeholder="Description"
                 value={listInfo.description}
-                onChange={(value) => setDescription(value)}
+                onChange={(value) => setListInfo({ ...listInfo, description: value })}
               />
             </div>
 
@@ -454,6 +481,12 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
           justify-center text-sm flex py-2 px-6 bg-blue-500 hover:bg-blue-600 font-medium text-white  transition duration-150">
             <AiOutlinePlayCircle className="mr-2" /> Listen
             </button>
+          {type == "spotify" &&
+            <button onClick={importToSlap} className="ml-4 rounded items-center
+          justify-center text-sm flex py-2 px-6 bg-green-500 hover:bg-green-600 font-medium text-white  transition duration-150">
+              <AiFillAccountBook className="mr-2" /> Import into Slapper
+            </button>
+          }
 
           <button onClick={refreshMetaInfo} className="ml-4 rounded items-center
           justify-center text-sm flex py-2 px-6 bg-yellow-500 hover:bg-yellow-600 font-medium text-white  transition duration-150">
@@ -469,11 +502,11 @@ export default function Croaker({ loadingUser, user, collectionId, type }) {
         {/* <div className="border-b border-gray-100">
           
         </div> */}
-<div ref={drop}>
+        <div ref={drop}>
           {items.map((item, i) => (
             <SlapItem moveItem={moveItem} key={i} item={item} i={i} dragging={dragging} setDragging={setDragging} />
           ))}
-</div>
+        </div>
 
 
 

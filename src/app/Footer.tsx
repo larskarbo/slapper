@@ -9,8 +9,7 @@ import Timeline from './Timeline/Timeline';
 
 const Footer = ({
 }) => {
-  const playingNow = usePlayingNowState()
-  const dispatch = usePlayingNowDispatch()
+  const { playingNow, pause, play } = usePlayingNowState()
   //
   //
   return (
@@ -26,14 +25,14 @@ const Footer = ({
         />
         {playingNow.state == "playing" ?
           <Button
-            onClick={() => pause(dispatch)}
+            onClick={() => pause()}
             disabled={false}
             icon={<IoPauseSharp className="relative" style={{
             }} size={30} />}
           />
           :
           <Button
-            onClick={() => play(dispatch)}
+            onClick={() => play()}
             disabled={playingNow.state == "idle"}
             icon={<IoPlaySharp className="relative" style={{
               left: 3
@@ -51,7 +50,7 @@ const Footer = ({
       {playingNow.item &&
         <div className="flex ">
           <div className="h-10 w-10 mr-4 rounded shadow relative overflow-hidden">
-            <img className="" src={playingNow.item.metaInfo.albumImage} />
+            <img className="" src={playingNow.item.metaInfo.image} />
           </div>
           <div className="font-light text-gray-800 text-sm w-40  overflow-hidden pr-4">
             <div className={"font-medium whitespace-nowrap overflow-ellipsis "}>{playingNow.item.metaInfo.title}</div>

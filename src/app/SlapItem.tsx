@@ -12,9 +12,7 @@ export const SlapItem = ({
   setDragging,
   moveItem
 }) => {
-  const playingNow = usePlayingNowState()
-  console.log('playingNow: ', playingNow);
-  const dispatch = usePlayingNowDispatch()
+  const {playingNow, playItem, pause} = usePlayingNowState()
 
   const mePlayingFocus = playingNow.item && playingNow.item?.trackId == item.trackId
   const mePlaying = mePlayingFocus && playingNow.state == "playing"
@@ -90,7 +88,7 @@ export const SlapItem = ({
         <img className="" src={item.metaInfo.image} />
         <button
           onClick={() => {
-            playItem(dispatch, item)
+            {mePlaying ? pause() : playItem(item)}
           }}
           className="w-full absolute left-0 top-0 right-0 bottom-0 bg-black bg-opacity-25 flex items-center justify-center
                 group-hover:opacity-100 opacity-0 transition-opacity duration-150

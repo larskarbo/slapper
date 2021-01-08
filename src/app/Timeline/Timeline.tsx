@@ -9,12 +9,11 @@ function Timeline() {
   // const [duration, setDuration] = useState(0);
   const lineRef = useRef(null);
 
-  const playingNow = usePlayingNowState()
-  const dispatch = usePlayingNowDispatch()
+  const {playingNow, seek} = usePlayingNowState()
 
   const onSeek = (ms) => {
     console.log('ms: ', ms);
-    seek(dispatch, ms)
+    seek(ms)
   }
 
   return (

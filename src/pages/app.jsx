@@ -18,51 +18,25 @@ import {
 import OnBoard from "../app/views/OnBoard";
 import Admin from "../app/views/Admin";
 import App from '../app/Main';
+import { UserProvider } from "../app/user-context";
 const url = "https://slapper.io";
 
 
 export default function AppRouter() {
   return (
     <IdentityContextProvider url={url}>
-      <Routing />
+      <UserProvider>
+        <Routing />
+      </UserProvider>
     </IdentityContextProvider>
   );
 }
 
 function Routing() {
-  const {
-    isConfirmedUser,
-    authedFetch,
-    getFreshJWT,
-    user: nUser,
-  } = useIdentityContext();
-  const [user, setUser] = useState(null);
-
-  const getUserFromServer = async () => {
-    generateHeaders(await getFreshJWT());
-    await request("GET", "fauna/users/getMe")
-      .then((res) => {
-        if (res.id) {
-
-          setUser(res);
-        } else {
-
-
-          throw new Error("No res.id");
-        }
-      })
-      .catch((error) => { });
-  };
-
-  useEffect(() => {
-    if (nUser && isConfirmedUser) {
-
-      getUserFromServer();
-    }
-  }, [nUser, isConfirmedUser]);
+  
 
   return (
-    <div>
+    <>
       {/* <Helmet>
         <meta
           name="description"
@@ -79,14 +53,14 @@ function Routing() {
       </Helmet> */}
       <Router basepath="/app">
         <LogOut path="/logout" />
-        <LoginPage user={user} path="/login" />
-        <LoginPage user={user} path="/register" />
-        <OnBoard user={user} path="/onboarding" />
-        <Admin user={user} path="/admin" />
-        <App user={user} default />
+        <LoginPage path="/login" />
+        <LoginPage path="/register" />
+        <OnBoard path="/onboarding" />
+        <Admin path="/admin" />
+        <App default />
         {/* <Croaker default loadingUser={loadingUser} user={user} /> */}
       </Router>
-    </div>
+    </>
   );
 }
 

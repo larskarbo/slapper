@@ -6,22 +6,21 @@ import Sidebar from "./Sidebar";
 import Croaker from "./Croaker";
 import Footer from "./Footer";
 import { PlayingNowProvider } from "./players/player-context";
-import SpotifyLists from "./views/SpotifyLists";
-import { SpotifyProvider } from './players/spotify-context';
 import Settings from './views/Settings';
-import SlapperLists from "./views/SlapperLists";
 import { DndProvider } from 'react-dnd'
 import { HTML5Backend } from 'react-dnd-html5-backend'
 import LoginPage from "./views/LoginPage";
+import Lists from "./views/Lists";
+import { SlapDataProvider } from './slapdata-context';
+import { useUser } from './user-context';
 
 const FOOTER_HEIGHT = 100
 
-export default function App({ user }) {
-  console.log('user: ', user);
-  const loading = true
+export default function App({  }) {
+  const user = useUser()
   return (
     <PlayingNowProvider>
-      <SpotifyProvider>
+      <SlapDataProvider>
         <DndProvider backend={HTML5Backend}>
           <div>
             <div className="w-full flex flex-row">
@@ -41,13 +40,12 @@ export default function App({ user }) {
                 {/* <h1>Home</h1> */}
                 {user ?
                   <Router basepath="/app">
-                    <Home user={user} path="/" />
-                    <SpotifyLists user={user} path="/spotify-playlists" />
-                    <SlapperLists user={user} path="/my-slaps" />
-                    <Settings user={user} path="/settings" />
-                    {/* <LoginPage user={user} path="/login" /> */}
-                    <Croaker user={user} type="slapper" path="/slap/:collectionId" />
-                    <Croaker user={user} type="spotify" path="/spotify/playlist/:collectionId" />
+                    <Home path="/" />
+                    {/* <SlapperLists path="/my-slaps" /> */}
+                    <Lists path="/my-slaps" />
+                    <Settings path="/settings" />
+                    <Croaker type="slapper" path="/slap/:collectionId" />
+                    <Croaker type="spotify" path="/spotify/playlist/:collectionId" />
                     <NotFound default />
                   </Router>
                   : null
@@ -63,7 +61,7 @@ export default function App({ user }) {
           </div>
 
         </DndProvider>
-      </SpotifyProvider>
+      </SlapDataProvider>
     </PlayingNowProvider>
   );
 }

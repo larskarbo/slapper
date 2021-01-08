@@ -5,8 +5,10 @@ import { TText } from "./utils/font";
 import { BButton } from "./comp/BButton";
 import { Link } from 'gatsby';
 import { useMatch } from "@reach/router"
+import { useSlapData } from "./slapdata-context";
 
 const Sidebar = ({ }) => {
+  const { slaps, spotifyLists } = useSlapData()
 
   return (
     <div>
@@ -17,10 +19,20 @@ const Sidebar = ({ }) => {
         </NavLink>
         <NavLink title="Explore" to="/app/explore" className="flex flex-row mb-2">
         </NavLink>
-        <NavLink title="My slaps" to="/app/my-slaps" className="flex flex-row mb-2">
+        <NavLink title="My lists" to="/app/my-slaps" className="flex flex-row mb-2">
         </NavLink>
-        <NavLink title="Spotify Playlists" to="/app/spotify-playlists" className="flex flex-row mb-2">
-        </NavLink>
+        {slaps.map(slap => (
+          <ListLink to={"/app/slap/" + slap.id}>
+            {slap.title}
+          </ListLink>
+        ))}
+        <div className="border-t border-gray-500" />
+        {spotifyLists.map(slap => (
+          <ListLink to={"/app/spotify/playlist/" + slap.id}>
+            {slap.title}
+          </ListLink>
+        ))}
+
         <NavLink title="Settings ⚙️" to="/app/settings" className="flex flex-row mb-2">
         </NavLink>
         {/* <NavLink to="/app/profile" className="flex flex-row mb-2">
@@ -34,7 +46,7 @@ const Sidebar = ({ }) => {
 
 export default Sidebar
 
-const NavLink = ({title, ...props}) => {
+const NavLink = ({ title, ...props }) => {
 
   const match = useMatch(props.to);
   return (
@@ -50,6 +62,17 @@ const NavLink = ({title, ...props}) => {
     >
       <div className={"w-2 " + (match && "bg-blue-300")}></div>
       <div className="pl-8 text-lg">{title}</div>
+    </Link>
+  )
+};
+const ListLink = ({  ...props }) => {
+
+  const match = useMatch(props.to);
+  return (
+    <Link
+      {...props}
+    >
+      <div className={"text-sm py-2 font-light pl-8 " + (match && "text-blue-400")}>{props.children || "Untitled"}</div>
     </Link>
   )
 };

@@ -155,10 +155,6 @@ export default class Spotify {
 
         })
         .then((playbackState) => {
-          this.playbackState = playbackState;
-          this.lastUpdatePlaybackState = new Date()
-          this.isPlaying = playbackState?.is_playing;
-          this.currentTrack = playbackState?.item?.id;
           this.onUpdatePlaybackState(playbackState);
         });
 
@@ -167,8 +163,8 @@ export default class Spotify {
 
     initPlayer();
     await poll();
-    // await pollDevices();
-    // setInterval(poll, 1500);
+    setInterval(poll, 1500);
+    await this.pollDevices();
     // setInterval(pollDevices, 10000);
 
     this.ready = true;
@@ -180,7 +176,7 @@ export default class Spotify {
     return await this.api.getMyDevices().then(({ devices }) => {
       console.log('devices: ', devices);
       this.devices = devices;
-      this.onUpdateDevices(devices);
+      // this.onUpdateDevices(devices);
       return devices
     });
 
@@ -208,7 +204,7 @@ export default class Spotify {
 
 
   play = async (opts) => {
-    console.log('playing', this.devices, this.devices.find(d => d.is_active))
+    console.log('playing')
     if (!this.devices.find(d => d.is_active)) {
       // const playbackState = await this.api.getMyCurrentPlaybackState()
       // console.log('playbackState: ', playbackState);
@@ -216,7 +212,6 @@ export default class Spotify {
       throw new Error(NO_DEVICE_ERROR_MESSAGE)
       return
     }
-    return
     console.log('play it')
     for (const i of [1, 2, 3]) {
       const playbackState = await this.api.getMyCurrentPlaybackState()
