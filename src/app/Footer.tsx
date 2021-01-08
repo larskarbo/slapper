@@ -1,219 +1,81 @@
 import React, { useEffect, useRef, useState } from "react";
-import SegmentView from "./SegmentView/SegmentView";
-import useHover from "@react-hook/hover";
-import { TText } from "./utils/font";
-import Play from "./comp/Play";
-import CircleButton from "./comp/CircleButton";
-import { RiRepeatFill } from "react-icons/ri";
-import { AiFillSound } from "react-icons/ai";
-import { ImPause2, ImPlay3 } from "react-icons/im";
+import { FaSpotify } from "react-icons/fa";
+import { IoPlaySkipForwardSharp, IoPlaySharp, IoPauseSharp } from "react-icons/io5";
+import { MdDevices } from "react-icons/md";
+import DeviceSelector from "./DeviceSelector";
+// import IoPlaySkipForwardSharp from "../app/svg/play-skip-forward-sharp.inline.svg"
+import { usePlayingNowState, usePlayingNowDispatch, play, pause } from './players/player-context';
+import Timeline from './Timeline/Timeline';
 
 const Footer = ({
-  onAddClip,
-  onDeleteClip,
-  playingNow,
-  onPause,
-  children,
-  clipRepeat,
-  setClipRepeat,
-  onUpdateClip,
-  onScrub,
-  onSetPlayingNow,
-  items,
-  onPlay,
 }) => {
+  const playingNow = usePlayingNowState()
+  const dispatch = usePlayingNowDispatch()
   //
   //
-  const playOrPause = () =>
-    playingNow?.state == "playing" ? onPause() : onPlay();
-
-  useEffect(() => {
-    document.onkeydown = (e) => {
-      if (e.code == "Space") {
-        if (e.target.nodeName === "TEXTAREA" || e.target.nodeName === "INPUT") {
-          return;
-        }
-        e.preventDefault();
-        playOrPause();
-      }
-    };
-  }, [playingNow?.state]);
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexGrow: 1,
-        flexDirection: "row",
-        height: "100%",
-      }}
-    >
-      <div
-        style={{
-          justifyContent: "center",
-          paddingLeft: 10,
-          paddingRight: 10,
-        }}
-      >
-        {/* <div
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          
-        </div> */}
-        <img
-          style={{
-            width: 64,
-          }}
-          src={playingNow?.item.metaInfo.image}
+    <div className="flex h-full items-center">
+      <div className="flex items-center h-full px-10">
+        <button className="p-2 hover:bg-gray-300 rounded-full bg-white transition-colors">
+
+        </button>
+        <Button
+          onClick={() => { }}
+          disabled={true}
+          icon={<IoPlaySkipForwardSharp size={20} className="rotate-180 transform" />}
+        />
+        {playingNow.state == "playing" ?
+          <Button
+            onClick={() => pause(dispatch)}
+            disabled={false}
+            icon={<IoPauseSharp className="relative" style={{
+            }} size={30} />}
+          />
+          :
+          <Button
+            onClick={() => play(dispatch)}
+            disabled={playingNow.state == "idle"}
+            icon={<IoPlaySharp className="relative" style={{
+              left: 3
+            }} size={30} />}
+          />
+
+        }
+        <Button
+          onClick={() => { }}
+          disabled={true}
+          icon={<IoPlaySkipForwardSharp size={20} />}
         />
       </div>
 
-      <div
-        style={{
-          justifyContent: "center",
-          width: "200px",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {/* <Text
-          style={{
-            fontWeight: "800",
-          }}
-        >
-        </Text> */}
-        {/* <MarqueeText
-          style={{ fontSize: 16, fontWeight: "800" }}
-          duration={3000}
-          marqueeOnStart={false}
-          loop
-          marqueeDelay={1000}
-          marqueeResetDelay={1000}
-        >
-          {playingNow?.item.metaInfo.title}
-        </MarqueeText> */}
-
-        <TText
-          style={{
-            fontWeight: "200",
-          }}
-        >
-          {playingNow?.item.metaInfo.artist}
-        </TText>
-      </div>
-
-      <div
-        style={{
-          alignItems: "center",
-          paddingLeft: 5,
-          paddingRight: 5,
-          flexDirection: "row",
-        }}
-      >
-        {playingNow?.item && (
-          <Play
-            playing={playingNow?.state == "playing"}
-            onPress={playOrPause}
-          />
-        )}
-
-        {playingNow?.type == "clip" && (
-          <div
-            style={{
-              border: "solid 2px black",
-              padding: 5,
-              marginLeft: 5,
-            }}
-          >
-            <TText>
-              {playingNow.state == "playing" ? <AiFillSound /> : <ImPause2 />}
-
-              {playingNow.clip.title}
-            </TText>
-            <div
-              style={{
-                flexDirection: "row",
-              }}
-            >
-              <CircleButton
-                Icon={ImPlay3}
-                onPress={() => {
-                  const playable = {
-                    type: "clip",
-                    item: playingNow.item,
-                    clip: playingNow.clip,
-                  };
-                  onPlay(playable);
-                }}
-              />
-              <CircleButton
-                inverted={clipRepeat}
-                Icon={RiRepeatFill}
-                onPress={() => {
-                  setClipRepeat(!clipRepeat);
-                }}
-              />
-            </div>
+      {playingNow.item &&
+        <div className="flex ">
+          <div className="h-10 w-10 mr-4 rounded shadow relative overflow-hidden">
+            <img className="" src={playingNow.item.metaInfo.albumImage} />
           </div>
-        )}
-      </div>
+          <div className="font-light text-gray-800 text-sm w-40  overflow-hidden pr-4">
+            <div className={"font-medium whitespace-nowrap overflow-ellipsis "}>{playingNow.item.metaInfo.title}</div>
+            <div className="whitespace-nowrap overflow-ellipsis">{playingNow.item.metaInfo.artist}</div>
+          </div>
+        </div>
+      }
 
-      <div
-        style={{
-          justifyContent: "center",
-          flexGrow: 1,
-        }}
-      >
-        {playingNow ? (
-          <SegmentView
-            clips={
-              playingNow
-                ? items.find((i) => playingNow.item.id == i.id)?.clips || []
-                : []
-            }
-            duration={playingNow?.item.metaInfo.duration || 0}
-            pointerAt={playingNow?.position || 0}
-            playing={playingNow?.state == "playing"}
-            playingNow={playingNow}
-            onScrub={onScrub}
-            onPlay={(clip) => {
-              const playable = {
-                type: "clip",
-                item: playingNow?.item,
-                clip: clip,
-              };
-              onPlay(playable);
-            }}
-            onPause={onPause}
-            item={playingNow?.item}
-            onAddClip={onAddClip}
-            onDeleteClip={onDeleteClip}
-            onUpdateClip={(clip, whatever) =>
-              onUpdateClip(playingNow?.item, clip, whatever)
-            }
-          />
-        ) : (
-          <TText>Play song to get started...</TText>
-        )}
-      </div>
-      {children}
-      {/* <div
-        style={{
-          justifyContent: "center",
-          width: 200
-        }}
-      >
-      Playing from spotify
-      </div> */}
+      <Timeline />
+
+      <DeviceSelector />
     </div>
   );
 };
+
+const Button = ({ onClick, disabled, icon }) => {
+  // const Comp ? 
+  return (
+    <button disabled={disabled} onClick={onClick} className={"p-2 rounded-full bg-white transition-colors duration-150 " +
+      (disabled ? "text-gray-300 cursor-default" : "hover:bg-gray-300 ")
+    }>
+      {icon}
+    </button>
+  )
+}
 
 export default Footer;

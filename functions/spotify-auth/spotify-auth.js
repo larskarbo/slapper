@@ -29,7 +29,9 @@ const scopes = [
   "user-modify-playback-state",
   "streaming",
   "user-read-private",
-  "user-read-email"
+  "user-read-email",
+  "playlist-read-private",
+  "playlist-read-collaborative"
 ];
 
 

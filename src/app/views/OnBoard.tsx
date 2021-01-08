@@ -1,23 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import netlifyIdentity from "netlify-identity-widget";
-import {
-  useHistory,
-  useLocation,
-  Route,
-  Switch,
-  Redirect,
-  Link,
-} from "react-router-dom";
 
 import { TText } from "../utils/font";
 import { BButton } from "../comp/BButton";
 import { Form, FormControl, InputGroup } from "react-bootstrap";
 import { FaGoogle, FaUser } from "react-icons/fa";
 import { request } from "../utils/request";
+import { Redirect } from '@reach/router';
 
 export default function ({ user, register = false }) {
-  let history = useHistory();
-  let location = useLocation();
   const formRef = useRef();
   const [msg, setMsg] = useState("");
 

@@ -1,214 +1,123 @@
-import React, { useState } from "react";
-import SegmentView from "./SegmentView/SegmentView";
-
-import { Menu, Item as ContextItem, MenuProvider } from "react-contexify";
-import styled from "styled-components";
-import Play from "./comp/Play";
-import { Item, Clip } from "./Croaker";
-import { FaSpotify, FaYoutube } from "react-icons/fa";
-import { sansSerif, TText } from "./utils/font";
-import { isClipPlaying } from "./utils/helpers";
-
-const StyledView = styled.div`
-  width: 100%;
-  /* height: 46px; */
-  border-width: 1px;
-  box-sizing: content-box;
-  border-color: #3b3b3b;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10;
-`;
-
-const Block = styled.div`
-  padding: 7px 7px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-`;
+import React, { useState, useRef } from "react";
+import { AiOutlinePlayCircle } from "react-icons/ai";
+import { IoPause, IoPlay } from "react-icons/io5";
+import { playItem, usePlayingNowDispatch, usePlayingNowState } from "./players/player-context";
+import { useDrag, useDrop } from 'react-dnd'
+import { useSpotifyDispatch } from './players/spotify-context';
 
 export const SlapItem = ({
-  title = "...",
-  onPause,
-  onPlay,
-  onScrub,
-  onSetText,
-  onUpdateClip,
-  playingNow,
-  onAddClip,
-  onDeleteClip,
-  disabled,
-  onDeleteItem,
   item,
-}: {
-  item: Item;
-  [key: string]: any;
+  i,
+  dragging,
+  setDragging,
+  moveItem
 }) => {
-  const clips = item.clips || [];
+  const playingNow = usePlayingNowState()
+  console.log('playingNow: ', playingNow);
+  const dispatch = usePlayingNowDispatch()
 
-  const songIsPlaying =
-    playingNow?.item.id == item.id &&
-    playingNow?.type == "item" &&
-    playingNow?.state == "playing";
+  const mePlayingFocus = playingNow.item && playingNow.item?.trackId == item.trackId
+  const mePlaying = mePlayingFocus && playingNow.state == "playing"
+  const [collectedProps, drag] = useDrag({
+    item: { item, index: i, type: "slapItem" }
+  })
 
+  const [, drop] = useDrop({
+    accept: "slapItem",
+    hover(draggingItem, monitor) {
+      if (!ref.current) {
+        return;
+      }
+      const dragIndex = draggingItem.index;
+      const hoverIndex = i;
+      // Don't replace items with themselves
+      if (dragIndex === hoverIndex) {
+        return;
+      }
+      // Determine rectangle on screen
+      const hoverBoundingRect = ref.current?.getBoundingClientRect();
+      // Get vertical middle
+      const hoverMiddleY = (hoverBoundingRect.bottom - hoverBoundingRect.top) / 2;
+      // Determine mouse position
+      const clientOffset = monitor.getClientOffset();
+      // Get pixels to the top
+      const hoverClientY = clientOffset.y - hoverBoundingRect.top;
+      // Only perform the move when the mouse has crossed half of the items height
+      // When dragging downwards, only move when the cursor is below 50%
+      // When dragging upwards, only move when the cursor is above 50%
+      // Dragging downwards
+      // if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) {
+      //   return;
+      // }
+      // // Dragging upwards
+      let shouldBe = hoverIndex
+      if (hoverClientY > hoverMiddleY) {
+        console.log('hoverIndex: ',);
+        shouldBe = hoverIndex + 1
+      }
+      if (shouldBe != dragging) {
+        draggingItem.dropTo = shouldBe
+        setDragging(shouldBe)
+      }
+    },
+    drop: (draggingItem) => {
+      console.log('item: ', draggingItem);
+      moveItem(draggingItem.index, draggingItem.item, draggingItem.dropTo)
+      setDragging(null)
+    }
+  });
+
+  const ref = useRef()
+
+  drag(drop(ref));
+  // console.log('playingNow: ', playingNow);
   return (
-    <StyledView className="horse" style={{}}>
-      <div
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <div
-          style={{
-            flexDirection: "row",
+    <div ref={ref}
+      className={"flex py-2 items-center border-b border-gray-100 px-4"
+        + "bg-white hover:bg-gray-50 transition-colors duration-100 group"
+
+      }
+
+      style={{
+        ...(dragging == i ? {
+          borderTop: "2px solid blue"
+        } : {
+            borderTop: "2px solid transparent"
+          })
+      }}>
+      <div className="mr-6 text-sm text-gray-400 font-thin w-2 text-center">{i + 1}</div>
+      <div className="h-10 w-10 mr-4 rounded shadow relative overflow-hidden">
+        <img className="" src={item.metaInfo.image} />
+        <button
+          onClick={() => {
+            playItem(dispatch, item)
           }}
-        >
-          <Block>
-            {/* {children} */}
-            <Play
-              playing={songIsPlaying}
-              disabled={disabled}
-              onPress={() => {
-                if (disabled) {
-                  alert("You need to connect to Spotify to play this song.");
-                  return;
-                }
-                const playable = {
-                  type: "item",
-                  item: item,
-                };
-                songIsPlaying ? onPause() : onPlay(playable);
-              }}
-            />
-          </Block>
-
-          <Block
-            style={{
-              width: 180,
-              justifyContent: "center",
-            }}
-          >
-            <div style={{ flexDirection: "column", flex: 1 }}>
-              <TText
-                style={{
-                  width: "100%",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  fontWeight: "bold",
-                }}
-              >
-                {title}
-              </TText>
-              <TText
-                style={{
-                  fontSize: 10,
-                }}
-              >
-                {item.videoId ? (
-                  <a target="_blank" href={"https://youtu.be/" + item.videoId}>
-                    <FaYoutube />
-                  </a>
-                ) : (
-                  <a
-                    target="_blank"
-                    href={"https://open.spotify.com/track/" + item.trackId}
-                  >
-                    <FaSpotify />
-                  </a>
-                )}
-              </TText>
-            </div>
-          </Block>
-          {clips.map((c) => {
-            const clipIsPlaying = isClipPlaying(playingNow, c);
-            return (
-              <Block
-                key={c.id}
-                style={{
-                  backgroundColor: "#E9E9E9",
-                }}
-              >
-                <Play
-                  playing={clipIsPlaying}
-                  onPress={() => {
-                    const playable = {
-                      type: "clip",
-                      item: item,
-                      clip: c,
-                    };
-                    onUpdateClip(c, { state: "playing" });
-                    if (clipIsPlaying) {
-                      onPause();
-                    } else {
-                      onPlay(playable);
-                    }
-                  }}
-                />
-                <TText
-                  style={{
-                    paddingLeft: 6,
-                  }}
-                >
-                  {c.title}
-                </TText>
-              </Block>
-            );
-          })}
-        </div>
-
-        <div
-          style={{
-            flexDirection: "row",
-          }}
-        >
-          <Block
-            style={{
-              flex: 1,
-              backgroundColor: "#FFFFD6",
-              borderLeft: "1px solid #3b3b3b",
-              borderRight: "1px solid #3b3b3b",
-              padding: 0,
-            }}
-          >
-            <textarea
-              value={item.text}
-              onChange={(e) => onSetText(e.target.value)}
-              placeholder="Write notes here..."
-              style={{
-                padding: 0,
-                fontSize: 10,
-                width: 200,
-                flex: 1,
-                height: "100%",
-                outline: "none",
-                ...sansSerif,
-              }}
-            />
-          </Block>
-
-          <MenuProvider id={item.id} event="onClick">
-            <Block
-              style={{
-                flex: 1,
-                pointer: "default"
-              }}
-            >
-              <TText>...</TText>
-            </Block>
-          </MenuProvider>
-        </div>
+          className="w-full absolute left-0 top-0 right-0 bottom-0 bg-black bg-opacity-25 flex items-center justify-center
+                group-hover:opacity-100 opacity-0 transition-opacity duration-150
+              ">
+          {mePlaying ?
+            <IoPause color="white" size={20} /> :
+            <IoPlay color="white" size={20} />}
+        </button>
       </div>
-
-      <SongContextMenu id={item.id} onDelete={onDeleteItem} />
-    </StyledView>
+      <div className="font-light text-gray-800 text-sm w-80 whitespace-nowrap  pr-4">
+        <div className={"font-medium overflow-ellipsis overflow-hidden " + (mePlayingFocus && "text-red-500")}>{item.metaInfo.title}</div>
+        <div>{item.metaInfo.artist}</div>
+      </div>
+      <div className=" w-40  overflow-x-hidden pr-4 py-1">
+        {item.clips.map((clip, i) => (
+          <button key={i} className="px-4 mb-2 inline-flex items-center py-1 bg-gray-600 font-medium text-white text-sm rounded">
+            <AiOutlinePlayCircle className="mr-2 flex-shrink-0" />
+            {clip.title}
+            <span className="opacity-50 ml-1"> ({Math.round((clip.to - clip.from) / 1000)}s)</span>
+          </button>
+        ))}
+      </div>
+      <div className=" w-60  overflow-x-hidden pr-4 py-1">
+        <div className="text-sm">
+          mitt navn er ARE
+              </div>
+      </div>
+    </div>
   );
 };
-
-// create your menu first
-const SongContextMenu = ({ id, onDelete }) => (
-  <Menu id={id}>
-    <ContextItem onClick={onDelete}>Remove song</ContextItem>
-  </Menu>
-);

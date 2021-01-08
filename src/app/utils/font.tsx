@@ -26,7 +26,7 @@ export const CleanInput = ({ style,onChange, ...props }) => (
 export const DEFAULT_BLACK = "#171717"
 
 export const TText = ({ children, ...props }) => (
-  <span
+  <div
     // {...props}
     style={{
       ...sansSerif,
@@ -35,7 +35,7 @@ export const TText = ({ children, ...props }) => (
     }}
   >
     {children}
-  </span>
+  </div>
 );
 
 

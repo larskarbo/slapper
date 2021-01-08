@@ -1,21 +1,21 @@
 import React from "react";
-import { useHistory, useLocation, Link, Route, Switch, Redirect } from "react-router-dom";
 
-import { TText } from "../../app/utils/font";
-import { BButton } from "../../app/comp/BButton";
+import { TText } from "../app/utils/font";
+import { BButton } from "../app/comp/BButton";
 import annotate from "./annotate.png";
 import segments from "./segments.png";
 import songs from "./songs.png";
-import { Logo } from "../../app/Sidebar";
+import { Logo } from "../app/SidebarOld";
+import { Link } from 'gatsby';
 
 export default function () {
-  const location = useLocation()
-  if(location.hash?.includes("confirmation_token")){
-    return <Redirect to={"/onboarding"+location.hash} />
-  }
-  if(location.hash?.includes("access_token")){
-    return <Redirect to={"/s"+location.hash} />
-  }
+  // const location = window.location
+  // if(location.hash?.includes("confirmation_token")){
+  //   return <Redirect to={"/onboarding"+location.hash} />
+  // }
+  // if(location.hash?.includes("access_token")){
+  //   return <Redirect to={"/s"+location.hash} />
+  // }
   return (
     <div
       style={{
@@ -159,7 +159,7 @@ export default function () {
 }
 
 const GetStarted = ({ style, children }) => {
-  let history = useHistory();
+  // let history = useHistory();
   return (
     <Link to="/register">
       <BButton

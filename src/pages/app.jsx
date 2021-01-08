@@ -1,0 +1,100 @@
+import React, { useContext, useEffect, useState } from "react";
+
+import { Router, Redirect } from "@reach/router"
+import { Link } from "gatsby"
+
+import "../app/index.css";
+import "../app/styles.css";
+import "react-contexify/dist/ReactContexify.min.css";
+
+import LoginPage from "../app/views/LoginPage";
+import { request, generateHeaders } from "../app/utils/request";
+import Croaker from "../app/Croaker";
+
+import {
+  IdentityContextProvider,
+  useIdentityContext,
+} from "react-netlify-identity";
+import OnBoard from "../app/views/OnBoard";
+import Admin from "../app/views/Admin";
+import App from '../app/Main';
+const url = "https://slapper.io";
+
+
+export default function AppRouter() {
+  return (
+    <IdentityContextProvider url={url}>
+      <Routing />
+    </IdentityContextProvider>
+  );
+}
+
+function Routing() {
+  const {
+    isConfirmedUser,
+    authedFetch,
+    getFreshJWT,
+    user: nUser,
+  } = useIdentityContext();
+  const [user, setUser] = useState(null);
+
+  const getUserFromServer = async () => {
+    generateHeaders(await getFreshJWT());
+    await request("GET", "fauna/users/getMe")
+      .then((res) => {
+        if (res.id) {
+
+          setUser(res);
+        } else {
+
+
+          throw new Error("No res.id");
+        }
+      })
+      .catch((error) => { });
+  };
+
+  useEffect(() => {
+    if (nUser && isConfirmedUser) {
+
+      getUserFromServer();
+    }
+  }, [nUser, isConfirmedUser]);
+
+  return (
+    <div>
+      {/* <Helmet>
+        <meta
+          name="description"
+          content="Organize and annotate songs and segments from Spotify, Youtube, Soundcloud in interactive, shareable documents"
+        />
+        <meta
+          property="og:image"
+          content="https://res.cloudinary.com/dfzqjzusj/image/upload/c_fill,g_north,h_630,w_1200/v1605177986/CleanShot_2020-11-12_at_11.45.29_2x.png"
+        />
+        <meta
+          property="twitter:image"
+          content="https://res.cloudinary.com/dfzqjzusj/image/upload/c_fill,g_north,h_630,w_1200/v1605177986/CleanShot_2020-11-12_at_11.45.29_2x.png"
+        />
+      </Helmet> */}
+      <Router basepath="/app">
+        <LogOut path="/logout" />
+        <LoginPage user={user} path="/login" />
+        <LoginPage user={user} path="/register" />
+        <OnBoard user={user} path="/onboarding" />
+        <Admin user={user} path="/admin" />
+        <App user={user} default />
+        {/* <Croaker default loadingUser={loadingUser} user={user} /> */}
+      </Router>
+    </div>
+  );
+}
+
+const LogOut = () => {
+  const { logoutUser } = useIdentityContext();
+
+  useEffect(() => {
+    logoutUser();
+  });
+  return <div>Logged out</div>;
+};

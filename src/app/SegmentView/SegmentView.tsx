@@ -132,7 +132,7 @@ export default function SegmentView({
             />
           ))}
 
-          <Pen
+          {/* <Pen
             duration={duration}
             pos={mouseMS}
             clips={clips}
@@ -142,7 +142,7 @@ export default function SegmentView({
             }
             }
             // onUpdate={(obj) => onUpdateClip(clip, obj)}
-          />
+          /> */}
 
           <Handle
             duration={duration}

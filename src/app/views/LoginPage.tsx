@@ -1,23 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
 import netlifyIdentity from "netlify-identity-widget";
-import {
-  useHistory,
-  useLocation,
-  Route,
-  Switch,
-  Redirect,
-  Link,
-} from "react-router-dom";
 
 import { useIdentityContext } from "react-netlify-identity";
 import { TText } from "../utils/font";
 import { BButton } from "../comp/BButton";
 import { FormControl, InputGroup } from "react-bootstrap";
 import { FaGoogle } from "react-icons/fa";
+import { Link } from 'gatsby';
+import { Redirect } from '@reach/router';
 
 export default function ({ user, register = false }) {
-  let history = useHistory();
-  let location = useLocation();
   const {
     isConfirmedUser,
     loginUser,
@@ -26,8 +18,8 @@ export default function ({ user, register = false }) {
     user: nUser,
   } = useIdentityContext();
   console.log("nUser: ", nUser);
-    const formRef = useRef();
-    const [msg, setMsg] = useState("");
+  const formRef = useRef();
+  const [msg, setMsg] = useState("");
 
   useEffect(() => {
     setMsg("");
@@ -57,7 +49,7 @@ export default function ({ user, register = false }) {
       .catch((err) => setMsg("Error: " + err.message));
   };
 
-  let { from } = location.state || { from: { pathname: "/s" } };
+  let { from } = location?.state || { from: { pathname: "/s" } };
   if (!from.pathname.includes("/s")) {
     from = { pathname: "/s" };
   }
@@ -115,76 +107,76 @@ export default function ({ user, register = false }) {
           {!isConfirmedUser && nUser ? (
             <TText>Check your email and confirm it!</TText>
           ) : (
-            <>
-              <form ref={formRef} onSubmit={register ? signup : login}>
-                <InputGroup className="mb-3">
-                  <InputGroup.Prepend>
-                    <InputGroup.Text id="basic-addon1">📤</InputGroup.Text>
-                  </InputGroup.Prepend>
-                  <FormControl
-                    name="email"
-                    placeholder="email"
-                    aria-label="email"
-                    aria-describedby="basic-addon1"
-                  />
-                </InputGroup>
+              <>
+                <form ref={formRef} onSubmit={register ? signup : login}>
+                  <InputGroup className="mb-3">
+                    <InputGroup.Prepend>
+                      <InputGroup.Text id="basic-addon1">📤</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <FormControl
+                      name="email"
+                      placeholder="email"
+                      aria-label="email"
+                      aria-describedby="basic-addon1"
+                    />
+                  </InputGroup>
 
-                <InputGroup className="mb-3">
-                  <InputGroup.Prepend>
-                    <InputGroup.Text id="basic-addon1">🔒</InputGroup.Text>
-                  </InputGroup.Prepend>
-                  <FormControl
-                    name="password"
-                    placeholder="password"
-                    type="password"
-                    aria-label="password"
-                    aria-describedby="basic-addon1"
-                  />
-                </InputGroup>
+                  <InputGroup className="mb-3">
+                    <InputGroup.Prepend>
+                      <InputGroup.Text id="basic-addon1">🔒</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <FormControl
+                      name="password"
+                      placeholder="password"
+                      type="password"
+                      aria-label="password"
+                      aria-describedby="basic-addon1"
+                    />
+                  </InputGroup>
 
-                <BButton
-                  style={{
-                    width: "100%",
-                  }}
-                  onPress={register ? signup : login}
-                  variant="secondary"
-                >
-                  Continue with mail
+                  <BButton
+                    style={{
+                      width: "100%",
+                    }}
+                    onPress={register ? signup : login}
+                    variant="secondary"
+                  >
+                    Continue with mail
                 </BButton>
-              </form>
+                </form>
 
-              <hr />
-              <BButton onPress={() => {
-                loginProvider("google")
-              }}>
-                <div
-                  style={{
-                    justifyContent: "space-between",
-                    flexDirection: "row",
-                    padding: 5,
-                  }}
-                >
-                  <div>
-                    <FaGoogle />
-                  </div>
-                  <div>
-                    <TText
-                      style={
-                        {
-                          // color:
+                <hr />
+                <BButton onPress={() => {
+                  loginProvider("google")
+                }}>
+                  <div
+                    style={{
+                      justifyContent: "space-between",
+                      flexDirection: "row",
+                      padding: 5,
+                    }}
+                  >
+                    <div>
+                      <FaGoogle />
+                    </div>
+                    <div>
+                      <TText
+                        style={
+                          {
+                            // color:
+                          }
                         }
-                      }
-                    >
-                      Sign {register ? "up" : "in"} with Google
+                      >
+                        Sign {register ? "up" : "in"} with Google
                     </TText>
+                    </div>
+                    <div>
+                      <TText></TText>
+                    </div>
                   </div>
-                  <div>
-                    <TText></TText>
-                  </div>
-                </div>
-              </BButton>
-            </>
-          )}
+                </BButton>
+              </>
+            )}
         </div>
         <TText
           style={{
@@ -193,13 +185,13 @@ export default function ({ user, register = false }) {
         >
           {register ? (
             <>
-              Already got an account? <Link to="/login">Login</Link>
+              Already got an account? <Link to="/app/login">Login</Link>
             </>
           ) : (
-            <>
-              No account yet? <Link to="/register">Register</Link>
-            </>
-          )}
+              <>
+                No account yet? <Link to="/app/register">Register</Link>
+              </>
+            )}
         </TText>
       </div>
     </div>

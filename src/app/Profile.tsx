@@ -3,7 +3,7 @@ import { BButton } from "./comp/BButton";
 import { TText } from "./utils/font";
 import netlifyIdentity from "netlify-identity-widget";
 import ky from "ky";
-import { BASE, request, stripe } from "./utils/request";
+import { BASE, request } from "./utils/request";
 
 const standard = [
   "Up to 5 songs per slap",
@@ -26,13 +26,13 @@ const Profile = ({ user }) => {
       priceId: location.href.includes("localhost") ? "price_1HoUBFAtEfCrIWZMucoYP33X" : "price_1HoawrAtEfCrIWZMEehEeLtN",
     }).then(function (result: any) {
       console.log('result: ', result);
-      stripe
-        .redirectToCheckout({
-          sessionId: result.sessionId,
-        })
-        .then((res) => {
-          console.log("res: ", res);
-        });
+      // stripe
+      //   .redirectToCheckout({
+      //     sessionId: result.sessionId,
+      //   })
+      //   .then((res) => {
+      //     console.log("res: ", res);
+      //   });
     });
   };
 

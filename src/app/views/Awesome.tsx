@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import netlifyIdentity from "netlify-identity-widget";
-import { useHistory, useLocation, Route, Switch } from "react-router-dom";
 import termsFrPath from "../../src/welcome.md";
 import marked from "marked";
 import request from "../utils/request";

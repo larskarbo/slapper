@@ -11,7 +11,7 @@ module.exports = {
         path: `${__dirname}/src/content`,
       },
     },
-
+    'gatsby-plugin-postcss',
     `gatsby-plugin-netlify`,
     {
       resolve: `gatsby-transformer-remark`,

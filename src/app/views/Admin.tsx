@@ -1,13 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import netlifyIdentity from "netlify-identity-widget";
-import {
-  useHistory,
-  useLocation,
-  Route,
-  Switch,
-  Redirect,
-  Link,
-} from "react-router-dom";
 
 import { TText } from "../utils/font";
 import { BButton } from "../comp/BButton";
