@@ -1,9 +1,11 @@
 import React, { Component } from "react";
 import { BButton } from "./comp/BButton";
-import { TText } from "./utils/font";
+import { div } from "./utils/font";
 import netlifyIdentity from "netlify-identity-widget";
 import ky from "ky";
 import { BASE, request } from "./utils/request";
+import { useUser } from "./user-context";
+import {loadStripe} from '@stripe/stripe-js/pure';
 
 const standard = [
   "Up to 5 songs per slap",
@@ -18,148 +20,95 @@ const premium = [
   "Support the development of Slapper ♥",
 ];
 
-const Profile = ({ user }) => {
-  console.log("user: ", user);
+const Profile = ({ }) => {
+  const { user } = useUser()
+  console.log('user: ', user);
+  
 
   const upgrade = () => {
     return request("POST", "money/checkout", {
       priceId: location.href.includes("localhost") ? "price_1HoUBFAtEfCrIWZMucoYP33X" : "price_1HoawrAtEfCrIWZMEehEeLtN",
-    }).then(function (result: any) {
+    }).then(async function (result: any) {
       console.log('result: ', result);
-      // stripe
-      //   .redirectToCheckout({
-      //     sessionId: result.sessionId,
-      //   })
-      //   .then((res) => {
-      //     console.log("res: ", res);
-      //   });
+
+      const stripe = await loadStripe(process.env.GATSBY_STRIPE_PUB_KEY);
+      stripe
+        .redirectToCheckout({
+          sessionId: result.sessionId,
+        })
+        .then((res) => {
+          console.log("res: ", res);
+        });
     });
   };
 
   const isPremium = user.plan == "premium";
 
   return (
-    <div
-      style={{
-        // marginBottom: 30,
-        // backgroundColor: "#333333",
-        paddingTop: 200,
-      }}
-    >
-      <h3>Profile</h3>
-      <TText>Name: {user.name}</TText>
-      <TText>Email: {user.email}</TText>
-      <TText>Current plan: {user.plan || "Standard"}</TText>
+    <div>
+      <div>Name: {user.name}</div>
+      <div>Email: {user.email}</div>
+      <div>Current plan: {user.plan || "Standard"}</div>
+      <div>Last payment: {user.lastPayment ? new Date(user.lastPayment.date["@ts"]).toLocaleDateString("en-US") : "?"}</div>
 
-      <div
-        style={{
-          flexDirection: "row",
-          paddingTop: 20,
-        }}
-      >
+      <div className="flex my-8">
         <div
-          style={{
-            width: 250,
-            marginRight: 30,
-            backgroundColor: "#FAFAFA",
-            border: "solid 1px black",
-            borderRadius: 10,
-            padding: 20,
-          }}
+          className="w-64 mr-8 bg-gray-50 border rounded p-4 border-gray-500"
         >
-          <TText
-            style={{
-              fontWeight: "bold",
-            }}
-          >
+          <div className="font-bold">
             Standard plan
-          </TText>
-          <TText
-            style={{
-              fontSize: 30,
-              paddingTop: 8,
-              paddingBottom: 8,
-              color: "#545454",
-            }}
+          </div>
+          <div
+            className="text-3xl py-3 text-gray-700"
           >
             0$
-          </TText>
+          </div>
           {standard.map((s) => (
-            <TText
+            <div
               key={s}
-              style={{
-                paddingBottom: 10,
-              }}
+              className="pb-3"
             >
               - {s}
-            </TText>
+            </div>
           ))}
           {isPremium ? (
-            <BButton variant="light" onPress={() => {
-              alert("Still a bit early in development, but just shoot me a message on mail@larskarbo.no or DM me at Twitter, and I will fix it!")
-            }}>Downgrade</BButton>
+            <form method="POST" action={"/.netlify/functions/money/customer-portal/" + user.stripeCustomerId}>
+              <button className="button  bg-gray-400 hover:bg-gray-500" type="submit">Downgrade</button>
+            </form>
+
           ) : (
-            <BButton variant="secondary">Current plan</BButton>
-          )}
+              <button className="button  bg-gray-400">Current plan</button>
+            )}
         </div>
+
+
         <div
-          style={{
-            width: 250,
-            marginRight: 30,
-            backgroundColor: "#FAFAFA",
-            border: "solid 1px black",
-            borderRadius: 10,
-            padding: 20,
-          }}
+          className="w-64 mr-8 bg-gray-50 border rounded p-4 border-gray-500"
         >
-          <TText
-            style={{
-              fontWeight: "bold",
-            }}
-          >
+          <div className="font-bold">
             Premium plan
-          </TText>
-          <TText
-            style={{
-              fontSize: 30,
-              paddingTop: 8,
-              paddingBottom: 8,
-              color: "#545454",
-            }}
+          </div>
+          <div
+            className="text-3xl py-3 text-gray-700"
           >
             5$/month
-          </TText>
+          </div>
           {premium.map((s) => (
-            <TText
+            <div
               key={s}
-              style={{
-                paddingBottom: 10,
-              }}
+              className="pb-3"
             >
               - {s}
-            </TText>
+            </div>
           ))}
-
           {isPremium ? (
-            <BButton variant="secondary">Current plan</BButton>
+            <button className="button  bg-green-500 " onClick={() => { }}>Current plan</button>
           ) : (
-            <BButton variant="primary" onClick={upgrade}>
-              Upgrade
-            </BButton>
-          )}
+              <button onClick={upgrade} className="button  bg-blue-600 hover:bg-blue-700">Upgrade</button>
+            )}
         </div>
       </div>
 
-      <BButton
-        style={{
-          marginTop: 25,
-        }}
-        onClick={() => {
-          window.location.href = "/logout"
-        }}
-      >
-        Log out
-      </BButton>
     </div>
   );
 };

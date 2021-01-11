@@ -3,21 +3,26 @@ import { request } from "../utils/request";
 import { Link } from 'gatsby';
 import { useSpotify } from "../players/spotify-context";
 import { usePlayingNowState } from "../players/player-context";
+import Profile from '../Profile';
+import { useUser } from "../user-context";
 
-export default function Settings({ user }) {
-  const {spotify} = usePlayingNowState()
-  console.log('spotify: ', spotify);
-  spotify.api.getMe().then(asdf => {
-    console.log('asdf: ', asdf);
-
-  }).catch(ds => {
-    console.log('ds: ', ds);
-
-  })
+export default function Settings({ }) {
+  const { spotify } = usePlayingNowState()
+  const { user } = useUser()
 
   return (
-    <div>
+    <div className="pb-8">
       <h1 className="text-4xl font-black mb-12">Settings</h1>
+
+      <Profile />
+
+      {user.stripeCustomerId &&
+        <form method="POST" action={"/.netlify/functions/money/customer-portal/" + user.stripeCustomerId}>
+          <button className="button bg-yellow-400 hover:bg-yellow-500" type="submit">Update payment settings</button>
+        </form>
+
+      }
+
       <h2 className="text-xl font-medium mb-4">Integrations</h2>
 
       <h3 className="text-lg mb-4">Spotify</h3>
@@ -41,10 +46,22 @@ export default function Settings({ user }) {
             onClick={() => spotify.authorize()}
             className="focus:outline-none rounded items-center
           justify-center text-sm flex py-2 px-6 bg-green-600 hover:bg-green-700 font-medium text-white  transition duration-150">
-           Link Spotify
+            Link Spotify
             </button>
         </>
       }
+
+
+      <hr className="mt-4" />
+
+      <Link to="/app/logout">
+      <button
+        className="button bg-gray-500 hover:bg-gray-600 mt-8"
+      >
+        Log out
+      </button>
+
+      </Link>
 
       {/* <div className="flex flex-row">
         {slaps.map(slap => (

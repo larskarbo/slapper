@@ -38,31 +38,3 @@ a {
 .Cursor {
   font-weight: 300;
 }
-
-hr {
-
-  border: 0;
-  border-top: 2px solid #e9ebeb;
-  margin: 32px 0 -1px;
-  text-align: center;
-  overflow: visible;
-  padding-bottom: 20px;
-}
-
-label {
-  font-size: 14px
-}
-
-hr::before {
-  content: "or";
-  position: relative;
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
-  background-color: #fff;
-  color: rgb(14, 30, 37);
-  padding: 4px;
-  top:-15px;
-}

@@ -24,8 +24,8 @@ exports.handler = async (req, res) => {
       // {CHECKOUT_SESSION_ID} is a string literal; do not change it!
       // the actual Session ID is returned in the query parameter when your customer
       // is redirected to the success page.
-      success_url: 'https://slapper.io/s/profile?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'https://slapper.io/s/profile',
+      success_url: 'https://slapper.io/app/settings?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'https://slapper.io/app/settings',
     });
 
     res.send({

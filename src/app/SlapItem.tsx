@@ -4,6 +4,7 @@ import { IoPause, IoPlay } from "react-icons/io5";
 import { playItem, usePlayingNowDispatch, usePlayingNowState } from "./players/player-context";
 import { useDrag, useDrop } from 'react-dnd'
 import { useSpotifyDispatch } from './players/spotify-context';
+import { useClip } from "./clip-context";
 
 export const SlapItem = ({
   item,
@@ -13,6 +14,7 @@ export const SlapItem = ({
   moveItem
 }) => {
   const {playingNow, playItem, pause} = usePlayingNowState()
+  const {focusClip} = useClip()
 
   const mePlayingFocus = playingNow.item && playingNow.item?.trackId == item.trackId
   const mePlaying = mePlayingFocus && playingNow.state == "playing"
@@ -104,7 +106,9 @@ export const SlapItem = ({
       </div>
       <div className=" w-40  overflow-x-hidden pr-4 py-1">
         {item.clips.map((clip, i) => (
-          <button key={i} className="px-4 mb-2 inline-flex items-center py-1 bg-gray-600 font-medium text-white text-sm rounded">
+          <button
+          onClick={() => focusClip(clip)}
+           key={i} className="px-4 mb-2 inline-flex items-center py-1 bg-gray-600 font-medium text-white text-sm rounded">
             <AiOutlinePlayCircle className="mr-2 flex-shrink-0" />
             {clip.title}
             <span className="opacity-50 ml-1"> ({Math.round((clip.to - clip.from) / 1000)}s)</span>

@@ -1,8 +1,9 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 
 input, button {
     @apply focus:outline-none;
+}
+
+.button {
+    @apply focus:outline-none rounded items-center justify-center text-sm;
+    @apply flex py-2 px-6 font-medium text-white  transition duration-150;
 }

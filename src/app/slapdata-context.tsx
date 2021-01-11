@@ -18,7 +18,7 @@ export function SlapDataProvider({ children }) {
   const [slapsLoaded, setSlapsLoaded] = useState(false)
   const [spotifyLists, setSpotifyLists] = useState([])
   const {spotify} = usePlayingNowState()
-  const user = useUser()
+  const {user} = useUser()
 
   useEffect(() => {
     console.log("here!")

@@ -10,37 +10,57 @@ import { useSlapData } from "./slapdata-context";
 const Sidebar = ({ }) => {
   const { slaps, spotifyLists } = useSlapData()
 
+  // return (
+  //   <>
+  //     <div className="">hey</div>
+  //     <div className="flex-grow overflow-scroll">
+  //       Hey2
+  //       {spotifyLists.map(slap => (
+  //         <ListLink key={slap.id} to={"/app/spotify/playlist/" + slap.id}>
+  //           {slap.title}
+  //         </ListLink>
+  //       ))}
+  //     </div>
+  //     <div className="">hey3</div>
+  //   </>
+  // )
   return (
-    <div>
+    <>
       <div className="my-8 text-xl font-bold px-4">Slapper</div>
 
-      <nav>
-        <NavLink title="Home" to="/app" className="flex flex-row mb-2" activeClassName="font-bold">
-        </NavLink>
-        <NavLink title="Explore" to="/app/explore" className="flex flex-row mb-2">
-        </NavLink>
-        <NavLink title="My lists" to="/app/my-slaps" className="flex flex-row mb-2">
-        </NavLink>
+      <NavLink title="Home" to="/app" className="flex flex-row mb-2" activeClassName="font-bold">
+      </NavLink>
+      <NavLink title="Explore" to="/app/explore" className="flex flex-row mb-2">
+      </NavLink>
+      <NavLink title="My lists" to="/app/my-slaps" className="flex flex-row mb-2">
+      </NavLink>
+      <div className="overflow-y-scroll flex-grow">
         {slaps.map(slap => (
-          <ListLink to={"/app/slap/" + slap.id}>
+          <ListLink key={slap.id} to={"/app/slap/" + slap.id}>
             {slap.title}
           </ListLink>
         ))}
         <div className="border-t border-gray-500" />
         {spotifyLists.map(slap => (
-          <ListLink to={"/app/spotify/playlist/" + slap.id}>
+          <ListLink key={slap.id} to={"/app/spotify/playlist/" + slap.id}>
             {slap.title}
           </ListLink>
         ))}
 
-        <NavLink title="Settings ⚙️" to="/app/settings" className="flex flex-row mb-2">
+      </div>
+
+
+      <div className="border-t border-gray-400 pt-4 pb-4">
+        <NavLink title="AB-Repeater" to="/app/settings" className="flex flex-row mb-2">
         </NavLink>
-        {/* <NavLink to="/app/profile" className="flex flex-row mb-2">
-          <div className="w-2 bg-red-400"></div>
-          <div className="pl-8 text-lg font-bold">My profile</div>
-        </NavLink> */}
-      </nav>
-    </div>
+        <NavLink title="Settings" to="/app/settings" className="flex flex-row mb-2">
+        </NavLink>
+      </div>
+      {/* <NavLink to="/app/profile" className="flex flex-row mb-2">
+        <div className="w-2 bg-red-400"></div>
+        <div className="pl-8 text-lg font-bold">My profile</div>
+      </NavLink> */}
+    </>
   )
 }
 
@@ -52,27 +72,20 @@ const NavLink = ({ title, ...props }) => {
   return (
     <Link
       {...props}
-      getProps={({ isCurrent }) => {
-        // the object returned here is passed to the
-        // anchor element's props
-        // return {
-        //   className: isCurrent ? "font-bold" : ""
-        // };
-      }}
     >
       <div className={"w-2 " + (match && "bg-blue-300")}></div>
       <div className="pl-8 text-lg">{title}</div>
     </Link>
   )
 };
-const ListLink = ({  ...props }) => {
+const ListLink = ({ ...props }) => {
 
   const match = useMatch(props.to);
   return (
     <Link
       {...props}
     >
-      <div className={"text-sm py-2 font-light pl-8 " + (match && "text-blue-400")}>{props.children || "Untitled"}</div>
+      <div className={"text-sm py-2 font-light pl-10 " + (match && "text-blue-400")}>{props.children || "Untitled"}</div>
     </Link>
   )
 };

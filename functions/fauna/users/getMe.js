@@ -13,7 +13,6 @@ exports.handler = async (req, res) => {
   return client
     .query(q.Get(q.Match(q.Index("users_index"), user.sub)))
     .then((response) => {
-      console.log("response: ", response);
       res.json(response.data);
     })
     .catch((error) => {
@@ -24,7 +23,6 @@ exports.handler = async (req, res) => {
           email: user.email,
           name: user.user_metadata.full_name,
         };
-        console.log('userItem: ', userItem);
 
         // return res.json(400, {});
         // return res.json(userItem);

@@ -12,6 +12,7 @@ router.get("/popularCollections", require("./popularCollections").handler);
 router.get("/collection/:id", require("./read").handler);
 router.put("/collection/:id", require("./update").handler);
 router.post("/collection", require("./create").handler);
+router.post("/deleteCollection/:id", require("./deleteCollection").handler);
 
 router.get("/users/getMe", require("./users/getMe").handler);
 router.get("/users/doesEmailExist/:email", require("./users/doesEmailExist").handler);

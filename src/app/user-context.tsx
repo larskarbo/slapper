@@ -21,6 +21,7 @@ export function UserProvider({ children }) {
     getFreshJWT,
     user: nUser,
   } = useIdentityContext();
+  console.log('nUser: ', nUser);
 
   const [user, setUser] = useState(null);
 
@@ -45,14 +46,14 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     if (nUser && isConfirmedUser) {
-
+      // setLoadingUser(false)
       getUserFromServer();
     }
   }, [nUser, isConfirmedUser]);
   
   
   return (
-    <UserContext.Provider value={user}>
+    <UserContext.Provider value={{user, isAuthenticated: !!nUser}}>
         {children}
     </UserContext.Provider>
   )

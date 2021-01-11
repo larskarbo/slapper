@@ -23,7 +23,7 @@ import { BButton } from "./comp/BButton";
 import useLocalStorage from "use-localstorage-hook";
 import { Link } from 'gatsby';
 import { FaPlay } from "react-icons/fa";
-import { AiFillAccountBook, AiFillPlayCircle, AiFillSave, AiOutlinePlayCircle } from "react-icons/ai";
+import { AiFillAccountBook, AiFillDelete, AiFillPlayCircle, AiFillSave, AiOutlinePlayCircle } from "react-icons/ai";
 import { IoPlay, IoPlaySharp } from "react-icons/io5";
 import { usePlayingNowState } from "./players/player-context";
 import { useUser } from "./user-context";
@@ -63,7 +63,7 @@ export interface Item {
 
 
 export default function Croaker({ collectionId, type }) {
-  const user = useUser()
+  const {user} = useUser()
   const [collectedProps, drop] = useDrop({
     accept: "nothing",
     drop: (asdf) => {
@@ -172,7 +172,6 @@ export default function Croaker({ collectionId, type }) {
         setListInfo({
           description: res.data.description,
           title: res.data.title,
-          coverImage: "https://via.placeholder.com/150"
         })
         setSlapUserId(res.data.user);
         setVisibility(res.data.visibility || "unlisted");
@@ -437,6 +436,22 @@ export default function Croaker({ collectionId, type }) {
     });
   }
 
+  const deleteSlap = () => {
+    if (user?.id != slapUserId) {
+      console.log('NOT YOUR SLAP slapUserId: ', user?.id, slapUserId);
+      return;
+    }
+    request("POST", "fauna/deleteCollection/" + collectionId, {
+      title: listInfo.title,
+      description: listInfo.description,
+      items: itemsForServer(items),
+      user: user.id,
+      visibility: visibility,
+    }).then((res: any) => {
+      console.log("saved")
+    });
+  }
+
   return (
 
     <div className="">
@@ -446,9 +461,12 @@ export default function Croaker({ collectionId, type }) {
       >
         <div className="flex">
           {/* <div className="w-40 h-40 bg-gray-600 rounded shadow"></div> */}
-          {listInfo.coverImage &&
+          {listInfo.coverImage ?
             <img src={listInfo.coverImage}
-              className="w-60 h-60 bg-gray-600 rounded shadow-lg"></img>}
+              className="w-60 h-60 rounded shadow-lg"></img>
+            : <div 
+            className={"w-60 h-60 bg-gray-400 rounded shadow-lg " + (!loaded && "animate-pulse")}></div>
+            }
           <div className="pl-8 pt-4 flex flex-grow flex-col justify-between">
             <div>
               <CleanInput
@@ -497,6 +515,12 @@ export default function Croaker({ collectionId, type }) {
           justify-center text-sm flex py-2 px-6 bg-yellow-500 hover:bg-yellow-600 font-medium text-white  transition duration-150">
             <AiFillSave className="mr-2" /> Save
             </button>
+
+
+          <button onClick={deleteSlap} className="ml-4 rounded items-center
+          justify-center text-sm flex py-2 px-6 bg-red-500 hover:bg-red-600 font-medium text-white  transition duration-150">
+            <AiFillDelete className="mr-2" /> Delete
+            </button>
         </div>
         <div className="border-t border-gray-100"></div>
         {/* <div className="border-b border-gray-100">
@@ -509,228 +533,6 @@ export default function Croaker({ collectionId, type }) {
         </div>
 
 
-
-
-        <div className="p-80"></div>
-        {loaded && (
-          <div>
-            <div
-              style={{
-              }}
-            >
-              {user?.id != slapUserId ? (
-                <TText style={{ color: "red" }}>
-                  You don't own this slap, so it won't be saved.
-                </TText>
-              ) : (
-                  <VisibilitySwitcher
-                    visibility={visibility}
-                    setVisibility={setVisibility}
-                  />
-                )}
-
-              <LinkShare
-                link={"https://slapper.io/s/" + collectionId}
-              />
-              {!spotify.credentials && items.find((i) => i.trackId) && (
-                <div
-                  style={{
-                    border: "1px solid black",
-                    width: "fit-content",
-                    padding: 10,
-                  }}
-                >
-                  <TText>Connect with spotify to play this Slap</TText>
-                  <Authorize spotify={spotify} />
-                </div>
-              )}
-
-              {/* 
-              {items.map((item, i) => (
-                <SlapItem
-                  item={item}
-                  duration={item.metaInfo?.duration}
-                  title={item.metaInfo?.title}
-                  text={item.text}
-                  key={item.videoId || item.trackId}
-                  playingNow={playingNow}
-                  onPause={() => pause()}
-                  onPlay={play}
-                  disabled={item.trackId && !spotify.credentials}
-                  onScrub={scrub}
-                  onSetSegment={(segment) => {
-                    updateItem(item, {
-                      from: segment.from,
-                      to: segment.to,
-                    });
-                  }}
-                  onSetText={(text) => updateItem(item, { text: text })}
-                  onSetTitle={(title) =>
-                    updateItem(item, { title: title })
-                  }
-                  onDeleteClip={(clip) => deleteClip(item, clip)}
-                  onDeleteItem={() => deleteItem(item)}
-                  onUpdateClip={(clip, whatever) =>
-                    updateClip(item, clip, whatever)
-                  }
-                />
-              ))} */}
-
-              {user?.plan == "premium" || items.length < 5 ? (
-                <>
-                  <KeyboardEventHandler
-                    handleKeys={["Enter"]}
-                    onKeyEvent={go}
-                  >
-                    <div
-                      style={{
-                        position: "relative",
-                        marginTop: 20,
-                        width: 500,
-                      }}
-                    >
-                      <input
-                        ref={myInputRef}
-                        type="text"
-                        style={{
-                          ...sansSerif,
-                          outline: "none",
-                          fontSize: input.length ? 10 : 15,
-                          width: "100%",
-                          padding: "10px 20px",
-                          borderWidth: 1,
-                          height: 45,
-                          borderColor: DEFAULT_BLACK,
-                        }}
-                        placeholder="Paste youtube or spotify link here"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                      />
-
-                      {input.length > 0 && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            right: 10,
-                            top: 10,
-                            bottom: 10,
-                            backgroundColor: "white",
-                            justifyContent: "center",
-                            paddingLeft: 20,
-                          }}
-                        >
-                          <TText>Press enter to add</TText>
-                        </div>
-                      )}
-                    </div>
-                  </KeyboardEventHandler>
-                  <TText
-                    style={{
-                      fontSize: 10,
-                      fontStyle: "italic",
-                    }}
-                  >
-                    ↑ Examples: ↑
-                          </TText>
-                  <TText
-                    style={{
-                      fontSize: 10,
-                      color: "blue",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    <a
-                      href="#"
-                      onClick={() => {
-                        setInput(
-                          "https://www.youtube.com/watch?v=Ob7vObnFUJc"
-                        );
-                        myInputRef.current.focus();
-                      }}
-                    >
-                      https://www.youtube.com/watch?v=Ob7vObnFUJc
-                            </a>
-                  </TText>
-                  <TText
-                    style={{
-                      fontSize: 10,
-                      color: "blue",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    <a
-                      href="#"
-                      onClick={() => {
-                        setInput(
-                          "spotify:track:698ItKASDavgwZ3WjaWjtz"
-                        );
-                        myInputRef.current.focus();
-                      }}
-                    >
-                      spotify:track:698ItKASDavgwZ3WjaWjtz
-                            </a>
-                  </TText>
-                  <TText
-                    style={{
-                      fontSize: 10,
-                      color: "blue",
-                      textDecoration: "underline",
-                    }}
-                  >
-                    <a
-                      href="#"
-                      onClick={() => {
-                        setInput(
-                          "https://open.spotify.com/track/698ItKASDavgwZ3WjaWjtz?si=PAypRLZDRyyS9-AUP_P6oQ"
-                        );
-                        myInputRef.current.focus();
-                      }}
-                    >
-                      https://open.spotify.com/track/698It...RLZDRyyS9-AUP_P6oQ
-                            </a>
-                  </TText>
-                </>
-              ) : (
-                  <div
-                    style={{
-                      padding: 20,
-                      backgroundColor: "#FFDCA8",
-                    }}
-                  >
-                    <TText
-                      style={{
-                        fontWeight: 700,
-                      }}
-                    >
-                      5 songs per slap is the maximum for the Standard
-                      plan
-                          </TText>
-                    <TText
-                      style={{
-                        marginBottom: 20,
-                      }}
-                    >
-                      Upgrade to premium to get the full Slapper
-                      experience, and support the development of the app!
-                          </TText>
-                    <Link to="/s/profile">
-                      <BButton variant="primary">
-                        Upgrade to premium
-                            </BButton>
-                    </Link>
-                  </div>
-                )}
-              {/* <FeedbackFish
-                    projectId="84e4f29205e0f4"
-                    userId={user?.email}
-                  >
-                    <BButton style={{ marginTop: 100, marginBottom: 100 }}>
-                      Send instant feedback ⚡
-                        </BButton>
-                  </FeedbackFish> */}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -224,6 +224,14 @@ export default class Spotify {
         await delay(500)
       }
     }
+
+
+    const playbackState = await this.api.getMyCurrentPlaybackState()
+    if (!playbackState.device) {
+      console.log("we need a device")
+      throw new Error(NO_DEVICE_ERROR_MESSAGE)
+      return
+    }
     throw new Error("Couldn't play!")
   }
 

@@ -1,10 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 
 import { Router, Redirect } from "@reach/router"
-import { Link } from "gatsby"
+import { Link, navigate } from "gatsby"
 
 import "../app/index.css";
 import "../app/styles.css";
+import "../app/tailwind.css";
 import "react-contexify/dist/ReactContexify.min.css";
 
 import LoginPage from "../app/views/LoginPage";
@@ -18,7 +19,7 @@ import {
 import OnBoard from "../app/views/OnBoard";
 import Admin from "../app/views/Admin";
 import App from '../app/Main';
-import { UserProvider } from "../app/user-context";
+import { UserProvider, useUser } from "../app/user-context";
 const url = "https://slapper.io";
 
 
@@ -33,7 +34,7 @@ export default function AppRouter() {
 }
 
 function Routing() {
-  
+
 
   return (
     <>
@@ -57,12 +58,22 @@ function Routing() {
         <LoginPage path="/register" />
         <OnBoard path="/onboarding" />
         <Admin path="/admin" />
-        <App default />
+        <PrivateRoute component={App} default />
         {/* <Croaker default loadingUser={loadingUser} user={user} /> */}
       </Router>
     </>
   );
 }
+
+const PrivateRoute = ({ component: Component, location, ...rest }) => {
+  const { isAuthenticated } = useUser()
+  if (!isAuthenticated && location.pathname !== `/app/login`) {
+    navigate("/app/login")
+    return null
+  }
+  return <Component {...rest} />
+}
+
 
 const LogOut = () => {
   const { logoutUser } = useIdentityContext();
