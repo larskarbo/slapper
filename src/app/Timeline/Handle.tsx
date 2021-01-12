@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { PADDING_SV } from "./SegmentView";
+import { PADDING_SV } from "../SegmentViewf/SegmentView";
 import { getCoordinates, getPosition, xToMS } from "./util";
 
 
@@ -42,10 +42,10 @@ class Handle extends Component {
     if (!this.props.parent) {
       w = 0
     } else {
-      w = this.props.parent.getBoundingClientRect().width - (PADDING_SV * 2)
+      w = this.props.parent.getBoundingClientRect().width
     }
 
-    const handlePos = PADDING_SV + (this.props.value / this.props.duration) * w
+    const handlePos = (this.props.value / this.props.duration) * w
 
     // const handle_width = this.props.isHovering ? HANDLE_WIDTH : 1
     const handle_width = 30

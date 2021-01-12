@@ -1,7 +1,16 @@
 
 
-export const isClipPlaying = (playingNow, clip) => (
-  playingNow?.type == "clip" &&
-                playingNow?.clip.id == clip.id &&
-                playingNow?.state == "playing"
-)
+export const spotifyTrackToSlapperTrack = (spotifyTrack) => {
+  return {
+    clips: [],
+    metaInfo: {
+      duration: spotifyTrack.duration_ms,
+      title: spotifyTrack.name,
+      artist: spotifyTrack.artists[0].name,
+      image: spotifyTrack.album.images[2].url,
+    },
+    type: "spotify",
+    trackId: spotifyTrack.id,
+  }
+
+}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SegmentView from "./SegmentView/SegmentView";
+import SegmentView from "./SegmentViewf/SegmentView";
 
 import { Menu, Item as ContextItem, MenuProvider } from "react-contexify";
 import styled from "styled-components";

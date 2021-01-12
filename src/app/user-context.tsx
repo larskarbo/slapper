@@ -21,13 +21,13 @@ export function UserProvider({ children }) {
     getFreshJWT,
     user: nUser,
   } = useIdentityContext();
-  console.log('nUser: ', nUser);
+  
 
   const [user, setUser] = useState(null);
 
   const getUserFromServer = async () => {
     generateHeaders(await getFreshJWT());
-    console.log("heuy")
+    
     await request("GET", "fauna/users/getMe")
       .then((res) => {
         if (res.id) {
@@ -40,7 +40,7 @@ export function UserProvider({ children }) {
         }
       })
       .catch((error) => {
-        console.log("Error with user")
+        
       });
   };
 
@@ -50,10 +50,12 @@ export function UserProvider({ children }) {
       getUserFromServer();
     }
   }, [nUser, isConfirmedUser]);
+
+  const isAuthenticated = !!nUser?.confirmed_at
   
   
   return (
-    <UserContext.Provider value={{user, isAuthenticated: !!nUser}}>
+    <UserContext.Provider value={{user, isAuthenticated}}>
         {children}
     </UserContext.Provider>
   )

@@ -41,14 +41,14 @@ export default class Spotify {
     this.onUpdatePlaybackState = () => { };
     this.onUpdateDevices = () => { };
     this.onGood = () => { };
-    this.mustOpenMenu = () => {console.log("mustOpenMenu not defined")};
+    this.mustOpenMenu = () => {};
   }
 
   onError = (error) => {
-    console.log('error: ', error);
-    console.log("Error from spotify js")
+    
+    
     if (error.includes("Unknown error: Player command failed: Restriction violated")) {
-      console.log('oooops')
+      
     } else {
       console["error"](error)
     }
@@ -174,7 +174,7 @@ export default class Spotify {
   pollDevices = async () => {
 
     return await this.api.getMyDevices().then(({ devices }) => {
-      console.log('devices: ', devices);
+      
       this.devices = devices;
       // this.onUpdateDevices(devices);
       return devices
@@ -204,18 +204,18 @@ export default class Spotify {
 
 
   play = async (opts) => {
-    console.log('playing')
+    
     if (!this.devices.find(d => d.is_active)) {
       // const playbackState = await this.api.getMyCurrentPlaybackState()
-      // console.log('playbackState: ', playbackState);
-      console.log("we need a device")
+      // 
+      
       throw new Error(NO_DEVICE_ERROR_MESSAGE)
       return
     }
-    console.log('play it')
+    
     for (const i of [1, 2, 3]) {
       const playbackState = await this.api.getMyCurrentPlaybackState()
-      console.log('playbackState: ', playbackState);
+      
       if (playbackState?.device) {
         await this.api.play(opts);
         this.isPlaying = true;
@@ -228,7 +228,7 @@ export default class Spotify {
 
     const playbackState = await this.api.getMyCurrentPlaybackState()
     if (!playbackState.device) {
-      console.log("we need a device")
+      
       throw new Error(NO_DEVICE_ERROR_MESSAGE)
       return
     }

@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { PADDING_SV } from "./SegmentView";
+import { PADDING_SV } from "../SegmentViewf/SegmentView";
 
 export default function Segment ({ children, from, to, duration, parent, style}) {
-  let w = parent.getBoundingClientRect().width - (PADDING_SV*2)
+  let w = parent.getBoundingClientRect().width
 
-  const startPos = PADDING_SV + (from / duration) * w
-  const endPos = PADDING_SV + (to / duration) * w
+  const startPos = (from / duration) * w
+  const endPos = (to / duration) * w
   return (
     <>
       <div style={{

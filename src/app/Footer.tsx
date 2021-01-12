@@ -5,6 +5,7 @@ import { MdDevices } from "react-icons/md";
 import DeviceSelector from "./DeviceSelector";
 // import IoPlaySkipForwardSharp from "../app/svg/play-skip-forward-sharp.inline.svg"
 import { usePlayingNowState, usePlayingNowDispatch, play, pause } from './players/player-context';
+import TimelineLeg from "./SegmentViewf/TimelineLeg";
 import Timeline from './Timeline/Timeline';
 
 const Footer = ({

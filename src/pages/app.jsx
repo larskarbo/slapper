@@ -3,9 +3,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { Router, Redirect } from "@reach/router"
 import { Link, navigate } from "gatsby"
 
-import "../app/index.css";
-import "../app/styles.css";
 import "../app/tailwind.css";
+import "../app/styles.css";
 import "react-contexify/dist/ReactContexify.min.css";
 
 import LoginPage from "../app/views/LoginPage";
@@ -54,21 +53,29 @@ function Routing() {
       </Helmet> */}
       <Router basepath="/app">
         <LogOut path="/logout" />
-        <LoginPage path="/login" />
-        <LoginPage path="/register" />
+        <LoginRoute component={LoginPage} path="/login" />
         <OnBoard path="/onboarding" />
         <Admin path="/admin" />
-        <PrivateRoute component={App} default />
+        <App default />
         {/* <Croaker default loadingUser={loadingUser} user={user} /> */}
       </Router>
     </>
   );
 }
 
-const PrivateRoute = ({ component: Component, location, ...rest }) => {
+const LoginRoute = ({ component: Component, location, ...rest }) => {
+  const { isAuthenticated } = useUser()
+  if (isAuthenticated) {
+    navigate("/app", {replace:true})
+    return null
+  }
+  return <Component {...rest} />
+}
+
+export const PrivateRoute = ({ component: Component, location, ...rest }) => {
   const { isAuthenticated } = useUser()
   if (!isAuthenticated && location.pathname !== `/app/login`) {
-    navigate("/app/login")
+    navigate("/app/login", {replace:true})
     return null
   }
   return <Component {...rest} />

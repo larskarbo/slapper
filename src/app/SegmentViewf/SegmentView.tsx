@@ -1,5 +1,5 @@
-import Handle from "./Handle";
-import Segment from "./Segment";
+import Handle from "../Timeline/Handle";
+import Segment from "../Timeline/Segment";
 import React, { Component, useEffect, useRef, useState } from "react";
 import "./SegmentView.css";
 import niceTicks from "nice-ticks";
@@ -8,9 +8,9 @@ import Play from "../comp/Play";
 import { CleanInput, TText } from "../utils/font";
 import CircleButton from "../comp/CircleButton";
 import { MdDelete } from "react-icons/md";
-import { getCoordinates, getPosition } from "./util";
+import { getCoordinates, getPosition } from "../Timeline/util";
 import Pen from "./Pen";
-import { Clip } from "./Clip";
+import { Clip } from "../Timeline/Clip";
 import { isClipPlaying } from "../utils/helpers";
 
 export const msToTime = (ms) => {
@@ -32,6 +32,7 @@ export default function SegmentView({
   onPlay,
   onPause,
 }) {
+  console.log('item: ', item);
   const [pointerAtRolling, setPointerAtRolling] = useState(0);
   const [draggingPointerValue, setDraggingPointerValue] = useState(0);
   const [draggingPointer, setDraggingPointer] = useState(false);
@@ -44,11 +45,11 @@ export default function SegmentView({
     const INTERVAL = 100;
     if (playing) {
       const interval = setInterval(() => {
-        setPointerAtRolling((pointerAt) =>{
-          window.guessingPosition = Math.min(pointerAt + INTERVAL, duration)
-         return Math.min(pointerAt + INTERVAL, duration)
-        }
-        );
+        // setPointerAtRolling((pointerAt) =>{
+        //   window.guessingPosition = Math.min(pointerAt + INTERVAL, duration)
+        //  return Math.min(pointerAt + INTERVAL, duration)
+        // }
+        // );
       }, INTERVAL);
       return () => clearInterval(interval);
     }

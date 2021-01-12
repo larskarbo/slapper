@@ -1,7 +1,7 @@
 import useHover from "@react-hook/hover";
 import React, { Component, useEffect, useRef, useState } from "react";
 import { PADDING_SV } from "./SegmentView";
-import { getCoordinates, getPosition, xToMS } from "./util";
+import { getCoordinates, getPosition, xToMS } from "../Timeline/util";
 
 let y = 0
 let isInsideAClip = false

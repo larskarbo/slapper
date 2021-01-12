@@ -2,17 +2,16 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { FaPause, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { BsFullscreen } from 'react-icons/bs';
 import Bar from './Bar';
-import { usePlayingNowState, usePlayingNowDispatch, play, pause, seek } from '../players/player-context';
-import { Clip } from './Clip';
-import { useClip } from '../clip-context';
+import { usePlayingNowState } from '../players/player-context';
+import SegmentView from './SegmentView';
 
-function Timeline() {
+function TimelineLeg() {
   const [pointerAtRolling, setPointerAtRolling] = useState(0);
   // const [duration, setDuration] = useState(0);
   const lineRef = useRef(null);
 
-  const { clipNow } = useClip()
   const { playingNow, seek } = usePlayingNowState()
+  console.log('playingNow: ', playingNow);
 
   const onSeek = (ms) => {
     console.log('ms: ', ms);
@@ -21,34 +20,49 @@ function Timeline() {
 
   return (
     <>
-      {playingNow &&
+      {playingNow.item ?
+      <SegmentView
+        clips={playingNow.item.clips}
+        duration={playingNow.item.metaInfo.duration || 0}
+        pointerAt={playingNow.position.ms || 0}
+        playing={playingNow.state == "playing"}
+        playingNow={playingNow}
+        onScrub={onSeek}
+        onPlay={(clip) => {
+          // const playable = {
+          //   type: "clip",
+          //   item: playingNow?.item,
+          //   clip: clip,
+          // };
+          // onPlay(playable);
+        }}
+        onPause={() => {}}
+        item={playingNow.item}
+        onAddClip={() => {}}
+        onDeleteClip={() => {}}
+        onUpdateClip={(clip, whatever) => {
+          console.log('clip: ', clip);
+          // onUpdateClip(playingNow?.item, clip, whatever)
+        }}
+      />
+      : "no"}
+      {/* {playingNow &&
         <>
           <div className="w-12 text-xs flex justify-center text-gray-500 font-light"><Time playing={playingNow.state == "playing"} position={playingNow.position} /></div>
           <div ref={lineRef} className="flex relative items-center flex-grow h-full">
 
             {playingNow.item &&
-              <>
-                {(clipNow && playingNow.item.id == clipNow?.item.id) &&
-                  <Clip
-                    isHovering={true}
-                    duration={playingNow.item.metaInfo.duration}
-                    parent={lineRef.current}
-                  />
+              <Bar parent={lineRef.current} duration={playingNow.item.metaInfo.duration} value={playingNow.position?.ms || 0}
+                onUp={(ms) => onSeek(ms)
                 }
-
-                <Bar parent={lineRef.current} duration={playingNow.item.metaInfo.duration} value={playingNow.position?.ms || 0}
-                  onUp={(ms) => onSeek(ms)
-                  }
-                  isPlaying={playingNow.state == "playing"}
-                />
-              </>
+                isPlaying={playingNow.state == "playing"}
+              />
             }
-
 
           </div>
           <div className="w-12 text-xs flex justify-center text-gray-500 font-light">{msToTime(playingNow.item?.metaInfo.duration)}</div>
         </>
-      }
+      } */}
     </>
   );
 }
@@ -88,4 +102,4 @@ const Time = ({ position, playing }) => {
   return <>{time}</>
 }
 
-export default Timeline;
+export default TimelineLeg;

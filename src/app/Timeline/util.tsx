@@ -1,4 +1,4 @@
-import { PADDING_SV } from "./SegmentView";
+import { PADDING_SV } from "../SegmentViewf/SegmentView";
 
 export function getPosition(e) {
   if (typeof e.touches !== "undefined") {

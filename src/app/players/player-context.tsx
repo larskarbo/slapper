@@ -63,7 +63,7 @@ function playingNowReducer(state, action) {
 type PlayingNowProviderProps = { children: React.ReactNode }
 const PlayingNowStateContext = React.createContext<State | undefined>(undefined)
 
-console.log("YOOOOOOO!!!!")
+
 const spotify = new Spotify()
 
 
@@ -71,11 +71,11 @@ const spotify = new Spotify()
 //   await spotify.api
 //     .getMyCurrentPlaybackState()
 //     .catch((e) => {
-//       console.log('e: ', e);
+//       
 
 //     })
 //     .then((playbackState: any) => {
-//       console.log('playbackState: ', playbackState);
+//       
 //       dispatch({
 //         type: 'set_playback_state',
 //         position: {
@@ -84,7 +84,7 @@ const spotify = new Spotify()
 //         },
 //         state: playbackState.is_playing ? "playing" : "paused"
 //       })
-//       // console.log(playbackState.progress_ms)
+//       // 
 //       // this.playbackState = playbackState;
 //       // this.lastUpdatePlaybackState = new Date()
 //       // this.isPlaying = playbackState?.is_playing;
@@ -110,7 +110,7 @@ const spotify = new Spotify()
 //   } catch (error) {
 //     // dispatch({type: 'error'})
 //     if(error.message == NO_DEVICE_ERROR_MESSAGE){
-//       console.log("show menu")
+//       
 //       spotify.mustOpenMenu()
 //     } else {
 //       alert("error," + error.message)
@@ -121,7 +121,7 @@ const spotify = new Spotify()
 
 // export async function play(dispatch: Dispatch) {
 //   // dispatch({type: 'start update', updates})
-//   console.log("going for it")
+//   
 //   try {
 //     const updatedUser = await spotify.play()
 //     dispatch({ type: 'play' })
@@ -133,7 +133,7 @@ const spotify = new Spotify()
 
 // export async function pause(dispatch: Dispatch) {
 //   // dispatch({type: 'start update', updates})
-//   console.log("going for it")
+//   
 //   try {
 //     const updatedUser = await spotify.pause()
 //     dispatch({ type: 'pause' })
@@ -145,11 +145,11 @@ const spotify = new Spotify()
 
 // export async function seek(dispatch: Dispatch, to: number) {
 //   // dispatch({type: 'start update', updates})
-//   console.log("going for it")
+//   
 //   try {
-    // const updatedUser = await spotify.api.seek(to)
-    // // dispatch({type: 'pause'})
-    // updatePlaybackState(dispatch)
+// const updatedUser = await spotify.api.seek(to)
+// // dispatch({type: 'pause'})
+// updatePlaybackState(dispatch)
 //   } catch (error) {
 //     // dispatch({type: 'error'})
 //     alert("error," + error.message)
@@ -178,9 +178,9 @@ export function PlayingNowProvider({ children }: PlayingNowProviderProps) {
         })
 
     } catch (error) {
-      console.log('error: ', error);
+      
       if (error.message == NO_DEVICE_ERROR_MESSAGE) {
-        console.log("show menu")
+        
         spotify.mustOpenMenu()
       } else {
         alert("error," + error.message)
@@ -189,8 +189,30 @@ export function PlayingNowProvider({ children }: PlayingNowProviderProps) {
     }
   }
 
+  async function playClip(item: Item, clip) {
+    await spotify.play({ uris: ["spotify:track:" + item.trackId], position_ms: clip.from })
+      .then(() => {
+        setPlayingNow({
+          item: item,
+          clip: clip,
+          position: {
+            ms: clip.from,
+            timestamp: Date.now()
+          },
+          state: "playing"
+        })
+        // updatePlaybackState()
+      })
+  }
+
   React.useEffect(() => {
     spotify.onUpdatePlaybackState = (playbackState) => {
+      if (!playbackState) {
+        setPlayingNow(playingNow => ({
+          ...playingNow,
+          state: "paused"
+        }))
+      }
       setPlayingNow(playingNow => ({
         ...playingNow,
         position: {
@@ -231,7 +253,7 @@ export function PlayingNowProvider({ children }: PlayingNowProviderProps) {
 
   return (
     <PlayingNowStateContext.Provider value={{
-      playingNow, playItem, pause, play, seek, spotify
+      playingNow, playItem, playClip, pause, play, seek, spotify
     }}>
       {/* <PlayingNowDispatchContext.Provider value={dispatch}> */}
       {children}

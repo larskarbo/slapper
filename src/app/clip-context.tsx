@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { usePlayingNowState } from './players/player-context';
 import { request } from './utils/request';
 import { useUser } from './user-context';
+import { useSlapData } from './slapdata-context';
 
 
 const ClipContext = React.createContext(undefined)
@@ -14,18 +15,37 @@ const ClipContext = React.createContext(undefined)
 
 
 export function ClipProvider({ children }) {
-  const [clipNow, setClipNow] = useState(null)
+  const [focusedClip, setFocusedClip] = useState(null)
+  const {slaps} = useSlapData()
 
-  const focusClip = (clip) => {
-    console.log('clip: ', clip);
-    setClipNow({
-      clip
+  const focusClip = (clipId, itemId, slapId) => {
+    setFocusedClip({
+      clipId,
+      itemId,
+      slapId
     })
+  }
 
+  const defocus = () => {
+    setFocusedClip(null)
+  }
+
+  let clipNow = null
+  
+  if(focusedClip){
+    const slap = slaps.find(s => s.id == focusedClip.slapId)
+    
+    
+    const item = slap.items.find(i => i.id == focusedClip.itemId)
+    const clip = item.clips.find(c => c.id == focusedClip.clipId)
+
+    clipNow = {
+      slap, item, clip
+    }
   }
   
   return (
-    <ClipContext.Provider value={{clipNow, focusClip}}>
+    <ClipContext.Provider value={{clipNow, focusClip, defocus}}>
         {children}
     </ClipContext.Provider>
   )

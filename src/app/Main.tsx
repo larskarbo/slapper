@@ -9,16 +9,17 @@ import { PlayingNowProvider } from "./players/player-context";
 import Settings from "./views/Settings";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import LoginPage from "./views/LoginPage";
 import Lists from "./views/Lists";
 import { SlapDataProvider } from "./slapdata-context";
 import { useUser } from "./user-context";
 import ClipSection from "./ClipSection";
 import { ClipProvider } from "./clip-context";
+import { PrivateRoute } from "../pages/app";
+import WarnExit from './WarnExit';
 
 const FOOTER_HEIGHT = 100;
 
-export default function App({}) {
+export default function App({ }) {
   const { user } = useUser();
 
   return (
@@ -28,14 +29,15 @@ export default function App({}) {
           <DndProvider backend={HTML5Backend}>
             <div>
               <div className="w-full flex flex-row">
+                <WarnExit />
                 <div
                   className="border-r flex flex-col border-gray-200 flex-shrink-0"
                   style={{
-                    width: 220,
+                    width: 260,
                     height: `calc(100vh - ${FOOTER_HEIGHT}px)`,
                   }}
                 >
-                  {user ? <Sidebar /> : null}
+                  <Sidebar />
                 </div>
 
                 <div
@@ -46,20 +48,18 @@ export default function App({}) {
                 >
                   <div className="flex flex-grow p-20 overflow-y-scroll">
                     {/* <h1>Home</h1> */}
-                    {user ? (
-                      <Router basepath="/app">
-                        <Home path="/" />
-                        {/* <SlapperLists path="/my-slaps" /> */}
-                        <Lists path="/my-slaps" />
-                        <Settings path="/settings" />
-                        <Croaker type="slapper" path="/slap/:collectionId" />
-                        <Croaker
-                          type="spotify"
-                          path="/spotify/playlist/:collectionId"
-                        />
-                        <NotFound default />
-                      </Router>
-                    ) : null}
+                    <Router basepath="/app">
+                      <Home path="/" />
+                      {/* <SlapperLists path="/my-slaps" /> */}
+                      <PrivateRoute component={Lists} path="/my-slaps" />
+                      <PrivateRoute component={Settings} path="/settings" />
+                      <Croaker type="slapper" path="/slap/:collectionId" />
+                      <Croaker
+                        type="spotify"
+                        path="/spotify/playlist/:collectionId"
+                      />
+                      <NotFound default />
+                    </Router>
                   </div>
                   <ClipSection />
                 </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import SegmentView from "./SegmentView/SegmentView";
+import SegmentView from "./SegmentViewf/SegmentView";
 import useHover from "@react-hook/hover";
 import { TText } from "./utils/font";
 import Play from "./comp/Play";
