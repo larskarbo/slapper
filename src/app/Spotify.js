@@ -9,46 +9,48 @@ export default class Spotify {
   constructor(opts = {}) {
     this.api = new SpotifyApi();
     this.credentials = false;
-    this.parseLocation();
     this.ready = false;
     this.loading = true;
     this.devices = [];
     this.me = null;
     this.playerId = null;
-    this.accessToken = localStorage.getItem("spotify_a_token");
-    this.refreshToken = localStorage.getItem("spotify_r_token");
     this.isPlaying = false;
     this.currentTrack = null;
     this.weAreInControl = false
     this.lastUpdatePlaybackState = null
 
+    if (typeof window != "undefined") {
+      // if not SSR
+      this.parseLocation();
+      this.accessToken = localStorage.getItem("spotify_a_token");
+      this.refreshToken = localStorage.getItem("spotify_r_token");
 
 
+      this.api.setAccessToken(this.accessToken);
 
-    this.api.setAccessToken(this.accessToken);
+      this.api.setOnRenew(this.renewToken);
+      this.api.setOnError(this.onError);
+      // this.renewToken()
+      if (this.accessToken && this.refreshToken) {
 
-    this.api.setOnRenew(this.renewToken);
-    this.api.setOnError(this.onError);
-    // this.renewToken()
-    if (this.accessToken && this.refreshToken) {
+        this.initMe().then(() => {
+          this.credentials = true;
+          this.startSpotifyEngine();
+        });
+      }
 
-      this.initMe().then(() => {
-        this.credentials = true;
-        this.startSpotifyEngine();
-      });
+      this.onUpdatePlaybackState = () => { };
+      this.onUpdateDevices = () => { };
+      this.onGood = () => { };
+      this.mustOpenMenu = () => { };
     }
-
-    this.onUpdatePlaybackState = () => { };
-    this.onUpdateDevices = () => { };
-    this.onGood = () => { };
-    this.mustOpenMenu = () => {};
   }
 
   onError = (error) => {
-    
-    
+
+
     if (error.includes("Unknown error: Player command failed: Restriction violated")) {
-      
+
     } else {
       console["error"](error)
     }
@@ -82,6 +84,7 @@ export default class Spotify {
   };
 
   parseLocation = () => {
+
     const hash = qs.parse(window.location.hash);
 
     if (hash.spotify_a_token && hash.spotify_a_token.length > 10) {
@@ -90,6 +93,7 @@ export default class Spotify {
       this.setRefreshToken(hash.spotify_r_token);
       window.location.hash = "";
     }
+
   };
 
   startSpotifyEngine = async () => {
@@ -174,7 +178,7 @@ export default class Spotify {
   pollDevices = async () => {
 
     return await this.api.getMyDevices().then(({ devices }) => {
-      
+
       this.devices = devices;
       // this.onUpdateDevices(devices);
       return devices
@@ -204,18 +208,18 @@ export default class Spotify {
 
 
   play = async (opts) => {
-    
+
     if (!this.devices.find(d => d.is_active)) {
       // const playbackState = await this.api.getMyCurrentPlaybackState()
       // 
-      
+
       throw new Error(NO_DEVICE_ERROR_MESSAGE)
       return
     }
-    
+
     for (const i of [1, 2, 3]) {
       const playbackState = await this.api.getMyCurrentPlaybackState()
-      
+
       if (playbackState?.device) {
         await this.api.play(opts);
         this.isPlaying = true;
@@ -228,7 +232,7 @@ export default class Spotify {
 
     const playbackState = await this.api.getMyCurrentPlaybackState()
     if (!playbackState.device) {
-      
+
       throw new Error(NO_DEVICE_ERROR_MESSAGE)
       return
     }
@@ -246,7 +250,7 @@ export default class Spotify {
       .catch((a) => {
 
       });
-    if(res.new_auth_needed){
+    if (res.new_auth_needed) {
       console.log('res: ', res);
       this.logOut()
       return

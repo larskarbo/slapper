@@ -15,9 +15,7 @@ export function getPosition(e) {
 
 export function getCoordinates(position, element) {
   var boundingRect = element.getBoundingClientRect();
-  // use window.devicePixelRatio because if a retina screen, canvas has more pixels
-  // than the getCoordinates
-  var dpr = 1// typeof window !== "undefined" ? window.devicePixelRatio : 1;
+  var dpr = 1
   return {
     x: (position.x - boundingRect.left) * dpr,
     y: (position.y - boundingRect.top) * dpr

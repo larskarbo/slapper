@@ -12,6 +12,7 @@ const premium = [
   "Unlimited songs per slap",
   "First to try new features",
   "Influence new decisions",
+  "Spotify playlist sync",
   "++ More premium perks coming",
   "Support the development of Slapper ♥",
 ];

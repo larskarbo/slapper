@@ -6,34 +6,41 @@ import { Form, FormControl, InputGroup } from "react-bootstrap";
 import { FaGoogle, FaUser } from "react-icons/fa";
 import { request } from "../utils/request";
 import { Redirect } from '@reach/router';
+import { useUser } from "../user-context";
+import { navigate } from "gatsby";
 
-export default function ({ user, register = false }) {
+export default function ({ }) {
   const formRef = useRef();
   const [msg, setMsg] = useState("");
+  const { user, isAuthenticated } = useUser()
 
-  useEffect(() => {
-    setMsg("");
-  }, [register]);
+  if(!isAuthenticated){
+    navigate("/app/login")
+  }
+
+  if(user?.userName){
+    navigate("/app/")
+  }
 
   const continueToSlapper = () => {
     const username = formRef.current.username.value;
     const emailUpdates = formRef.current.emailUpdates.value;
     console.log('username: ', username);
-    if(username.length < 4){
+    if (username.length < 4) {
       return alert("Please have at least 4 letters in your username")
     }
     // const password = formRef.current.password.value;
 
     request("POST", "fauna/users/setMe", {
-      username:username,
-      emailUpdates:emailUpdates,
+      username: username,
+      emailUpdates: emailUpdates,
     })
-      .then((user:any) => {
+      .then((user: any) => {
         console.log("Success! Signed up", user);
-        window.location.href="/s";
+        navigate("/app")
       })
       .catch((err) => {
-        if(err.message.includes("instance not unique")){
+        if (err.message.includes("instance not unique")) {
           setMsg("Username not available, please choose something else")
         } else {
           setMsg("Error: " + err.message)
@@ -41,102 +48,65 @@ export default function ({ user, register = false }) {
       });
   };
 
-  let { from } = location.state || { from: { pathname: "/s" } };
-  if (!from.pathname.includes("/s")) {
-    from = { pathname: "/s" };
-  }
-
-  if (user && user.username) {
-    return <Redirect to={from} />;
-  }
-
   return (
-    <div
-      style={{
-        // width: "100%",
-        height: "100%",
-        display: "flex",
-        padding: 100,
-        backgroundColor: "oldlace",
-      }}
-    >
-      <div
-        style={{
-          width: "100%",
-          alignItems: "center",
-        }}
-      >
-        <TText
-          style={{
-            fontWeight: 500,
-            paddingBottom: 20,
-          }}
-        >
-          Slapper.io
-        </TText>
-        <div
-          style={{
-            maxWidth: 400,
-            width: "100%",
-            padding: 25,
-            backgroundColor: "white",
-            borderRadius: 10,
-            boxShadow:
-              "0 1px 3px 0 rgba(0,0,0,.1), 0 1px 2px 0 rgba(0,0,0,.06)",
-          }}
-        >
-          {msg && (
-            <TText
-              style={{
-                color: "red",
-              }}
-            >
-              {msg}
-            </TText>
-          )}
-          <form ref={formRef} onSubmit={(e) => {
-            e.preventDefault()
-            continueToSlapper()
-          }}>
-            <TText>Choose a username:</TText>
-            <InputGroup className="mb-3">
-              <InputGroup.Prepend>
-                <InputGroup.Text id="basic-addon1">
-                  <FaUser />
-                </InputGroup.Text>
-              </InputGroup.Prepend>
-              <FormControl
-                required
-                name="username"
-                placeholder="username"
-                aria-label="username"
-                aria-describedby="basic-addon1"
-              />
-            </InputGroup>
 
+    <div className="w-full min-h-screen h-full flex flex-col items-center justify-center bg-yellow-50">
+      <h1 className="text-2xl font pb-12">
+        Just one more step...
+      </h1>
+      <div className="w-full px-4 py-8 pt-5 mx-3 bg-white rounded-lg shadow sm:w-96">
+        {msg && (
+          <div className="text-red-500 mb-3"
+          >
+            {msg}
+          </div>
+        )}
+        <form ref={formRef} onSubmit={(e) => {
+          e.preventDefault()
+          continueToSlapper()
+        }}>
+          <label
+            htmlFor="username"
+            className="block text-sm font-medium leading-5 text-gray-700"
+          >
+            Choose a username:
+          </label>
+          <div className="mt-1 rounded-md shadow-sm">
+            <input
+              id="username"
+              type="text"
+              tabindex="1"
+              name="username"
+              placeholder=""
+              required=""
+              className="block w-full px-3 py-2 placeholder-gray-400 transition duration-150 ease-in-out
+                border border-gray-300 rounded-md appearance-none focus:outline-none
+                focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5"
+            />
+          </div>
 
+          <label className="flex items-center pb-2 my-2">
+            <input type="checkbox" name="emailUpdates" className="rounded" />
+            <span className="ml-2">
+            Receive occasional updates about Slapper
+            </span>
+          </label>
 
-            <InputGroup className="mb-3">
-              <Form.Check
-                name="emailUpdates"
-                type="switch"
-                id="custom-switch"
-                label="Receive occasional updates about Slapper"
-              />
-            </InputGroup>
 
             <button
-              style={{
-                width: "100%",
-              }}
-              onPress={continueToSlapper}
-              variant="secondary"
-            >
-              Continue to Slapper
-            </button>
-          </form>
-        </div>
+            type="submit"
+            className="shadow-sm w-full flex justify-center cursor-pointer py-2 px-4 border
+                border-transparent text-sm font-medium rounded-md text-white bg-gray-700
+                 focus:outline-none focus:border-gray-700 focus:shadow-outline-indigo active:bg-gray-700 transition duration-150 ease-in-out"
+          >
+            Continue to Slapper
+          </button>
+        </form>
       </div>
+
+
+      <div className="pb-16"></div>
     </div>
+
   );
 }

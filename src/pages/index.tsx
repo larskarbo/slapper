@@ -4,16 +4,14 @@ import { TText } from "../app/utils/font";
 import annotate from "./annotate.png";
 import segments from "./segments.png";
 import songs from "./songs.png";
-import { Link } from 'gatsby';
+import { Link, navigate } from 'gatsby';
+import { Redirect } from '@reach/router';
 
 export default function () {
-  // const location = window.location
-  // if(location.hash?.includes("confirmation_token")){
-  //   return <Redirect to={"/onboarding"+location.hash} />
-  // }
-  // if(location.hash?.includes("access_token")){
-  //   return <Redirect to={"/s"+location.hash} />
-  // }
+  if(typeof window != "undefined" && window.location.hash.includes("confirmation_token")){
+    console.log(window.location.hash)
+    navigate("/app/"+window.location.hash)
+  }
   return (
     <div
       style={{

@@ -9,6 +9,7 @@ import { useUser } from './user-context';
 import update from 'immutability-helper';
 
 import { v4 as uuidv4 } from "uuid";
+import { navigate } from 'gatsby';
 
 const SlapDataContext = React.createContext(undefined)
 
@@ -219,6 +220,24 @@ export function SlapDataProvider({ children }) {
     });
   };
 
+  const newSlap = () => {
+    // if (user?.id != slapUserId) {
+    //   
+    //   return;
+    // }
+
+    request("POST", "fauna/collection", {
+      title: "",
+      description: "",
+      items: [],
+      user: user.id,
+      visibility: "unlisted",
+    }).then((res: any) => {
+      setReloadSlapsUpdateInt(Math.random())
+      navigate("/app/slap/" + res.ref["@ref"].id)
+    });
+  };
+
 
   useEffect(() => {
     if (spotify.me && slapsLoaded) {
@@ -250,7 +269,7 @@ export function SlapDataProvider({ children }) {
 
   return (
     <SlapDataContext.Provider value={{ slaps, dirtySlaps, saveSlap, spotifyLists, addItem, moveItem,
-     editItemText, deleteSlap, addClip, editClip, setMetaInfo, setListInfo, setReloadSlapsUpdateInt}}>
+     editItemText, deleteSlap, addClip, editClip, setMetaInfo, setListInfo, setReloadSlapsUpdateInt, newSlap}}>
       {children}
     </SlapDataContext.Provider>
   )

@@ -3,6 +3,10 @@ require("dotenv").config({
 })
 
 module.exports = {
+  siteMetadata: {
+    title: `Slapper`,
+    siteUrl: `https://slapper.io`,
+  },
   plugins: [
     {
       resolve: `gatsby-source-filesystem`,
@@ -38,7 +42,7 @@ module.exports = {
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
     `gatsby-plugin-image`,
-    `gatsby-plugin-feed`,
+    // `gatsby-plugin-feed`,
     // {
     //   resolve: `gatsby-plugin-manifest`,
     //   options: {

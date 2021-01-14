@@ -5,8 +5,6 @@ export const BASE = `/.netlify/functions/`;
 
 let headers = {};
 
-// export const stripe = window.Stripe(process.env.STRIPE_PUB_KEY)
-
 export function generateHeaders(token) {
   headers = {
     "Content-Type": "application/json",

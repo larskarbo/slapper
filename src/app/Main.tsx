@@ -19,11 +19,17 @@ import WarnExit from './WarnExit';
 import Feedback from './Feedback';
 import { YoutubeProvider } from './youtube-context';
 import { YoutubeBox } from './players/YoutubeBox';
+import { navigate } from "gatsby";
 
 const FOOTER_HEIGHT = 100;
 
 export default function App({ }) {
   const { user } = useUser();
+
+  if(user && !user.username){
+    navigate("/app/onboarding")
+  }
+  console.log('user: ', user);
 
   return (
     <YoutubeProvider>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import KeyboardEventHandler from "react-keyboard-event-handler";
+// import KeyboardEventHandler from "react-keyboard-event-handler";
 import urlParser from "js-video-url-parser";
 import { request } from "./utils/request";
 import { v4 as uuidv4 } from "uuid";
@@ -134,16 +134,6 @@ export default function Croaker({ slapId, type }) {
       navigate("/app/slap/" + res.ref["@ref"].id)
     });
 
-    // request("POST", "fauna/collection", {
-    //   title: "",
-    //   description: "",
-    //   items: [],
-    //   user: user.id,
-    //   visibility: "public",
-    // }).then((res:any) => {
-    //   history.replace({ pathname: "/s/" + res.ref["@ref"].id });
-    //   setUpdateCounter(updateCounter + 1);
-    // });
   };
 
   const go = async () => {
@@ -184,7 +174,7 @@ export default function Croaker({ slapId, type }) {
     if (parsed && parsed.provider == "youtube") {
 
       request("GET", "youtube/getVideoData/" + parsed.id)
-        .then((res:any) => {
+        .then((res: any) => {
 
           addItem(slapId, {
             clips: [],
@@ -399,7 +389,10 @@ export default function Croaker({ slapId, type }) {
 
         {user?.plan == "premium" || items.length < 5 ? (
           <>
-            <KeyboardEventHandler handleKeys={["Enter"]} onKeyEvent={go}>
+            <form onSubmit={e => {
+              e.preventDefault()
+              go()
+            }}>
               <div
                 style={{
                   position: "relative",
@@ -425,7 +418,8 @@ export default function Croaker({ slapId, type }) {
                   onChange={(e) => setInput(e.target.value)}
                 />
                 {input.length > 0 && (
-                  <div
+                  <button
+                    type="submit"
                     style={{
                       position: "absolute",
                       right: 10,
@@ -437,10 +431,10 @@ export default function Croaker({ slapId, type }) {
                     }}
                   >
                     <div>Press enter to add</div>
-                  </div>
+                  </button>
                 )}
               </div>
-            </KeyboardEventHandler>
+            </form>
             <div
               style={{
                 fontSize: 10,
@@ -525,8 +519,8 @@ export default function Croaker({ slapId, type }) {
                 Upgrade to premium to get the full Slapper experience, and support
                 the development of the app!
             </div>
-              <Link to="/s/profile">
-                <button variant="primary">Upgrade to premium</button>
+              <Link to="/app/settings">
+                <button className="ml-4 rounded items-center justify-center text-sm flex py-2 px-6 bg-green-500 hover:bg-green-600 font-medium text-white  transition duration-150">Upgrade to premium</button>
               </Link>
             </div>
           )}
