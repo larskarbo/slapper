@@ -263,7 +263,7 @@ export function SlapDataProvider({ children }) {
   }, [spotify?.me, slapsLoaded])
 
   return (
-    <SlapDataContext.Provider value={{ slaps, dirtySlaps, saveSlap, spotifyLists, addItem, moveItem,
+    <SlapDataContext.Provider value={{ slaps, dirtySlaps, saveSlap, slapsLoaded, spotifyLists, addItem, moveItem,
      editItemText, deleteSlap, addClip, editClip, setMetaInfo, setListInfo, setReloadSlapsUpdateInt, newSlap}}>
       {children}
     </SlapDataContext.Provider>

@@ -84,7 +84,7 @@ const SpotifySync = ({ slapId }) => {
           "bg-green-500 hover:bg-green-600"
         }
       >
-        <AiOutlineSync className="mr-2" /> Sync with Spotify
+        <AiOutlineSync className="mr-2" /> Sync now
       </button>
       {showModal && (
         <>

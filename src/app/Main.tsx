@@ -29,7 +29,6 @@ export default function App({ }) {
   if(user && !user.username){
     navigate("/app/onboarding")
   }
-  console.log('user: ', user);
 
   return (
     <YoutubeProvider>
@@ -64,9 +63,9 @@ export default function App({ }) {
                         {/* <SlapperLists path="/my-slaps" /> */}
                         <PrivateRoute component={Lists} path="/my-slaps" />
                         <PrivateRoute component={Settings} path="/settings" />
-                        <Croaker type="slapper" path="/slap/:slapId" />
+                        <Croaker listType="slapper" path="/slap/:slapId" />
                         <Croaker
-                          type="spotify"
+                          listType="spotify"
                           path="/spotify/playlist/:slapId"
                         />
                         <NotFound default />

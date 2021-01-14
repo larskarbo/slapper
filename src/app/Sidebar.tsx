@@ -51,7 +51,7 @@ const Sidebar = ({ }) => {
           <div className="overflow-y-scroll flex-grow border-t border-b border-gray-400">
 
             {slaps.filter(slap => slap.spotifyLinked).length > 0 && <>
-              <div className="pl-6 text-xs uppercase pt-4 font-bold text-gray-700">Slapper + Spotify</div>
+              <div className="pl-6 text-xs uppercase pt-4 font-bold text-gray-700">Slapper (🔄 Spotify)</div>
               <div className="py-2 my-1 bg-gray-100">
 
                 {slaps.filter(slap => slap.spotifyLinked).map(slap => (

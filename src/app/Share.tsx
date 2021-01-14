@@ -53,7 +53,7 @@ const Share = ({ slapId }) => {
                     <input
                       id="link"
                       type="text"
-                      tabindex="1"
+                      tabIndex="1"
                       name="link"
                       value={"https://slapper.io/app/slap/" + slapId}
                       className="block w-full px-3 py-2 placeholder-gray-400 transition duration-150 ease-in-out

@@ -51,7 +51,8 @@ export interface Item {
   };
 }
 
-export default function Croaker({ slapId, type }) {
+export default function Croaker({ slapId, listType }) {
+  
   const { user } = useUser();
   const [_, drop] = useDrop({
     accept: "nothing",
@@ -60,7 +61,7 @@ export default function Croaker({ slapId, type }) {
     },
   });
 
-  const { slaps, dirtySlaps, saveSlap, setReloadSlapsUpdateInt, addItem, setListInfo, moveItem, editItemText, deleteSlap, addClip, setMetaInfo } = useSlapData()
+  const { slaps, dirtySlaps, slapsLoaded, saveSlap, setReloadSlapsUpdateInt, addItem, setListInfo, moveItem, editItemText, deleteSlap, addClip, setMetaInfo } = useSlapData()
   const ourSlap = slaps.find(s => s.id == slapId)
   const dirty = dirtySlaps[ourSlap?.id]
   const { spotify } = usePlayingNowState();
@@ -72,8 +73,8 @@ export default function Croaker({ slapId, type }) {
 
   const myInputRef = useRef(null);
 
-  const items = ourSlap?.items || []
   const [spotifyItems, setSpotifyItems] = useState([])
+  const items = ourSlap?.items || spotifyItems || []
   const [slapUserId, setSlapUserId] = useState(null);
   const [loaded, setLoaded] = useState(!!ourSlap);
 
@@ -86,17 +87,11 @@ export default function Croaker({ slapId, type }) {
   const [visibility, setVisibility] = useState("unlisted");
 
   useEffect(() => {
-    if (ourSlap) {
-      setLoaded(true)
-    }
-  }, [!!ourSlap]);
-
-  useEffect(() => {
     if (!slapId) {
       return;
     }
 
-    if (type == "spotify") {
+    if (listType == "spotify") {
       setLoaded(false);
       spotify.api.getPlaylist(slapId).then((a) => {
 
@@ -113,14 +108,66 @@ export default function Croaker({ slapId, type }) {
         setLoaded(true);
 
       });
-    } else if (type == "slapper") {
-      // check if you need to reload metadata
-      if (ourSlap?.items.some(i => i.type == "spotify" && !i.metaInfo.image)) {
-        console.log("MUST RELOAD!")
-        refreshMetaInfo()
-      }
     }
   }, [slapId]);
+
+  useEffect(() => {
+    if (!slapId) {
+      return;
+    }
+
+    if (listType == "slapper" && slapsLoaded) {
+      // check if you need to reload metadata
+      if (ourSlap) {
+
+        setLoaded(true)
+        if (ourSlap?.items.some(i => i.type == "spotify" && !i.metaInfo.image)) {
+          
+          refreshMetaInfo()
+        }
+
+      } else {
+        //TODO REFACTOR AROUND HERE
+        request("GET", "fauna/collection/" + slapId).then((res: any) => {
+          setSpotifyItems(
+            res.data.items.map(item => {
+              if (item.videoId) {
+                return (
+                  {
+                    ...item,
+                    type: "youtube"
+                  }
+                )
+              } else if (item.trackId) {
+                return (
+                  {
+                    ...item,
+                    type: "spotify"
+                  }
+                )
+              }
+            })
+          );
+
+          setLoaded(true)
+
+
+          setSpotifyListInfo({
+            description: res.data.description,
+            title: res.data.title,
+            coverImage: res.data.coverImage,
+          });
+        }).catch((error) => {
+          console["error"]('error: ', error);
+
+        })
+      }
+
+
+
+
+    }
+  }, [slapId, slapsLoaded]);
 
   const importToSlap = () => {
     request("POST", "fauna/collection", {
@@ -236,7 +283,7 @@ export default function Croaker({ slapId, type }) {
               <CleanInput
                 className="text-3xl font-bold overflow-visible"
                 placeholder="Untitled"
-                readOnly={type == "spotify"}
+                readOnly={listType == "spotify"}
                 value={ourSlap?.title || spotifyListInfo.title}
                 onChange={(value) => setListInfo(slapId, { title: value })}
               />
@@ -252,7 +299,7 @@ export default function Croaker({ slapId, type }) {
                   paddingBottom: 30,
                   fontSize: 16,
                 }}
-                readOnly={type == "spotify"}
+                readOnly={listType == "spotify"}
                 placeholder="Description"
                 value={ourSlap?.description || spotifyListInfo.description}
                 onChange={(value) =>
@@ -275,13 +322,7 @@ export default function Croaker({ slapId, type }) {
         </div>
 
         <div className="flex py-8">
-          {/* <button
-            className="rounded items-center
-          justify-center text-sm flex py-2 px-6 bg-blue-500 hover:bg-blue-600 font-medium text-white  transition duration-150"
-          >
-            <AiOutlinePlayCircle className="mr-2" /> Listen
-          </button> */}
-          {type == "spotify" && (
+          {listType == "spotify" && (
             <button
               onClick={importToSlap}
               className="ml-4 rounded items-center
@@ -299,35 +340,40 @@ export default function Croaker({ slapId, type }) {
             <AiFillAccountBook className="mr-2" /> Refresh metainfo
           </button> */}
 
-          <button
-            onClick={() => saveSlap(slapId)}
-            className={"ml-4 rounded items-center " +
-              "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 "
-              + (dirty ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500")}
-          >
-            <AiFillSave className="mr-2" /> Save
-          </button>
+          {listType == "slapper" && (
+            <>
+              {ourSlap && <button
+                onClick={() => saveSlap(slapId)}
+                className={"ml-4 rounded items-center " +
+                  "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 "
+                  + (dirty ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500")}
+              >
+                <AiFillSave className="mr-2" /> Save
+          </button>}
 
-          <Share slapId={slapId} />
+              <Share slapId={slapId} />
 
-          {ourSlap?.spotifyLinked &&
-            <SpotifySync slapId={slapId} />
+              {ourSlap?.spotifyLinked &&
+                <SpotifySync slapId={slapId} />
 
-          }
-
-
-
-          <button
-            onClick={() => {
-              if(window.confirm("Are you sure?")){
-                deleteSlap(slapId)
               }
-            }}
-            className="ml-4 rounded items-center
+
+
+
+              {ourSlap && <button
+                onClick={() => {
+                  if (window.confirm("Are you sure?")) {
+                    deleteSlap(slapId)
+                  }
+                }}
+                className="ml-4 rounded items-center
           justify-center text-sm flex py-2 px-6 bg-red-500 hover:bg-red-600 font-medium text-white  transition duration-150"
-          >
-            <AiFillDelete className="mr-2" /> Delete
-          </button>
+              >
+                <AiFillDelete className="mr-2" /> Delete
+          </button>}
+            </>
+          )}
+
         </div>
         <div className="border-t border-gray-100"></div>
         {/* <div className="border-b border-gray-100">
@@ -341,10 +387,12 @@ export default function Croaker({ slapId, type }) {
               <div ref={drop}>
                 {items.map((item, i) => (
                   <SlapItem
+                    listType={listType}
                     moveItem={(...props) => moveItem(slapId, ...props)}
                     addClip={(...props) => addClip(slapId, i, ...props)}
                     key={i}
                     slapId={slapId}
+                    readOnly={!ourSlap}
                     item={item}
                     i={i}
                     onSetText={(text) => editItemText(slapId, i, text)}
@@ -357,8 +405,8 @@ export default function Croaker({ slapId, type }) {
               <div>
                 {spotifyItems.map((item, i) => (
                   <SlapItem
-                    moveItem={(...props) => moveItem(slapId, ...props)}
-                    addClip={(...props) => addClip(slapId, i, ...props)}
+                    listType={listType}
+                    readOnly={!ourSlap}
                     key={i}
                     slapId={slapId}
                     item={item}

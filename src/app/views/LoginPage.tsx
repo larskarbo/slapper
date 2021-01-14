@@ -102,7 +102,7 @@ function Form({}) {
             <input
               id="email"
               type="email"
-              tabindex="1"
+              tabIndex="1"
               name="email"
               placeholder="you@domain.com"
               required=""
@@ -124,7 +124,7 @@ function Form({}) {
                 <input
                   id="password"
                   type="password"
-                  tabindex="1"
+                  tabIndex="1"
                   name="password"
                   placeholder="********"
                   required=""

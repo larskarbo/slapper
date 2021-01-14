@@ -18,15 +18,18 @@ export const SlapItem = ({
   moveItem,
   onSetText,
   addClip,
-  slapId
+  listType,
+  slapId,
+  readOnly
 }) => {
-  const { playingNow, playItem, pause } = usePlayingNowState()
   
+  const { playingNow, playItem, pause } = usePlayingNowState()
+
   const { focusClip, clipNow, defocus } = useClip()
 
   const mePlayingFocus = playingNow.item &&
-  ((playingNow.item.type == "spotify" && playingNow.item?.trackId == item.trackId )|| 
-  (playingNow.item.type == "youtube" && playingNow.item?.videoId == item.videoId ))
+    ((playingNow.item.type == "spotify" && playingNow.item?.trackId == item.trackId) ||
+      (playingNow.item.type == "youtube" && playingNow.item?.videoId == item.videoId))
   const mePlaying = mePlayingFocus && playingNow.state == "playing"
   const [collectedProps, drag] = useDrag({
     item: { item, index: i, type: "slapItem" }
@@ -70,7 +73,7 @@ export const SlapItem = ({
       }
     },
     drop: (draggingItem) => {
-      
+
       moveItem(draggingItem.index, draggingItem.item, draggingItem.dropTo)
       setDragging(null)
     }
@@ -81,7 +84,7 @@ export const SlapItem = ({
   drag(drop(ref));
   // 
   return (
-    <div ref={ref}
+    <div ref={readOnly ? null : ref}
       className={"flex py-2 items-center border-b border-gray-100 px-4"
         + "bg-white hover:bg-gray-50 transition-colors duration-100 group"
 
@@ -96,7 +99,7 @@ export const SlapItem = ({
       }}>
       <div className="mr-6 flex text-sm text-gray-400 font-thin w-4 text-center">
         <div>{i + 1} </div>
-      {/* {item.type=="spotify" && <FaSpotify className="group-hover:opacity-100 opacity-0 flex-shrink-0" />}
+        {/* {item.type=="spotify" && <FaSpotify className="group-hover:opacity-100 opacity-0 flex-shrink-0" />}
       {item.type=="youtube" && <FaYoutube className="group-hover:opacity-100 opacity-0 flex-shrink-0" />} */}
       </div>
       <div className="h-10 w-10 mr-4 rounded shadow relative overflow-hidden">
@@ -117,30 +120,35 @@ export const SlapItem = ({
         <div className={"font-medium overflow-ellipsis overflow-hidden " + (mePlayingFocus && "text-red-500")}>{item.metaInfo.title}</div>
         <div>{item.type == "youtube" ? "YouTube" : item.metaInfo.artist}</div>
       </div>
-      <div className=" w-80 -py-2 -mt-1  overflow-x-hidden pr-4 ">
-        {item.clips.map((clip, i) => {
-          const active = clipNow?.clip.id == clip.id
-          return(
-          <button
-            onClick={() => active ? defocus() : focusClip(clip.id, item.id, slapId)}
-            key={i} className={"px-2 text-xs mt-1 mr-1 inline-flex items-center py-1 font-medium text-white rounded " + (active ? "bg-red-500 " : "bg-gray-500 ")}>
-            {clip.title}
-            <span className="opacity-50 ml-1"> ({Math.round((clip.to - clip.from) / 1000)}s)</span>
-          </button>
-        )})}
-        <button
-            onClick={() => addClip({from:10000, to:20000})}
-            key={i} className="px-2 text-xs mb-2 inline-flex items-center py-1 bg-gray-300 hover:bg-gray-400 font-medium text-white rounded">
-            +
-          </button>
-      </div>
-      <div className=" w-60  overflow-x-hidden pr-4 py-1 h-full">
-        <textarea value={item.text || ""} onChange={e => onSetText(e.target.value)} className="text-sm border w-full h-full">
-        </textarea>
-      </div>
-      <DropdownMenu options={[
-        { name: "Remove", onClick: () => { } }
-      ]} />
+      {listType == "slapper" &&
+        <>
+          <div className=" w-80 -py-2 -mt-1  overflow-x-hidden pr-4 ">
+            {item.clips.map((clip, i) => {
+              const active = clipNow?.clip.id == clip.id
+              return (
+                <button
+                  onClick={() => active ? defocus() : focusClip(clip.id, item.id, slapId)}
+                  key={i} className={"px-2 text-xs mt-1 mr-1 inline-flex items-center py-1 font-medium text-white rounded " + (active ? "bg-red-500 " : "bg-gray-500 ")}>
+                  {clip.title}
+                  <span className="opacity-50 ml-1"> ({Math.round((clip.to - clip.from) / 1000)}s)</span>
+                </button>
+              )
+            })}
+           {!readOnly && <button
+              onClick={() => addClip({ from: 10000, to: 20000 })}
+              key={i} className="px-2 text-xs mb-2 inline-flex items-center py-1 bg-gray-300 hover:bg-gray-400 font-medium text-white rounded">
+              +
+          </button>}
+          </div>
+          <div className=" w-60  overflow-x-hidden pr-4 py-1 h-full">
+            <textarea readOnly={readOnly} value={item.text || ""} onChange={e => onSetText(e.target.value)} className="text-sm border w-full h-full">
+            </textarea>
+          </div>
+          <DropdownMenu options={[
+            { name: "Remove", onClick: () => { } }
+          ]} />
+        </>
+      }
     </div>
   );
 };

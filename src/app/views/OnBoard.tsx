@@ -75,7 +75,7 @@ export default function ({ }) {
             <input
               id="username"
               type="text"
-              tabindex="1"
+              tabIndex="1"
               name="username"
               placeholder=""
               required=""

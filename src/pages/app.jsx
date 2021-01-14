@@ -66,7 +66,7 @@ function Routing() {
 const LoginRoute = ({ component: Component, location, ...rest }) => {
   const { isAuthenticated } = useUser()
   if (isAuthenticated) {
-    navigate("/app", {replace:true})
+    navigate("/app", { replace: true })
     return null
   }
   return <Component {...rest} />
@@ -75,7 +75,7 @@ const LoginRoute = ({ component: Component, location, ...rest }) => {
 export const PrivateRoute = ({ component: Component, location, ...rest }) => {
   const { isAuthenticated } = useUser()
   if (!isAuthenticated && location.pathname !== `/app/login`) {
-    navigate("/app/login", {replace:true})
+    navigate("/app/login", { replace: true })
     return null
   }
   return <Component {...rest} />
