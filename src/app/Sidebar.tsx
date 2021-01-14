@@ -79,7 +79,7 @@ const Sidebar = ({ }) => {
               onClick={newSlap}
               className="  mx-4 mt-2   w-full text-left"
             >
-              <div className={"text-sm py-2 font-light px-5 bg-gray-100 rounded  border transition-colors duration-150 hover:bg-gray-200 inline-flex items-center "}><FaPlusCircle className="mr-2" /> Create new slap</div>
+              <div className={"text-sm py-2 font-light px-5 bg-gray-100 rounded  border transition-colors duration-150 hover:bg-gray-200 inline-flex items-center "}><FaPlusCircle className="mr-2" /> New slapper list</div>
             </button>
             {spotifyLists.length > 0 && <>
               <div className="pl-6 text-xs uppercase pt-4 font-bold text-gray-700">Spotify Playlists</div>

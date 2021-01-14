@@ -8,13 +8,13 @@ module.exports = {
     siteUrl: `https://slapper.io`,
   },
   plugins: [
-    {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        name: `content`,
-        path: `${__dirname}/src/content`,
-      },
-    },
+    // {
+    //   resolve: `gatsby-source-filesystem`,
+    //   options: {
+    //     name: `content`,
+    //     path: `${__dirname}/src/content`, <- gave error on netlify, check fileparty
+    //   },
+    // },
     'gatsby-plugin-postcss',
     `gatsby-plugin-netlify`,
     {

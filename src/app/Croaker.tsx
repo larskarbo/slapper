@@ -314,7 +314,11 @@ export default function Croaker({ slapId, type }) {
 
 
           <button
-            onClick={() => deleteSlap(slapId)}
+            onClick={() => {
+              if(window.confirm("Are you sure?")){
+                deleteSlap(slapId)
+              }
+            }}
             className="ml-4 rounded items-center
           justify-center text-sm flex py-2 px-6 bg-red-500 hover:bg-red-600 font-medium text-white  transition duration-150"
           >

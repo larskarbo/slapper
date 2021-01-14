@@ -152,7 +152,8 @@ export function SlapDataProvider({ children }) {
     //   return;
     // }
     request("POST", "fauna/deleteCollection/" + slapId).then((res: any) => {
-      alert("deleted!")
+      navigate("/app/my-slaps")
+      setReloadSlapsUpdateInt(Math.random())
     });
   };
 
