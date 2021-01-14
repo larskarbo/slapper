@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MdComputer, MdDevices, MdPhone, MdPhoneIphone } from "react-icons/md";
-import useClickOutside from "use-click-outside";
 import { usePlayingNowState } from "./players/player-context";
 import { useSpotify } from "./players/spotify-context";
 
