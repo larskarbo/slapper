@@ -16,6 +16,7 @@ export const SlapItem = ({
   dragging,
   setDragging,
   moveItem,
+  onDelete,
   onSetText,
   addClip,
   listType,
@@ -145,7 +146,7 @@ export const SlapItem = ({
             </textarea>
           </div>
           <DropdownMenu options={[
-            { name: "Remove", onClick: () => { } }
+            { name: "Remove", onClick: () => onDelete() }
           ]} />
         </>
       }

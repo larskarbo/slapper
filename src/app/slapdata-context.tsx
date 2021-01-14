@@ -157,6 +157,19 @@ export function SlapDataProvider({ children }) {
     });
   };
 
+  const deleteItem = (slapId, itemIndex) => {
+    const index = slaps.findIndex(s => s.id == slapId)
+    setSlaps(slaps => update(slaps, {
+      [index]: {
+        items: {
+          $splice: [[itemIndex, 1]],
+        }
+      }
+    }));
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
+
+  };
+
   const addClip = (slapId, itemIndex, clip) => {
     const index = slaps.findIndex(s => s.id == slapId)
     setSlaps(slaps => update(slaps, {
@@ -263,7 +276,7 @@ export function SlapDataProvider({ children }) {
   }, [spotify?.me, slapsLoaded])
 
   return (
-    <SlapDataContext.Provider value={{ slaps, dirtySlaps, saveSlap, slapsLoaded, spotifyLists, addItem, moveItem,
+    <SlapDataContext.Provider value={{ slaps, dirtySlaps, deleteItem, saveSlap, slapsLoaded, spotifyLists, addItem, moveItem,
      editItemText, deleteSlap, addClip, editClip, setMetaInfo, setListInfo, setReloadSlapsUpdateInt, newSlap}}>
       {children}
     </SlapDataContext.Provider>
