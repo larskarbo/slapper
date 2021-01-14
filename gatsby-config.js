@@ -14,6 +14,13 @@ module.exports = {
     'gatsby-plugin-postcss',
     `gatsby-plugin-netlify`,
     {
+      resolve: `gatsby-plugin-splitbee`,
+      options: {
+        includeInDevelopment: false,
+        delayTimeout: 0
+      },
+    },
+    {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [

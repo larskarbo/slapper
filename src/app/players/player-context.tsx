@@ -3,7 +3,8 @@ import * as React from 'react'
 import Spotify from '../Spotify';
 import { Item } from '../Croaker';
 import { NO_DEVICE_ERROR_MESSAGE } from '../Spotify';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useYoutube } from '../youtube-context';
 
 type Action = { type: any, [key: string]: any }
 type Dispatch = (action: Action) => void
@@ -66,147 +67,97 @@ const PlayingNowStateContext = React.createContext<State | undefined>(undefined)
 
 const spotify = new Spotify()
 
-
-// async function updatePlaybackState(dispatch: Dispatch) {
-//   await spotify.api
-//     .getMyCurrentPlaybackState()
-//     .catch((e) => {
-//       
-
-//     })
-//     .then((playbackState: any) => {
-//       
-//       dispatch({
-//         type: 'set_playback_state',
-//         position: {
-//           ms: playbackState.progress_ms,
-//           timestamp: Date.now()
-//         },
-//         state: playbackState.is_playing ? "playing" : "paused"
-//       })
-//       // 
-//       // this.playbackState = playbackState;
-//       // this.lastUpdatePlaybackState = new Date()
-//       // this.isPlaying = playbackState?.is_playing;
-//       // this.currentTrack = playbackState?.item?.id;
-//       // this.onUpdatePlaybackState(playbackState);
-//     });
-// }
-
-// export async function playItem(dispatch: Dispatch, item: Item) {
-//   // dispatch({type: 'start update', updates})
-//   try {
-//     const updatedUser = await spotify.play({ uris: ["spotify:track:" + item.trackId] })
-//     .then(() => {
-//       dispatch({
-//         type: 'play_item', item, position: {
-//           ms: 0,
-//           timestamp: Date.now()
-//         }
-//       })
-//       updatePlaybackState(dispatch)
-//     })
-
-//   } catch (error) {
-//     // dispatch({type: 'error'})
-//     if(error.message == NO_DEVICE_ERROR_MESSAGE){
-//       
-//       spotify.mustOpenMenu()
-//     } else {
-//       alert("error," + error.message)
-
-//     }
-//   }
-// }
-
-// export async function play(dispatch: Dispatch) {
-//   // dispatch({type: 'start update', updates})
-//   
-//   try {
-//     const updatedUser = await spotify.play()
-//     dispatch({ type: 'play' })
-//   } catch (error) {
-//     // dispatch({type: 'error'})
-//     alert("error," + error.message)
-//   }
-// }
-
-// export async function pause(dispatch: Dispatch) {
-//   // dispatch({type: 'start update', updates})
-//   
-//   try {
-//     const updatedUser = await spotify.pause()
-//     dispatch({ type: 'pause' })
-//   } catch (error) {
-//     // dispatch({type: 'error'})
-//     alert("error," + error.message)
-//   }
-// }
-
-// export async function seek(dispatch: Dispatch, to: number) {
-//   // dispatch({type: 'start update', updates})
-//   
-//   try {
-// const updatedUser = await spotify.api.seek(to)
-// // dispatch({type: 'pause'})
-// updatePlaybackState(dispatch)
-//   } catch (error) {
-//     // dispatch({type: 'error'})
-//     alert("error," + error.message)
-//   }
-// }
-
-
 export function PlayingNowProvider({ children }: PlayingNowProviderProps) {
   const [playingNow, setPlayingNow] = useState({
     state: "idle"
   })
+  const [playingType, setPlayingType] = useState("spotify")
+
+  const youtube = useYoutube()
 
   async function playItem(item: Item) {
-    try {
-      await spotify.play({ uris: ["spotify:track:" + item.trackId] })
+    if (item.type == "youtube") {
+      // youtube
+      console.log('youtube: ', youtube);
+      // youtube.playVideo(item.videoId)
+      setPlayingType("youtube")
+      setPlayingNow({
+        item: item,
+        state: "loading"
+      })
+      youtube.youtubeElement.target.cueVideoById(item.videoId, 0)
+      youtube.youtubeElement.target.seekTo(0)
+      youtube.youtubeElement.target.playVideo()
+      spotify.pause()
+    } else {
+      try {
+
+        setPlayingType("spotify")
+        await spotify.play({ uris: ["spotify:track:" + item.trackId] })
+          .then(() => {
+            setPlayingNow({
+              item: item,
+              position: {
+                ms: 0,
+                timestamp: Date.now()
+              },
+              state: "playing"
+            })
+            // updatePlaybackState()
+          })
+
+      } catch (error) {
+        if (error.message == NO_DEVICE_ERROR_MESSAGE) {
+
+          spotify.mustOpenMenu()
+        } else {
+          alert("error," + error.message)
+
+        }
+      }
+    }
+  }
+
+  async function playClip(item: Item, clip) {
+    if (item.type == "youtube") {
+      // youtube
+      console.log('youtube: ', youtube);
+      // youtube.playVideo(item.videoId)
+      setPlayingType("youtube")
+      setPlayingNow({
+        item: item,
+        clip: clip,
+        state: "loading"
+      })
+      console.log('clip: ', clip);
+      if (youtube.youtubeElement.target.getVideoData()['video_id'] != item.videoId) {
+        youtube.youtubeElement.target.cueVideoById(item.videoId, clip.from / 1000)
+        youtube.youtubeElement.target.playVideo()
+      }
+      youtube.youtubeElement.target.seekTo(clip.from / 1000)
+      spotify.pause()
+    } else {
+      await spotify.play({ uris: ["spotify:track:" + item.trackId], position_ms: clip.from })
         .then(() => {
           setPlayingNow({
             item: item,
+            clip: clip,
             position: {
-              ms: 0,
+              ms: clip.from,
               timestamp: Date.now()
             },
             state: "playing"
           })
           // updatePlaybackState()
         })
-
-    } catch (error) {
-      
-      if (error.message == NO_DEVICE_ERROR_MESSAGE) {
-        
-        spotify.mustOpenMenu()
-      } else {
-        alert("error," + error.message)
-
-      }
     }
   }
 
-  async function playClip(item: Item, clip) {
-    await spotify.play({ uris: ["spotify:track:" + item.trackId], position_ms: clip.from })
-      .then(() => {
-        setPlayingNow({
-          item: item,
-          clip: clip,
-          position: {
-            ms: clip.from,
-            timestamp: Date.now()
-          },
-          state: "playing"
-        })
-        // updatePlaybackState()
-      })
-  }
-
-  React.useEffect(() => {
+  useEffect(() => {
     spotify.onUpdatePlaybackState = (playbackState) => {
+      if (playingType != "spotify") {
+        return
+      }
       if (!playbackState) {
         setPlayingNow(playingNow => ({
           ...playingNow,
@@ -215,45 +166,66 @@ export function PlayingNowProvider({ children }: PlayingNowProviderProps) {
       }
       setPlayingNow(playingNow => ({
         ...playingNow,
-        position: {
+        position: playbackState ? {
           ms: playbackState.progress_ms,
           timestamp: Date.now()
-        },
+        } : undefined,
         state: playbackState.is_playing ? "playing" : "paused"
       }))
     }
-  }, [spotify])
+  }, [spotify, playingType])
 
   async function seek(to) {
-    const updatedUser = await spotify.api.seek(to)
+    if (playingType == "spotify") {
+      const updatedUser = await spotify.api.seek(to)
+    } else {
+      youtube.youtubeElement.target.seekTo(to / 1000)
+    }
     // updatePlaybackState()
   }
 
   async function pause() {
-    await spotify.api.pause()
-      .then(() => {
-        setPlayingNow({
-          ...playingNow,
-          state: "paused"
+    if (playingType == "spotify") {
+      await spotify.api.pause()
+        .then(() => {
+          setPlayingNow({
+            ...playingNow,
+            state: "paused"
+          })
+          // updatePlaybackState(dispatch)
         })
-        // updatePlaybackState(dispatch)
+    } else {
+      youtube.youtubeElement.target.pauseVideo()
+      setPlayingNow({
+        ...playingNow,
+        state: "paused"
       })
+    }
+
   }
 
   async function play() {
-    await spotify.api.play()
-      .then(() => {
-        setPlayingNow({
-          ...playingNow,
-          state: "playing"
+    if (playingType == "spotify") {
+      await spotify.api.play()
+        .then(() => {
+          // setPlayingNow({
+          //   ...playingNow,
+          //   state: "playing"
+          // })
+          // updatePlaybackState(dispatch)
         })
-        // updatePlaybackState(dispatch)
-      })
+    } else {
+      youtube.youtubeElement.target.playVideo()
+      // setPlayingNow({
+      //   ...playingNow,
+      //   state: "playing"
+      // })
+    }
   }
 
   return (
     <PlayingNowStateContext.Provider value={{
-      playingNow, playItem, playClip, pause, play, seek, spotify
+      playingNow, playItem, playClip, pause, play, seek, spotify, setPlayingNow
     }}>
       {/* <PlayingNowDispatchContext.Provider value={dispatch}> */}
       {children}

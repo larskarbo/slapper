@@ -1,25 +1,29 @@
-import React, {  } from "react";
+import React, { } from "react";
 
 
 export const sansSerif = {
-  fontFamily:`-apple-system, BlinkMacSystemFont, "Segoe UI",
+  fontFamily: `-apple-system, BlinkMacSystemFont, "Segoe UI",
   Roboto, Oxygen-Sans, Ubuntu, Cantarell,
   "Helvetica Neue", sans-serif`
 }
 
 
-export const CleanInput = ({ style,onChange, ...props }) => (
+export const CleanInput = ({ style, onChange, readOnly = false, ...props }) => (
   <input
     {...props}
     style={{
       outline: "none",
       borderWidth: 0,
-      width:"100%",
+      width: "100%",
       ...sansSerif,
       ...style,
     }}
     type="text"
-    onChange={(e) => onChange(e.target.value)}
+    onChange={(e) => {
+      if (!readOnly) {
+        onChange(e.target.value)
+      }
+    }}
   />
 );
 

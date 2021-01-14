@@ -1,4 +1,3 @@
-import { PADDING_SV } from "../SegmentViewf/SegmentView";
 
 export function getPosition(e) {
   if (typeof e.touches !== "undefined") {
@@ -26,8 +25,8 @@ export function getCoordinates(position, element) {
 }
 
 export const xToMS = (x, duration, parent) => {
-  const width = parent.getBoundingClientRect().width - PADDING_SV * 2;
-  const ms = Math.round(((x - PADDING_SV) / width) * duration);
+  const width = parent.getBoundingClientRect().width;
+  const ms = Math.round((x / width) * duration);
   if (ms < 0) {
     return 0;
   }

@@ -1,10 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import netlifyIdentity from "netlify-identity-widget";
 
 import { TText } from "../utils/font";
-import { BButton } from "../comp/BButton";
-import { Form, FormControl, InputGroup } from "react-bootstrap";
-import { FaGoogle, FaUser } from "react-icons/fa";
 import { request } from "../utils/request";
 
 export default function ({ user }) {

@@ -246,8 +246,12 @@ export default class Spotify {
       .catch((a) => {
 
       });
+    if(res.new_auth_needed){
+      console.log('res: ', res);
+      this.logOut()
+      return
+    }
     // if(!res){
-    // 	// this.logOut()
     // 	return
     // }
 

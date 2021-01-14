@@ -7,6 +7,8 @@ import { useDrag, useDrop } from 'react-dnd'
 import { useSpotifyDispatch } from './players/spotify-context';
 import { useClip } from "./clip-context";
 import useClickOutside from 'use-click-outside';
+import { FaSpotify } from 'react-icons/fa';
+import { FaYoutube } from 'react-icons/fa';
 
 export const SlapItem = ({
   item,
@@ -22,7 +24,9 @@ export const SlapItem = ({
   
   const { focusClip, clipNow, defocus } = useClip()
 
-  const mePlayingFocus = playingNow.item && playingNow.item?.trackId == item.trackId
+  const mePlayingFocus = playingNow.item &&
+  ((playingNow.item.type == "spotify" && playingNow.item?.trackId == item.trackId )|| 
+  (playingNow.item.type == "youtube" && playingNow.item?.videoId == item.videoId ))
   const mePlaying = mePlayingFocus && playingNow.state == "playing"
   const [collectedProps, drag] = useDrag({
     item: { item, index: i, type: "slapItem" }
@@ -90,9 +94,13 @@ export const SlapItem = ({
             borderTop: "2px solid transparent"
           })
       }}>
-      <div className="mr-6 text-sm text-gray-400 font-thin w-2 text-center">{i + 1}</div>
+      <div className="mr-6 flex text-sm text-gray-400 font-thin w-4 text-center">
+        <div>{i + 1} </div>
+      {/* {item.type=="spotify" && <FaSpotify className="group-hover:opacity-100 opacity-0 flex-shrink-0" />}
+      {item.type=="youtube" && <FaYoutube className="group-hover:opacity-100 opacity-0 flex-shrink-0" />} */}
+      </div>
       <div className="h-10 w-10 mr-4 rounded shadow relative overflow-hidden">
-        <img className="" src={item.metaInfo.image} />
+        <img className=" h-full object-cover" src={item.metaInfo.image || "https://img.youtube.com/vi/" + item.videoId + "/default.jpg"} />
         <button
           onClick={() => {
             { mePlaying ? pause() : playItem(item) }
@@ -107,7 +115,7 @@ export const SlapItem = ({
       </div>
       <div className="font-light text-gray-800 text-sm w-40 whitespace-nowrap  pr-4">
         <div className={"font-medium overflow-ellipsis overflow-hidden " + (mePlayingFocus && "text-red-500")}>{item.metaInfo.title}</div>
-        <div>{item.metaInfo.artist}</div>
+        <div>{item.type == "youtube" ? "YouTube" : item.metaInfo.artist}</div>
       </div>
       <div className=" w-80 -py-2 -mt-1  overflow-x-hidden pr-4 ">
         {item.clips.map((clip, i) => {

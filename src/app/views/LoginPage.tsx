@@ -1,14 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
-import netlifyIdentity from "netlify-identity-widget";
 
 import { useIdentityContext } from "react-netlify-identity";
-import { TText } from "../utils/font";
-import { BButton } from "../comp/BButton";
-import { FormControl, InputGroup } from "react-bootstrap";
 import { FaGoogle } from "react-icons/fa";
-import { Link } from "gatsby";
-import { Redirect } from "@reach/router";
-import { useUser } from "../user-context";
 import { request } from "../utils/request";
 import { navigate } from "gatsby"
 

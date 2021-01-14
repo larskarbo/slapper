@@ -1,9 +1,5 @@
 import React, { Component } from "react";
-import { BButton } from "./comp/BButton";
-import { div } from "./utils/font";
-import netlifyIdentity from "netlify-identity-widget";
-import ky from "ky";
-import { BASE, request } from "./utils/request";
+import { request } from "./utils/request";
 import { useUser } from "./user-context";
 import {loadStripe} from '@stripe/stripe-js/pure';
 
@@ -22,14 +18,12 @@ const premium = [
 
 const Profile = ({ }) => {
   const { user } = useUser()
-  console.log('user: ', user);
-  
 
   const upgrade = () => {
     return request("POST", "money/checkout", {
       priceId: location.href.includes("localhost") ? "price_1HoUBFAtEfCrIWZMucoYP33X" : "price_1HoawrAtEfCrIWZMEehEeLtN",
     }).then(async function (result: any) {
-      console.log('result: ', result);
+      
 
       const stripe = await loadStripe(process.env.GATSBY_STRIPE_PUB_KEY);
       stripe
@@ -37,7 +31,7 @@ const Profile = ({ }) => {
           sessionId: result.sessionId,
         })
         .then((res) => {
-          console.log("res: ", res);
+          
         });
     });
   };

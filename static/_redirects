@@ -1,0 +1,2 @@
+/s /app
+/s/*  /app/slap/:splat

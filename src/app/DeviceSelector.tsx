@@ -60,13 +60,13 @@ export default function DeviceSelector({ }) {
         </button>
         {contextMenu && (
           <div
-            className="origin-top-right overflow-y-scroll absolute right-4 border-2 py-8 bottom-12 border-gray-700 mt-2 w-80 h-96 rounded-md  shadow-xl 
+            className="origin-top-right z-10 overflow-y-scroll absolute right-4 border-2 py-8 bottom-12 border-gray-700 mt-2 w-80 h-96 rounded-md  shadow-xl 
 		  bg-white"
             role="menu"
             aria-orientation="vertical"
             aria-labelledby="options-menu"
           >
-            <div className="font-bold text-center pb-4 ">Connect to a device</div>
+            <div className="font-bold text-center pb-4 ">Connect to a Spotify device</div>
 
             {loading ?
               "" :

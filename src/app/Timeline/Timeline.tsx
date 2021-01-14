@@ -15,7 +15,7 @@ function Timeline() {
   const { playingNow, seek } = usePlayingNowState()
 
   const onSeek = (ms) => {
-    console.log('ms: ', ms);
+    
     seek(ms)
   }
 

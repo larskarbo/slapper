@@ -8,21 +8,22 @@ import update from "immutability-helper";
 import { SlapItem } from "./SlapItem";
 import Authorize from "./Authorize";
 import { sansSerif } from "./utils/font";
-import { CleanInput, DEFAULT_BLACK, TText } from "./utils/font";
+import { CleanInput, DEFAULT_BLACK } from "./utils/font";
 import { useDrop } from "react-dnd";
-import LinkShare from "./comp/LinkShare";
-import { BButton } from "./comp/BButton";
-import { Link } from "gatsby";
+import { Link, navigate } from "gatsby";
 import {
   AiFillAccountBook,
   AiFillDelete,
   AiFillSave,
   AiOutlinePlayCircle,
+  AiOutlineSync,
 } from "react-icons/ai";
 import { usePlayingNowState } from "./players/player-context";
 import { useUser } from "./user-context";
 import { spotifyTrackToSlapperTrack } from "./utils/helpers";
 import { useSlapData } from "./slapdata-context";
+import { useYoutube } from "./youtube-context";
+import SpotifySync from "./SpotifySync";
 
 export const FOOTER_HEIGHT = 120;
 
@@ -49,19 +50,20 @@ export interface Item {
   };
 }
 
-export default function Croaker({ collectionId, type }) {
+export default function Croaker({ slapId, type }) {
   const { user } = useUser();
   const [_, drop] = useDrop({
     accept: "nothing",
     drop: (asdf) => {
-      
+
     },
   });
-  const { slaps, dirtySlaps, saveSlap, addItem, moveItem, editItemText, deleteSlap, addClip } = useSlapData()
-  const ourSlap = slaps.find(s => s.id == collectionId)
+
+  const { slaps, dirtySlaps, saveSlap, setReloadSlapsUpdateInt, addItem, setListInfo, moveItem, editItemText, deleteSlap, addClip, setMetaInfo } = useSlapData()
+  const ourSlap = slaps.find(s => s.id == slapId)
   const dirty = dirtySlaps[ourSlap?.id]
   const { spotify } = usePlayingNowState();
-  
+
   const [input, setInput] = useState(
     // "https://www.youtube.com/watch?time_continue=13&v=XUQiSBRgX7M&feature=emb_title"
     ""
@@ -72,9 +74,9 @@ export default function Croaker({ collectionId, type }) {
   const items = ourSlap?.items || []
   const [spotifyItems, setSpotifyItems] = useState([])
   const [slapUserId, setSlapUserId] = useState(null);
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(!!ourSlap);
 
-  const [listInfo, setListInfo] = useState({
+  const [spotifyListInfo, setSpotifyListInfo] = useState({
     title: "",
     description: "",
     coverImage: null,
@@ -83,20 +85,26 @@ export default function Croaker({ collectionId, type }) {
   const [visibility, setVisibility] = useState("unlisted");
 
   useEffect(() => {
-    if (!collectionId) {
+    if (ourSlap) {
+      setLoaded(true)
+    }
+  }, [!!ourSlap]);
+
+  useEffect(() => {
+    if (!slapId) {
       return;
     }
-    setLoaded(false);
 
     if (type == "spotify") {
-      spotify.api.getPlaylist(collectionId).then((a) => {
-        
+      setLoaded(false);
+      spotify.api.getPlaylist(slapId).then((a) => {
+
         setSpotifyItems(
           a.tracks.items.map(({ track }) => spotifyTrackToSlapperTrack(track))
         );
-        
 
-        setListInfo({
+
+        setSpotifyListInfo({
           description: a.description.replaceAll("&quot;", '"'),
           title: a.name,
           coverImage: a.images[0].url,
@@ -105,20 +113,25 @@ export default function Croaker({ collectionId, type }) {
 
       });
     } else if (type == "slapper") {
+      // check if you need to reload metadata
+      if (ourSlap?.items.some(i => i.type == "spotify" && !i.metaInfo.image)) {
+        console.log("MUST RELOAD!")
+        refreshMetaInfo()
+      }
     }
-  }, [collectionId]);
+  }, [slapId]);
 
   const importToSlap = () => {
     request("POST", "fauna/collection", {
-      title: listInfo.title,
-      description: listInfo.description,
-      items: itemsForServer(items),
+      title: spotifyListInfo.title,
+      description: spotifyListInfo.description,
+      items: spotifyItems,
       user: user.id,
       visibility: visibility,
-      spotifyLinked: collectionId,
+      spotifyLinked: slapId,
     }).then((res: any) => {
-      
-      
+      setReloadSlapsUpdateInt(Math.random())
+      navigate("/app/slap/" + res.ref["@ref"].id)
     });
 
     // request("POST", "fauna/collection", {
@@ -138,6 +151,8 @@ export default function Croaker({ collectionId, type }) {
     let parsed = urlParser.parse(input);
     const id = uuidv4();
 
+    window.splitbee?.track("Add song", { value: input })
+
     if (input.split(":").length == 3) {
       trackId = input.split(":")[2];
     } else if (input.includes("https://open.spotify.com")) {
@@ -153,78 +168,74 @@ export default function Croaker({ collectionId, type }) {
       // ]);
     } else {
       alert("couldn't parse link");
+
+      setInput("");
       return;
     }
 
     if (trackId) {
       spotify.api.getTrack(trackId).then(track => {
-        
-        
-        addItem(collectionId, spotifyTrackToSlapperTrack(track))
+
+
+        addItem(slapId, spotifyTrackToSlapperTrack(track))
       })
+    }
+
+    if (parsed && parsed.provider == "youtube") {
+
+      request("GET", "youtube/getVideoData/" + parsed.id)
+        .then((res:any) => {
+
+          addItem(slapId, {
+            clips: [],
+            metaInfo: {
+              duration: res.duration * 1000,
+              title: res.title,
+            },
+            type: "youtube",
+            videoId: parsed.id,
+          })
+        })
     }
 
     setInput("");
   };
 
-  
+
   const refreshMetaInfo = () => {
-    
+
     for (const item of items) {
       if (item.trackId) {
-        
         spotify.api.getTrack(item.trackId).then((track) => {
-          console.log({
+          setMetaInfo(slapId, item.id, {
             duration: track.duration_ms,
             title: track.name,
             image: track.album.images[0].url,
             artist: track.artists[0].name,
-          });
-          setItems((items) =>
-            items.map((i) => {
-              if (i.trackId == item.trackId) {
-                return {
-                  ...i,
-                  metaInfo: {
-                    duration: track.duration_ms,
-                    title: track.name,
-                    image: track.album.images[0].url,
-                    artist: track.artists[0].name,
-                  },
-                };
-              }
-              return i;
-            })
-          );
-          // onSetMetaInfo(item, {
-          //   duration: track.duration_ms,
-          //   title: track.name,
-          //   image: track.album.images[0].url,
-          //   artist: track.artists[0].name,
-          // });
+          })
         });
       }
     }
   };
 
 
-  
+
 
   return (
-    <div className="pb-8">
+    <div className="pb-24">
       <div style={{}}>
         <div className="flex">
           {/* <div className="w-40 h-40 bg-gray-600 rounded shadow"></div> */}
-          {ourSlap?.coverImage ? (
+          {(ourSlap?.coverImage || spotifyListInfo.coverImage) ? (
             <img
-              src={ourSlap.coverImage}
+              src={ourSlap?.coverImage || spotifyListInfo.coverImage}
               className="w-60 h-60 rounded shadow-lg"
             ></img>
           ) : (
               <div
                 className={
                   "w-60 h-60 bg-gray-400 rounded shadow-lg " +
-                  (!ourSlap && "animate-pulse")
+                  (!loaded && "animate-pulse")
                 }
               ></div>
             )}
@@ -233,8 +244,9 @@ export default function Croaker({ collectionId, type }) {
               <CleanInput
                 className="text-3xl font-bold overflow-visible"
                 placeholder="Untitled"
-                value={ourSlap?.title || ""}
-                onChange={(value) => setListInfo({ ...listInfo, title: value })}
+                readOnly={type == "spotify"}
+                value={ourSlap?.title || spotifyListInfo.title}
+                onChange={(value) => setListInfo(slapId, { title: value })}
               />
               <div className="flex items-center my-4  text-gray-900">
                 {/* <img
@@ -248,10 +260,11 @@ export default function Croaker({ collectionId, type }) {
                   paddingBottom: 30,
                   fontSize: 16,
                 }}
+                readOnly={type == "spotify"}
                 placeholder="Description"
-                value={ourSlap?.description || ""}
+                value={ourSlap?.description || spotifyListInfo.description}
                 onChange={(value) =>
-                  setListInfo({ ...listInfo, description: value })
+                  setListInfo(slapId, { description: value })
                 }
               />
 
@@ -270,12 +283,12 @@ export default function Croaker({ collectionId, type }) {
         </div>
 
         <div className="flex py-8">
-          <button
+          {/* <button
             className="rounded items-center
           justify-center text-sm flex py-2 px-6 bg-blue-500 hover:bg-blue-600 font-medium text-white  transition duration-150"
           >
             <AiOutlinePlayCircle className="mr-2" /> Listen
-          </button>
+          </button> */}
           {type == "spotify" && (
             <button
               onClick={importToSlap}
@@ -286,25 +299,32 @@ export default function Croaker({ collectionId, type }) {
             </button>
           )}
 
-          <button
+          {/* <button
             onClick={refreshMetaInfo}
             className="ml-4 rounded items-center
           justify-center text-sm flex py-2 px-6 bg-yellow-500 hover:bg-yellow-600 font-medium text-white  transition duration-150"
           >
             <AiFillAccountBook className="mr-2" /> Refresh metainfo
-          </button>
+          </button> */}
 
           <button
-            onClick={() => saveSlap(collectionId)}
-            className={"ml-4 rounded items-center"+
-          "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 "
-        + (dirty ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500")}
+            onClick={() => saveSlap(slapId)}
+            className={"ml-4 rounded items-center" +
+              "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 "
+              + (dirty ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500")}
           >
             <AiFillSave className="mr-2" /> Save
           </button>
 
+          {ourSlap?.spotifyLinked &&
+            <SpotifySync slapId={slapId} />
+
+          }
+
+
+
           <button
-            onClick={deleteSlap}
+            onClick={() => deleteSlap(slapId)}
             className="ml-4 rounded items-center
           justify-center text-sm flex py-2 px-6 bg-red-500 hover:bg-red-600 font-medium text-white  transition duration-150"
           >
@@ -316,27 +336,45 @@ export default function Croaker({ collectionId, type }) {
           
 
         </div> */}
-        {ourSlap ?
+        {(loaded) ?
+          <>
+            {ourSlap ?
 
-          <div ref={drop}>
-            {items.map((item, i) => (
-              <SlapItem
-                moveItem={(...props) => moveItem(collectionId, ...props)}
-                addClip={(...props) => addClip(collectionId, i, ...props)}
-                key={i}
-                slapId={collectionId}
-                item={item}
-                i={i}
-                dragging={dragging}
-                setDragging={setDragging}
-                onSetText={(text) => {
-                  editItemText(collectionId, i, text)
-                }}
-              />
-            ))}
-          </div>
+              <div ref={drop}>
+                {items.map((item, i) => (
+                  <SlapItem
+                    moveItem={(...props) => moveItem(slapId, ...props)}
+                    addClip={(...props) => addClip(slapId, i, ...props)}
+                    key={i}
+                    slapId={slapId}
+                    item={item}
+                    i={i}
+                    onSetText={(text) => editItemText(slapId, i, text)}
+                    dragging={dragging}
+                    setDragging={setDragging}
+                  />
+                ))}
+              </div>
+              :
+              <div>
+                {spotifyItems.map((item, i) => (
+                  <SlapItem
+                    moveItem={(...props) => moveItem(slapId, ...props)}
+                    addClip={(...props) => addClip(slapId, i, ...props)}
+                    key={i}
+                    slapId={slapId}
+                    item={item}
+                    i={i}
+                    dragging={dragging}
+                    setDragging={setDragging}
+                  />
+                ))}
+              </div>
+            }
+          </>
           :
           <div>
+
             <div className="bg-gray-200 animate-pulse w-full h-12 mb-4 rounded"></div>
             <div className="bg-gray-200 animate-pulse w-full h-12 mb-4 rounded"></div>
             <div className="bg-gray-200 animate-pulse w-full h-12 mb-4 rounded"></div>
@@ -345,7 +383,6 @@ export default function Croaker({ collectionId, type }) {
 
 
 
-        <LinkShare link={"https://slapper.io/s/" + collectionId} />
 
         {!spotify.credentials && items.find((i) => i.trackId) && (
           <div
@@ -355,7 +392,7 @@ export default function Croaker({ collectionId, type }) {
               padding: 10,
             }}
           >
-            <TText>Connect with spotify to play this Slap</TText>
+            <div>Connect with spotify to play this Slap</div>
             <Authorize spotify={spotify} />
           </div>
         )}
@@ -372,6 +409,7 @@ export default function Croaker({ collectionId, type }) {
               >
                 <input
                   ref={myInputRef}
+                  className="rounded border border-gray-400 mb-2"
                   type="text"
                   style={{
                     ...sansSerif,
@@ -381,7 +419,6 @@ export default function Croaker({ collectionId, type }) {
                     padding: "10px 20px",
                     borderWidth: 1,
                     height: 45,
-                    borderColor: DEFAULT_BLACK,
                   }}
                   placeholder="Paste youtube or spotify link here"
                   value={input}
@@ -399,20 +436,20 @@ export default function Croaker({ collectionId, type }) {
                       paddingLeft: 20,
                     }}
                   >
-                    <TText>Press enter to add</TText>
+                    <div>Press enter to add</div>
                   </div>
                 )}
               </div>
             </KeyboardEventHandler>
-            <TText
+            <div
               style={{
                 fontSize: 10,
                 fontStyle: "italic",
               }}
             >
               ↑ Examples: ↑
-            </TText>
-            <TText
+            </div>
+            <div
               style={{
                 fontSize: 10,
                 color: "blue",
@@ -428,8 +465,8 @@ export default function Croaker({ collectionId, type }) {
               >
                 https://www.youtube.com/watch?v=Ob7vObnFUJc
               </a>
-            </TText>
-            <TText
+            </div>
+            <div
               style={{
                 fontSize: 10,
                 color: "blue",
@@ -445,8 +482,8 @@ export default function Croaker({ collectionId, type }) {
               >
                 spotify:track:698ItKASDavgwZ3WjaWjtz
               </a>
-            </TText>
-            <TText
+            </div>
+            <div
               style={{
                 fontSize: 10,
                 color: "blue",
@@ -464,7 +501,7 @@ export default function Croaker({ collectionId, type }) {
               >
                 https://open.spotify.com/track/14WuWxuKmG...TQ1X0zgjtQ
               </a>
-            </TText>
+            </div>
           </>
         ) : (
             <div
@@ -473,23 +510,23 @@ export default function Croaker({ collectionId, type }) {
                 backgroundColor: "#FFDCA8",
               }}
             >
-              <TText
+              <div
                 style={{
                   fontWeight: 700,
                 }}
               >
                 5 songs per slap is the maximum for the Standard plan
-            </TText>
-              <TText
+            </div>
+              <div
                 style={{
                   marginBottom: 20,
                 }}
               >
                 Upgrade to premium to get the full Slapper experience, and support
                 the development of the app!
-            </TText>
+            </div>
               <Link to="/s/profile">
-                <BButton variant="primary">Upgrade to premium</BButton>
+                <button variant="primary">Upgrade to premium</button>
               </Link>
             </div>
           )}
@@ -506,7 +543,7 @@ function VisibilitySwitcher({ setVisibility, visibility }) {
       }}
     >
       {visibility == "public" ? (
-        <TText
+        <div
           style={{
             fontSize: 12,
           }}
@@ -515,9 +552,9 @@ function VisibilitySwitcher({ setVisibility, visibility }) {
           <a onClick={() => setVisibility("unlisted")} href="#">
             Change to "unlisted"
           </a>
-        </TText>
+        </div>
       ) : (
-          <TText
+          <div
             style={{
               fontSize: 12,
             }}
@@ -526,7 +563,7 @@ function VisibilitySwitcher({ setVisibility, visibility }) {
             <a onClick={() => setVisibility("public")} href="#">
               Change to "public"
           </a>
-          </TText>
+          </div>
         )}
     </div>
   );

@@ -17,6 +17,7 @@ const SlapDataContext = React.createContext(undefined)
 
 export function SlapDataProvider({ children }) {
   const [slaps, setSlaps] = useState([])
+  const [reloadSlapsUpdateInt, setReloadSlapsUpdateInt] = useState(0)
   const [dirtySlaps, setDirtySlaps] = useState({})
   const [slapsLoaded, setSlapsLoaded] = useState(false)
   const [spotifyLists, setSpotifyLists] = useState([])
@@ -24,14 +25,31 @@ export function SlapDataProvider({ children }) {
   const { user } = useUser()
 
   useEffect(() => {
-    
+
     if (user) {
       request("GET", "fauna/myCollections").then((res: any) => {
-        
+
         setSlaps(
           res.map((r) => ({
             ...r.data,
             id: r.ref["@ref"].id,
+            items: r.data.items.map(item => {
+              if (item.videoId) {
+                return (
+                  {
+                    ...item,
+                    type: "youtube"
+                  }
+                )
+              } else if (item.trackId) {
+                return (
+                  {
+                    ...item,
+                    type: "spotify"
+                  }
+                )
+              }
+            }),
             link: "/app/slap/" + r.ref["@ref"].id
           }))
         );
@@ -42,7 +60,7 @@ export function SlapDataProvider({ children }) {
 
       })
     }
-  }, [user]);
+  }, [user, reloadSlapsUpdateInt]);
 
   const addItem = (slapId, newItem) => {
     const index = slaps.findIndex(s => s.id == slapId)
@@ -53,12 +71,12 @@ export function SlapDataProvider({ children }) {
         }
       }
     }));
-    setDirtySlaps(update(dirtySlaps, {$merge:{[slapId]: true}}))
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
   }
 
   const moveItem = (slapId, itemIndex, item, newIndex) => {
     const index = slaps.findIndex(s => s.id == slapId)
-    
+
     let newIndexAdjusted = newIndex;
     if (itemIndex < newIndex) {
       newIndexAdjusted -= 1;
@@ -73,7 +91,7 @@ export function SlapDataProvider({ children }) {
         }
       }
     }));
-    setDirtySlaps(update(dirtySlaps, {$merge:{[slapId]: true}}))
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
 
   }
 
@@ -90,8 +108,39 @@ export function SlapDataProvider({ children }) {
         }
       }
     }));
-    setDirtySlaps(update(dirtySlaps, {$merge:{[slapId]: true}}))
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
+  }
 
+  const setMetaInfo = (slapId, itemId, metaInfo) => {
+    const index = slaps.findIndex(s => s.id == slapId)
+    const slap = slaps.find(s => s.id == slapId)
+    const itemIndex = slap.items.findIndex(i => i.id == itemId)
+
+    setSlaps(slaps => update(slaps, {
+      [index]: {
+        items: {
+          [itemIndex]: {
+            $merge: {
+              metaInfo: metaInfo
+            }
+          }
+        }
+      }
+    }));
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
+  }
+
+  const setListInfo = (slapId, listInfo) => {
+    const index = slaps.findIndex(s => s.id == slapId)
+
+    setSlaps(slaps => update(slaps, {
+      [index]: {
+        $merge: {
+          ...listInfo
+        }
+      }
+    }));
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
   }
 
   const deleteSlap = (slapId) => {
@@ -102,7 +151,7 @@ export function SlapDataProvider({ children }) {
     //   return;
     // }
     request("POST", "fauna/deleteCollection/" + slapId).then((res: any) => {
-      
+      alert("deleted!")
     });
   };
 
@@ -123,7 +172,7 @@ export function SlapDataProvider({ children }) {
         }
       }
     }));
-    setDirtySlaps(update(dirtySlaps, {$merge:{[slapId]: true}}))
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
 
   };
 
@@ -146,7 +195,7 @@ export function SlapDataProvider({ children }) {
         }
       }
     }));
-    setDirtySlaps(update(dirtySlaps, {$merge:{[slapId]: true}}))
+    setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: true } }))
 
   }
 
@@ -160,12 +209,13 @@ export function SlapDataProvider({ children }) {
     request("PUT", "fauna/collection/" + slapId, {
       title: slap.title,
       description: slap.description,
+      coverImage: slap.coverImage,
       items: slap.items,
       user: user.id,
       visibility: slap.visibility,
     }).then((res: any) => {
-      
-      setDirtySlaps(update(dirtySlaps, {$merge:{[slapId]: false}}))
+
+      setDirtySlaps(update(dirtySlaps, { $merge: { [slapId]: false } }))
     });
   };
 
@@ -173,7 +223,7 @@ export function SlapDataProvider({ children }) {
   useEffect(() => {
     if (spotify.me && slapsLoaded) {
       spotify.api.getUserPlaylists(spotify.me.id).then((res: any) => {
-        
+
         setSpotifyLists(
           res.items
             .filter((spotifyList) => {
@@ -185,7 +235,8 @@ export function SlapDataProvider({ children }) {
             .map((r) => ({
               ...r,
               title: r.name,
-              img: r.images[0].url,
+              type: "spotify",
+              coverImage: r.images[0].url,
               link: "/app/spotify/playlist/" + r.id
             }))
         );
@@ -198,7 +249,8 @@ export function SlapDataProvider({ children }) {
   }, [spotify?.me, slapsLoaded])
 
   return (
-    <SlapDataContext.Provider value={{ slaps, dirtySlaps, saveSlap, spotifyLists, addItem, moveItem, editItemText, deleteSlap, addClip, editClip }}>
+    <SlapDataContext.Provider value={{ slaps, dirtySlaps, saveSlap, spotifyLists, addItem, moveItem,
+     editItemText, deleteSlap, addClip, editClip, setMetaInfo, setListInfo, setReloadSlapsUpdateInt}}>
       {children}
     </SlapDataContext.Provider>
   )

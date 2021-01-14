@@ -14,9 +14,11 @@ export default function Settings({ }) {
     <div className="pb-8">
       <h1 className="text-4xl font-black mb-12">Settings</h1>
 
-      <Profile />
+      {user &&
+        <Profile />
+      }
 
-      {user.stripeCustomerId &&
+      {user?.stripeCustomerId &&
         <form method="POST" action={"/.netlify/functions/money/customer-portal/" + user.stripeCustomerId}>
           <button className="button bg-yellow-400 hover:bg-yellow-500" type="submit">Update payment settings</button>
         </form>
@@ -55,10 +57,10 @@ export default function Settings({ }) {
       <hr className="mt-4" />
 
       <Link to="/app/logout">
-      <button
-        className="button bg-gray-500 hover:bg-gray-600 mt-8"
-      >
-        Log out
+        <button
+          className="button bg-gray-500 hover:bg-gray-600 mt-8"
+        >
+          Log out
       </button>
 
       </Link>

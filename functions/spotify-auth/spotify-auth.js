@@ -31,7 +31,9 @@ const scopes = [
   "user-read-private",
   "user-read-email",
   "playlist-read-private",
-  "playlist-read-collaborative"
+  "playlist-read-collaborative",
+  "playlist-modify-public",
+  "playlist-modify-private",
 ];
 
 
@@ -136,6 +138,13 @@ router.get('/refresh_token', function (req, res) {
   };
 
   request.post(authOptions, function (error, response, body) {
+    const authedScopes = response.body.scope.split(" ").sort()
+    if(JSON.stringify(authedScopes) != JSON.stringify(scopes.sort())){
+      return res.send({
+        'new_auth_needed': true
+      });
+    }
+    
     if (!error && response.statusCode === 200) {
       var access_token = body.access_token;
       res.send({

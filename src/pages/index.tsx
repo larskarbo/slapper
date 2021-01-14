@@ -1,11 +1,9 @@
 import React from "react";
 
 import { TText } from "../app/utils/font";
-import { BButton } from "../app/comp/BButton";
 import annotate from "./annotate.png";
 import segments from "./segments.png";
 import songs from "./songs.png";
-import { Logo } from "../app/SidebarOld";
 import { Link } from 'gatsby';
 
 export default function () {
@@ -57,7 +55,7 @@ export default function () {
           maxWidth: 1000,
         }}
       >
-        <Logo />
+        <div>Slapper.io</div>
         <TText
           style={{
             fontSize: 40,
@@ -161,8 +159,8 @@ export default function () {
 const GetStarted = ({ style, children }) => {
   // let history = useHistory();
   return (
-    <Link to="/register">
-      <BButton
+    <Link to="/app">
+      <button
         style={{
           marginTop: 50,
           marginBottom: 30,
@@ -171,7 +169,7 @@ const GetStarted = ({ style, children }) => {
         variant="success"
       >
         {children}
-      </BButton>
+      </button>
     </Link>
   );
 };
