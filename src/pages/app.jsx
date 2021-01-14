@@ -3,10 +3,6 @@ import React, { useContext, useEffect, useState } from "react";
 import { Router, Redirect } from "@reach/router"
 import { Link, navigate } from "gatsby"
 
-import "../app/tailwind.css";
-import "../app/styles.css";
-import "react-contexify/dist/ReactContexify.min.css";
-
 import LoginPage from "../app/views/LoginPage";
 import { request, generateHeaders } from "../app/utils/request";
 import Croaker from "../app/Croaker";
