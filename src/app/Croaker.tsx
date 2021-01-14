@@ -24,6 +24,7 @@ import { spotifyTrackToSlapperTrack } from "./utils/helpers";
 import { useSlapData } from "./slapdata-context";
 import { useYoutube } from "./youtube-context";
 import SpotifySync from "./SpotifySync";
+import Share from "./Share";
 
 export const FOOTER_HEIGHT = 120;
 
@@ -125,6 +126,7 @@ export default function Croaker({ slapId, type }) {
     request("POST", "fauna/collection", {
       title: spotifyListInfo.title,
       description: spotifyListInfo.description,
+      coverImage: spotifyListInfo.coverImage,
       items: spotifyItems,
       user: user.id,
       visibility: visibility,
@@ -258,12 +260,12 @@ export default function Croaker({ slapId, type }) {
                 }
               />
 
-              {(slapUserId && user?.id == slapUserId) && (
+              {/* {(slapUserId && user?.id == slapUserId) && (
                 <VisibilitySwitcher
                   visibility={visibility}
                   setVisibility={setVisibility}
                 />
-              )}
+              )} */}
             </div>
 
             <div className="text-gray-500 text-sm">
@@ -299,12 +301,14 @@ export default function Croaker({ slapId, type }) {
 
           <button
             onClick={() => saveSlap(slapId)}
-            className={"ml-4 rounded items-center" +
+            className={"ml-4 rounded items-center " +
               "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 "
               + (dirty ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500")}
           >
             <AiFillSave className="mr-2" /> Save
           </button>
+
+          <Share slapId={slapId} />
 
           {ourSlap?.spotifyLinked &&
             <SpotifySync slapId={slapId} />

@@ -79,7 +79,7 @@ const SpotifySync = ({ slapId }) => {
           setShowModal(true)
         }}
         className={
-          "ml-4 rounded items-center" +
+          "ml-4 rounded items-center " +
           "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 " +
           "bg-green-500 hover:bg-green-600"
         }

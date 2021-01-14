@@ -84,7 +84,14 @@ const Sidebar = ({ }) => {
             {spotifyLists.length > 0 && <>
               <div className="pl-6 text-xs uppercase pt-4 font-bold text-gray-700">Spotify Playlists</div>
               <div className="py-2 my-1 bg-gray-100">
-                {spotifyLists.map(slap => (
+                {spotifyLists
+                .filter((spotifyList) => {
+                  if (slaps.find(s => s.spotifyLinked == spotifyList.id)) {
+                    return false
+                  }
+                  return true
+                })
+                .map(slap => (
                   <ListLink key={slap.id} to={"/app/spotify/playlist/" + slap.id}>
                     {slap.title}
                   </ListLink>

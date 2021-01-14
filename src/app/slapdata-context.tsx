@@ -246,12 +246,6 @@ export function SlapDataProvider({ children }) {
 
         setSpotifyLists(
           res.items
-            .filter((spotifyList) => {
-              if (slaps.find(s => s.spotifyLinked == spotifyList.id)) {
-                return false
-              }
-              return true
-            })
             .map((r) => ({
               ...r,
               title: r.name,
