@@ -16,6 +16,8 @@ build/
 web-build/
 samplex.xcworkspace
 
+.cache
+
 public
 
 Podfile.lock# Logs
