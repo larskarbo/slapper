@@ -5,20 +5,9 @@ import { FaGoogle } from "react-icons/fa";
 import { request } from "../utils/request";
 import { navigate } from "gatsby";
 
-export default function () {
-  return (
-    <div className="w-full min-h-screen h-full flex flex-col items-center justify-center bg-yellow-50">
-      <h1 className="text-2xl font pb-12">
-        <span className="font-bold">Slapper</span> is waiting for you
-      </h1>
-      <Form />
 
-      <div className="pb-16"></div>
-    </div>
-  );
-}
 
-function Form({}) {
+export default function LoginPage({ }) {
   const {
     loginUser,
     signupUser,
@@ -185,8 +174,17 @@ function Form({}) {
   }
 
   return (
-    <div className="w-full px-4 py-8 pt-5 mx-3 bg-white rounded-lg shadow sm:w-96">
-      {content}
+    <div className="w-full min-h-screen h-full flex flex-col items-center justify-center bg-yellow-50">
+      <h1 className="text-2xl font pb-12">
+        <span className="font-bold">Slapper</span> is waiting for you
+      </h1>
+
+      <div className="w-full px-4 py-8 pt-5 mx-3 bg-white rounded-lg shadow sm:w-96">
+
+        {content}
+      </div>
+
+      <div className="pb-16"></div>
     </div>
   );
 }
