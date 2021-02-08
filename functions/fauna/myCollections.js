@@ -25,7 +25,8 @@ exports.handler = async (req, res) => {
       })
       // then query the refs
       client.query(getAllItemsDataQuery).then(ret => {
-        res.json(ret)
+        const filtered = ret.filter(r => !r.data.deleted)
+        res.json(filtered)
       })
     })
     .catch(error => {
