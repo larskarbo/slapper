@@ -1,11 +1,1 @@
-
-```
-stripe trigger checkout.session.completed
-stripe events resend evt_1HoZa1AtEfCrIWZM8jjB7Ni0
-```
-
-```
-stripe listen --forward-to localhost:8888/.netlify/functions/money/webhook
-```
-
-make sure to update WEBHOOK_SECRET (but often it's the same)
+docs here: https://www.notion.so/larskarbo/Stripe-1ad252e756a34a32b265d3fd265f19f7
