@@ -6,6 +6,7 @@ import segments from "./segments.png";
 import songs from "./songs.png";
 import { Link, navigate } from "gatsby";
 import { Redirect } from "@reach/router";
+import Helmet from "react-helmet";
 
 export default function () {
   if (
@@ -19,6 +20,13 @@ export default function () {
     <div className="bg-yellow-50 min-h-screen flex justify-center">
       <div className="max-w-2xl pt-12">
         <div className="text-center uppercase font-light">Slapper.io</div>
+        <Helmet>
+          <title>Organize, annotate and play music - Slapper</title>
+          <meta
+            name="description"
+            content="Organize and annotate songs and segments from Spotify, Youtube, Soundcloud in interactive, shareable documents"
+          />
+        </Helmet>
         <div
           style={{
             fontSize: 40,

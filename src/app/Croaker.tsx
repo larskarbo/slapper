@@ -19,7 +19,7 @@ import { useSlapData } from "./slapdata-context";
 import SpotifySync from "./SpotifySync";
 import Share from "./Share";
 import Adder from "./Adder";
-
+import { Helmet } from 'react-helmet';
 export const FOOTER_HEIGHT = 120;
 
 
@@ -193,6 +193,13 @@ export default function Croaker({ slapId, listType }) {
 
   return (
     <div className="pb-24">
+      <Helmet>
+          <title>{ourSlap?.title || spotifyListInfo.title} - Slapper</title>
+          <meta
+            name="description"
+            content={ourSlap?.description || spotifyListInfo.description}
+          />
+        </Helmet>
       <div style={{}}>
         <div className="flex">
           {/* <div className="w-40 h-40 bg-gray-600 rounded shadow"></div> */}
