@@ -70,7 +70,6 @@ const Profile = ({ }) => {
             <form method="POST" action={"/.netlify/functions/money/customer-portal/" + user.stripeCustomerId}>
               <button className="button  bg-gray-400 hover:bg-gray-500" type="submit">Downgrade</button>
             </form>
-
           ) : (
               <button className="button  bg-gray-400">Current plan</button>
             )}

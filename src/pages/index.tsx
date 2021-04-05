@@ -4,57 +4,22 @@ import { TText } from "../app/utils/font";
 import annotate from "./annotate.png";
 import segments from "./segments.png";
 import songs from "./songs.png";
-import { Link, navigate } from 'gatsby';
-import { Redirect } from '@reach/router';
+import { Link, navigate } from "gatsby";
+import { Redirect } from "@reach/router";
 
 export default function () {
-  if(typeof window != "undefined" && window.location.hash.includes("confirmation_token")){
-    console.log(window.location.hash)
-    navigate("/app/"+window.location.hash)
+  if (
+    typeof window != "undefined" &&
+    window.location.hash.includes("confirmation_token")
+  ) {
+    console.log(window.location.hash);
+    navigate("/app/" + window.location.hash);
   }
   return (
-    <div
-      style={{
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        width: "100%",
-        backgroundColor: "oldlace",
-      }}
-    >
-      {/* <div
-        style={{
-          height: 40,
-          backgroundColor: "#008aff",
-          justifyContent: "center",
-          width: "100%"
-        }}
-      >
-        <TText
-          style={{
-            color: "white",
-            textAlign: "center",
-          }}
-        >
-          🚀 Live on <a
-          style={{
-            color: "white",
-          }} target="_blank" href="https://www.producthunt.com/">Product hunt</a>
-        </TText>
-      </div> */}
-      <div
-        style={{
-          flexDirection: "column",
-          alignItems: "center",
-          paddingBottom: 40,
-          paddingTop: 20,
-          paddingLeft: 20,
-          paddingRight: 20,
-          maxWidth: 1000,
-        }}
-      >
-        <div>Slapper.io</div>
-        <TText
+    <div className="bg-yellow-50 min-h-screen flex justify-center">
+      <div className="max-w-2xl pt-12">
+        <div className="text-center uppercase font-light">Slapper.io</div>
+        <div
           style={{
             fontSize: 40,
             textAlign: "center",
@@ -88,8 +53,8 @@ export default function () {
             play{" "}
           </span>
           music
-        </TText>
-        <TText
+        </div>
+        <div
           style={{
             fontSize: 20,
             textAlign: "center",
@@ -99,15 +64,15 @@ export default function () {
           }}
         >
           from Spotify and Youtube in the same list.
-        </TText>
+        </div>
 
         <GetStarted style={{ marginTop: 20 }}>Go to app</GetStarted>
 
         <video
           style={{
             width: "100%",
-            boxShadow: "3px 3px 5px 6px #ccc",
           }}
+          className="my-6 shadow-xl"
           controls={false}
           muted
           loop
@@ -128,46 +93,49 @@ export default function () {
           Sorry, your browser doesn't support embedded videos.
         </video>
 
-        <GetStarted>Get started</GetStarted>
+        <div className="flex justify-center my-6 mt-18">
+          <div className="max-w-sm">
+            <img src={songs} />
+            <img src={annotate} />
+            <img src={segments} />
+          </div>
+        </div>
+        <GetStarted>Go to app</GetStarted>
 
-        <img
-          style={{
-            maxWidth: 400,
-          }}
-          src={songs}
-        />
-        <img
-          style={{
-            maxWidth: 400,
-          }}
-          src={annotate}
-        />
-        <img
-          style={{
-            maxWidth: 400,
-          }}
-          src={segments}
-        />
-        <GetStarted style={{ marginTop: 20 }}>Get started</GetStarted>
+        <div className="flex mt-16 justify-center my-24">
+          <div className="">
+            <a href="https://larskarbo.no" target="_blank">
+              <div
+                className=" flex items-center border border-gray-200 rounded p-2 px-4
+                hover:border-gray-400 transition-colors duration-150 hover:shadow-sm
+                "
+              >
+                <img
+                  alt="Lars"
+                  className="rounded-full mr-2 w-8"
+                  src="https://s.gravatar.com/avatar/4579b299730ddc53e3d523ec1cd5482a?s=72"
+                />
+                <div className="font-light">
+                  made by <strong className="font-bold">@larskarbo</strong>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
 
-const GetStarted = ({ style, children }) => {
+const GetStarted = ({ children }) => {
   // let history = useHistory();
   return (
-    <Link to="/app">
-      <button
-        style={{
-          marginTop: 50,
-          marginBottom: 30,
-          ...style,
-        }}
-        variant="success"
-      >
-        {children}
-      </button>
-    </Link>
+    <div className="flex my-6 justify-center">
+      <Link className="" to="/app">
+        <button className="bg-green-100 shadow hover:border-green-400 transition-colors duration-150 hover:shadow-sm border border-green-200 rounded p-2 px-4">
+          {children}
+        </button>
+      </Link>
+    </div>
   );
 };
