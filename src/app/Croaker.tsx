@@ -7,11 +7,7 @@ import Authorize from "./Authorize";
 import { CleanInput, DEFAULT_BLACK } from "./utils/font";
 import { useDrop } from "react-dnd";
 import { Link, navigate } from "gatsby";
-import {
-  AiFillAccountBook,
-  AiFillDelete,
-  AiFillSave,
-} from "react-icons/ai";
+import { AiFillAccountBook, AiFillDelete, AiFillSave } from "react-icons/ai";
 import { usePlayingNowState } from "./players/player-context";
 import { useUser } from "./user-context";
 import { spotifyTrackToSlapperTrack } from "./utils/helpers";
@@ -19,9 +15,8 @@ import { useSlapData } from "./slapdata-context";
 import SpotifySync from "./SpotifySync";
 import Share from "./Share";
 import Adder from "./Adder";
-import { Helmet } from 'react-helmet';
+import { Helmet } from "react-helmet";
 export const FOOTER_HEIGHT = 120;
-
 
 export interface Clip {
   from: number;
@@ -46,22 +41,32 @@ export interface Item {
 }
 
 export default function Croaker({ slapId, listType }) {
-
   const { user } = useUser();
   const [_, drop] = useDrop({
     accept: "nothing",
-    drop: (asdf) => {
-
-    },
+    drop: (asdf) => {},
   });
 
-  const { slaps, dirtySlaps, slapsLoaded, saveSlap, deleteItem, setReloadSlapsUpdateInt, setListInfo, moveItem, editItemText, deleteSlap, addClip, setMetaInfo } = useSlapData()
-  const ourSlap = slaps.find(s => s.id == slapId)
-  const dirty = dirtySlaps[ourSlap?.id]
+  const {
+    slaps,
+    dirtySlaps,
+    slapsLoaded,
+    saveSlap,
+    deleteItem,
+    setReloadSlapsUpdateInt,
+    setListInfo,
+    moveItem,
+    editItemText,
+    deleteSlap,
+    addClip,
+    setMetaInfo,
+  } = useSlapData();
+  const ourSlap = slaps.find((s) => s.id == slapId);
+  const dirty = dirtySlaps[ourSlap?.id];
   const { spotify } = usePlayingNowState();
 
-  const [spotifyItems, setSpotifyItems] = useState([])
-  const items = ourSlap?.items || spotifyItems || []
+  const [spotifyItems, setSpotifyItems] = useState([]);
+  const items = ourSlap?.items || spotifyItems || [];
   const [loaded, setLoaded] = useState(!!ourSlap);
 
   const [spotifyListInfo, setSpotifyListInfo] = useState({
@@ -80,11 +85,9 @@ export default function Croaker({ slapId, listType }) {
     if (listType == "spotify") {
       setLoaded(false);
       spotify.api.getPlaylist(slapId).then((a) => {
-
         setSpotifyItems(
           a.tracks.items.map(({ track }) => spotifyTrackToSlapperTrack(track))
         );
-
 
         setSpotifyListInfo({
           description: a.description.replaceAll("&quot;", '"'),
@@ -92,7 +95,6 @@ export default function Croaker({ slapId, listType }) {
           coverImage: a.images[0].url,
         });
         setLoaded(true);
-
       });
     }
   }, [slapId]);
@@ -105,53 +107,44 @@ export default function Croaker({ slapId, listType }) {
     if (listType == "slapper" && slapsLoaded) {
       // check if you need to reload metadata
       if (ourSlap) {
-
-        setLoaded(true)
-        if (ourSlap?.items.some(i => i.type == "spotify" && !i.metaInfo.image)) {
-
-          refreshMetaInfo()
+        setLoaded(true);
+        if (
+          ourSlap?.items.some((i) => i.type == "spotify" && !i.metaInfo.image)
+        ) {
+          refreshMetaInfo();
         }
-
       } else {
         //TODO REFACTOR AROUND HERE
-        request("GET", "fauna/collection/" + slapId).then((res: any) => {
-          setSpotifyItems(
-            res.data.items.map(item => {
-              if (item.videoId) {
-                return (
-                  {
+        request("GET", "fauna/collection/" + slapId)
+          .then((res: any) => {
+            setSpotifyItems(
+              res.data.items.map((item) => {
+                if (item.videoId) {
+                  return {
                     ...item,
-                    type: "youtube"
-                  }
-                )
-              } else if (item.trackId) {
-                return (
-                  {
+                    type: "youtube",
+                  };
+                } else if (item.trackId) {
+                  return {
                     ...item,
-                    type: "spotify"
-                  }
-                )
-              }
-            })
-          );
+                    type: "spotify",
+                  };
+                }
+              })
+            );
 
-          setLoaded(true)
+            setLoaded(true);
 
-
-          setSpotifyListInfo({
-            description: res.data.description,
-            title: res.data.title,
-            coverImage: res.data.coverImage,
+            setSpotifyListInfo({
+              description: res.data.description,
+              title: res.data.title,
+              coverImage: res.data.coverImage,
+            });
+          })
+          .catch((error) => {
+            console["error"]("error: ", error);
           });
-        }).catch((error) => {
-          console["error"]('error: ', error);
-
-        })
       }
-
-
-
-
     }
   }, [slapId, slapsLoaded]);
 
@@ -165,15 +158,12 @@ export default function Croaker({ slapId, listType }) {
       visibility: visibility,
       spotifyLinked: slapId,
     }).then((res: any) => {
-      setReloadSlapsUpdateInt(Math.random())
-      navigate("/app/slap/" + res.ref["@ref"].id)
+      setReloadSlapsUpdateInt(Math.random());
+      navigate("/app/slap/" + res.ref["@ref"].id);
     });
-
   };
 
-
   const refreshMetaInfo = () => {
-
     for (const item of items) {
       if (item.trackId) {
         spotify.api.getTrack(item.trackId).then((track) => {
@@ -182,40 +172,37 @@ export default function Croaker({ slapId, listType }) {
             title: track.name,
             image: track.album.images[0].url,
             artist: track.artists[0].name,
-          })
+          });
         });
       }
     }
   };
 
-
-
-
   return (
     <div className="pb-24">
       <Helmet>
-          <title>{ourSlap?.title || spotifyListInfo.title} - Slapper</title>
-          <meta
-            name="description"
-            content={ourSlap?.description || spotifyListInfo.description}
-          />
-        </Helmet>
+        <title>{ourSlap?.title || spotifyListInfo.title} - Slapper</title>
+        <meta
+          name="description"
+          content={ourSlap?.description || spotifyListInfo.description}
+        />
+      </Helmet>
       <div style={{}}>
         <div className="flex">
           {/* <div className="w-40 h-40 bg-gray-600 rounded shadow"></div> */}
-          {(ourSlap?.coverImage || spotifyListInfo.coverImage) ? (
+          {ourSlap?.coverImage || spotifyListInfo.coverImage ? (
             <img
               src={ourSlap?.coverImage || spotifyListInfo.coverImage}
               className="w-60 h-60 rounded shadow-lg"
             ></img>
           ) : (
-              <div
-                className={
-                  "w-60 h-60 bg-gray-400 rounded shadow-lg " +
-                  (!loaded && "animate-pulse")
-                }
-              ></div>
-            )}
+            <div
+              className={
+                "w-60 h-60 bg-gray-400 rounded shadow-lg " +
+                (!loaded && "animate-pulse")
+              }
+            ></div>
+          )}
           <div className="pl-8 pt-4 flex flex-grow flex-col justify-between">
             <div>
               <CleanInput
@@ -254,7 +241,13 @@ export default function Croaker({ slapId, listType }) {
             </div>
 
             <div className="text-gray-500 text-sm">
-              {items.length} tracks - {msToHM(items.reduce((duration, item) => duration + item.metaInfo.duration, 0))}
+              {items.length} tracks -{" "}
+              {msToHM(
+                items.reduce(
+                  (duration, item) => duration + item.metaInfo.duration,
+                  0
+                )
+              )}
             </div>
           </div>
         </div>
@@ -280,48 +273,49 @@ export default function Croaker({ slapId, listType }) {
 
           {listType == "slapper" && (
             <>
-              {ourSlap && <button
-                onClick={() => saveSlap(slapId)}
-                className={"ml-4 rounded items-center " +
-                  "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 "
-                  + (dirty ? "bg-yellow-500 hover:bg-yellow-600" : "bg-gray-500")}
-              >
-                <AiFillSave className="mr-2" /> Save
-          </button>}
+              {ourSlap && (
+                <button
+                  onClick={() => saveSlap(slapId)}
+                  className={
+                    "ml-4 rounded items-center " +
+                    "justify-center text-sm flex py-2 px-6  font-medium text-white  transition duration-150 " +
+                    (dirty
+                      ? "bg-yellow-500 hover:bg-yellow-600"
+                      : "bg-gray-500")
+                  }
+                >
+                  <AiFillSave className="mr-2" /> Save
+                </button>
+              )}
 
               <Share slapId={slapId} />
 
-              {ourSlap?.spotifyLinked &&
-                <SpotifySync slapId={slapId} />
+              {ourSlap?.spotifyLinked && <SpotifySync slapId={slapId} />}
 
-              }
-
-
-
-              {ourSlap && <button
-                onClick={() => {
-                  if (window.confirm("Are you sure?")) {
-                    deleteSlap(slapId)
-                  }
-                }}
-                className="ml-4 rounded items-center
+              {ourSlap && (
+                <button
+                  onClick={() => {
+                    if (window.confirm("Are you sure?")) {
+                      deleteSlap(slapId);
+                    }
+                  }}
+                  className="ml-4 rounded items-center
           justify-center text-sm flex py-2 px-6 bg-red-500 hover:bg-red-600 font-medium text-white  transition duration-150"
-              >
-                <AiFillDelete className="mr-2" /> Delete
-          </button>}
+                >
+                  <AiFillDelete className="mr-2" /> Delete
+                </button>
+              )}
             </>
           )}
-
         </div>
         <div className="border-t border-gray-100"></div>
         {/* <div className="border-b border-gray-100">
           
 
         </div> */}
-        {(loaded) ?
+        {loaded ? (
           <>
-            {ourSlap ?
-
+            {ourSlap ? (
               <div ref={drop}>
                 {items.map((item, i) => (
                   <SlapItem
@@ -340,7 +334,7 @@ export default function Croaker({ slapId, listType }) {
                   />
                 ))}
               </div>
-              :
+            ) : (
               <div>
                 {spotifyItems.map((item, i) => (
                   <SlapItem
@@ -356,19 +350,15 @@ export default function Croaker({ slapId, listType }) {
                   />
                 ))}
               </div>
-            }
+            )}
           </>
-          :
+        ) : (
           <div>
-
             <div className="bg-gray-200 animate-pulse w-full h-12 mb-4 rounded"></div>
             <div className="bg-gray-200 animate-pulse w-full h-12 mb-4 rounded"></div>
             <div className="bg-gray-200 animate-pulse w-full h-12 mb-4 rounded"></div>
           </div>
-        }
-
-
-
+        )}
 
         {!spotify.credentials && items.find((i) => i.trackId) && (
           <div
@@ -383,9 +373,12 @@ export default function Croaker({ slapId, listType }) {
           </div>
         )}
 
-        {ourSlap &&
-          <Adder slapId={slapId} allowedToAdd={user?.plan == "premium" || items.length < 5} />
-        }
+        {ourSlap && (
+          <Adder
+            slapId={slapId}
+            allowedToAdd={user?.plan == "premium" || items.length < 5}
+          />
+        )}
       </div>
     </div>
   );
@@ -410,25 +403,24 @@ function VisibilitySwitcher({ setVisibility, visibility }) {
           </a>
         </div>
       ) : (
-          <div
-            style={{
-              fontSize: 12,
-            }}
-          >
-            This slap can only be accessed by link.{" "}
-            <a onClick={() => setVisibility("public")} href="#">
-              Change to "public"
+        <div
+          style={{
+            fontSize: 12,
+          }}
+        >
+          This slap can only be accessed by link.{" "}
+          <a onClick={() => setVisibility("public")} href="#">
+            Change to "public"
           </a>
-          </div>
-        )}
+        </div>
+      )}
     </div>
   );
 }
 
-
 export const msToHM = (ms) => {
-  const minutes = Math.round(ms / 60_000)
-  const hours = Math.floor(minutes / 60)
+  const minutes = Math.round(ms / 60_000);
+  const hours = Math.floor(minutes / 60);
 
-  return (hours && (hours + " hrs ")) + minutes % 60 + " mins"
-}
+  return (hours && hours + " hrs ") + (minutes % 60) + " mins";
+};

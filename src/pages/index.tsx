@@ -130,6 +130,14 @@ export default function () {
             </a>
           </div>
         </div>
+
+        <div className="my-8 font-light text-white w-full text-center underline text-sm">
+        <div>
+          <Link to="/ab-repeat-spotify/">
+            3 Ways to AB-repeat Spotify
+          </Link>
+        </div>
+      </div>
       </div>
     </div>
   );
