@@ -1,7 +1,7 @@
 ---
 title: 3 ways to AB-repeat Spotify
 excerpt: No excerpt
-hero: ./5-ways-to-watch-videos-with-friends.png
+hero: ./segments.png
 date: 2020-12-28
 ---
 
