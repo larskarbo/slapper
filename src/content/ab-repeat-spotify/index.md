@@ -21,7 +21,7 @@ Here are some ways you can AB-repeat segments from Spotify.
 
 ### 2. Audacity
 
-If you have a chance to download the mp3 from somewhere, you can use [Audacity](https://www.audacityteam.org/) or your favourite DAW to loop segments.
+If you have a chance to download the mp3 from somewhere, you can use [Audacity](https://www.audacityteam.org/) or your favorite DAW to loop segments.
 
 ### 3. Slapper
 
