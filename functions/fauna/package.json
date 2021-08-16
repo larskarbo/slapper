@@ -15,6 +15,7 @@
   "author": "Netlify",
   "license": "MIT",
   "dependencies": {
+    "axios": "^0.21.1",
     "express": "^4.17.1",
     "faunadb": "^2.14.2",
     "serverless-http": "^2.6.0"

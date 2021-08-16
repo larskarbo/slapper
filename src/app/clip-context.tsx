@@ -19,6 +19,8 @@ export function ClipProvider({ children }) {
   const {slaps} = useSlapData()
 
   const focusClip = (clipId, itemId, slapId) => {
+    console.log('clipId, itemId, slapId: ', clipId, itemId, slapId);
+    return
     setFocusedClip({
       clipId,
       itemId,

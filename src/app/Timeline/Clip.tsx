@@ -1,27 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { MdDelete } from "react-icons/md";
-import CircleButton from "../comp/CircleButton";
-import Play from "../comp/Play";
-import { CleanInput } from "../utils/font";
-import Handle from "./Handle";
-import Segment from "./Segment";
-import { IoPlaySharp } from 'react-icons/io5';
-import { FaCross } from "react-icons/fa";
-import { AiFillCloseCircle } from "react-icons/ai";
 import { useClip } from "../clip-context";
 import { useSlapData } from "../slapdata-context";
+import Handle from "./Handle";
+import Segment from "./Segment";
 
-export const Clip = ({
-  isHovering,
-  duration,
-  parent,
-}) => {
-  const {clipNow} = useClip()
-  const {editClip} = useSlapData()
-  const clip = clipNow.clip
+export const Clip = ({ isHovering, duration, parent }) => {
+  const { clipNow } = useClip();
+  const { editClip } = useSlapData();
+  const clip = clipNow.clip;
 
-  const [localFrom, setLocalFrom] = useState(clip.from);
-  const [localTo, setLocalTo] = useState(clip.to);
+  const [localFrom, setLocalFrom] = useState(clip?.from);
+  const [localTo, setLocalTo] = useState(clip?.to);
 
   useEffect(() => {
     setLocalFrom(clip.from);
@@ -30,6 +19,10 @@ export const Clip = ({
   useEffect(() => {
     setLocalTo(clip.to);
   }, [clip.to]);
+
+  if (!clip) {
+    return null;
+  }
 
   return (
     <>
@@ -45,12 +38,8 @@ export const Clip = ({
         from={localFrom}
         to={localTo}
       >
-        <div
-          className="flex items-center"
-        >
-          
-          <div className="text-xs whitespace-nowrap"
-          >{clip.title}</div>
+        <div className="flex items-center">
+          <div className="text-xs whitespace-nowrap">{clip.title}</div>
         </div>
         <div
           style={{

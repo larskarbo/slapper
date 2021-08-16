@@ -1,7 +1,5 @@
 // src/playingNow-context.js
 import * as React from 'react'
-import Spotify from '../Spotify';
-import { Item } from '../Croaker';
 import { useState, useEffect } from 'react';
 import { usePlayingNowState } from './players/player-context';
 import { request } from './utils/request';
