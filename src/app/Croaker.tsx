@@ -66,7 +66,7 @@ export default function Croaker({ slapId, listType }) {
   const { spotify } = usePlayingNowState();
 
   const [spotifyItems, setSpotifyItems] = useState([]);
-  console.log('ourSlap?.items: ', ourSlap?.items);
+  console.log('ourSlap: ', ourSlap);
   const items: Item[] = ourSlap?.items || spotifyItems || [];
   const [loaded, setLoaded] = useState(!!ourSlap);
 

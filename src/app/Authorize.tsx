@@ -8,7 +8,7 @@ const Authorize = ({ spotify }) => {
 	let content
 
 	if (!spotify.credentials) {
-		content = <div>
+		content = <button>
 			{/* <div style={{ fontSize: 14, marginBottom: 6 }}>Hello 👋<br/>Please connect to Spotify in order to get started. <br />PS: Spotify Premium required </div> */}
 			<img
 				width="200px"
@@ -17,7 +17,7 @@ const Authorize = ({ spotify }) => {
 				}}
 				src={connect}
 			></img>
-		</div>
+		</button>
 	}
 
 	if(spotify.ready){

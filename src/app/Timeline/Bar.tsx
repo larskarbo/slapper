@@ -115,6 +115,7 @@ function Handle({ value, duration, parent, onUp, isPlaying }) {
   const val = isUsingDragValue ? draggingPointerValue : pointerAtRolling
   return (
     <div {...backgroundHitterProps} className="cursor-pointer group flex items-center h-8 w-full">
+      asdf
       <div className="bg-gray-500 absolute w-full h-xs h-0.5 group-hover:h-1"></div>
       <div className={" absolute h-0.5 group-hover:h-1 " + (isUsingDragValue ? "bg-green-300" : "bg-red-300")} style={{
         width: (val / duration) * 100 + "%"

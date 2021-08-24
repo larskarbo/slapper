@@ -17,6 +17,7 @@ web-build/
 samplex.xcworkspace
 
 .cache
+backup-project
 
 public
 

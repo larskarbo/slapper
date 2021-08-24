@@ -74,9 +74,16 @@ export default function () {
           from Spotify and Youtube in the same list.
         </div>
 
-        <GetStarted style={{ marginTop: 20 }}>Go to app</GetStarted>
+        <GetStarted>Go to the main app</GetStarted>
+        <div className="flex my-6 justify-center">
+          <Link className="" to="/spotify-ab-looper">
+            <button className="bg-green-100 shadow hover:border-green-400 transition-colors duration-150 hover:shadow-sm border border-green-200 rounded p-2 px-4">
+              Go to the Spotify AB-looper
+            </button>
+          </Link>
+        </div>
 
-        <video
+        {/* <video
           style={{
             width: "100%",
           }}
@@ -99,7 +106,7 @@ export default function () {
             type="video/mp4"
           />
           Sorry, your browser doesn't support embedded videos.
-        </video>
+        </video> */}
 
         <div className="flex justify-center my-6 mt-18">
           <div className="max-w-sm">
@@ -108,7 +115,6 @@ export default function () {
             <img src={segments} />
           </div>
         </div>
-        <GetStarted>Go to app</GetStarted>
 
         <div className="flex mt-16 justify-center my-24">
           <div className="">
@@ -132,12 +138,10 @@ export default function () {
         </div>
 
         <div className="my-8 font-light w-full text-center underline text-sm">
-        <div>
-          <Link to="/ab-repeat-spotify/">
-            3 Ways to AB-repeat Spotify
-          </Link>
+          <div>
+            <Link to="/ab-repeat-spotify/">3 Ways to AB-repeat Spotify</Link>
+          </div>
         </div>
-      </div>
       </div>
     </div>
   );
