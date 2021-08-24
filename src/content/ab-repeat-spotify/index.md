@@ -29,7 +29,7 @@ If you have a chance to download the mp3 from somewhere, you can use [Audacity](
 
 With Slapper, you can also make notes and save collections of segments for later use.
 
-[Start AB-repeating with Slapper now.](/)
+[Start AB-repeating with Slapper now.](/spotify-ab-looper/)
 
 ## Conclusion
 
