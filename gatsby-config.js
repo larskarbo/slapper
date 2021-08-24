@@ -18,10 +18,9 @@ module.exports = {
     'gatsby-plugin-postcss',
     `gatsby-plugin-netlify`,
     {
-      resolve: `gatsby-plugin-splitbee`,
+      resolve: `gatsby-plugin-plausible`,
       options: {
-        includeInDevelopment: false,
-        delayTimeout: 0
+        domain: `slapper.io`,
       },
     },
     {
