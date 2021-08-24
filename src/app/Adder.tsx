@@ -18,7 +18,6 @@ const Adder = ({ slapId, allowedToAdd }) => {
     let parsed = urlParser.parse(input);
     const id = uuidv4();
 
-    window.splitbee?.track("Add song", { value: input });
 
     if (input.split(":").length == 3) {
       trackId = input.split(":")[2];
