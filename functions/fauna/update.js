@@ -19,7 +19,7 @@ exports.handler = async (req, res) => {
     .then(response => {
       console.log('response: ', response);
       axios.post(process.env.SLACK_WEBHOOK_URL, {
-        text: "Some user saved " + response?.data?.title + ` (${id})`,
+        text: "Some user saved " + response.data.title + ` (${id})`,
       })
       res.json(response)
     })
