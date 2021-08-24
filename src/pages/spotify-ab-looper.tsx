@@ -4,14 +4,21 @@ import Helmet from "react-helmet";
 import Authorize from "../app/Authorize";
 import Spotify from "../app/Spotify";
 import Bar from "../app/Timeline/Bar";
-import { Clip } from "../app/Timeline/Clip";
 import { ClipSimpleForLooper } from "../ClipSimpleForLooper";
 const spotify = new Spotify();
+
 export default function SpotifyABLooper() {
   const [playingNow, setPlayingNow] = useState(null);
-  const [loopFrom, setLoopFrom] = useState("0:00");
-  const [loopTo, setLoopTo] = useState("0:30");
+  
   const [loopActive, setLoopActive] = useState(false);
+  const [lastPeek, setLastPeek] = useState({
+    timeLeft: null,
+    atTime: new Date(),
+  });
+  const [clip, setClip] = useState({
+    from: 10_000,
+    to: 20_000,
+  });
 
   useEffect(() => {
     if (playingNow?.state == "playing" && loopActive) {
@@ -19,19 +26,33 @@ export default function SpotifyABLooper() {
 
       return () => clearTimeout(timeout);
     }
-  }, [playingNow, loopFrom, loopTo, loopActive]);
+  }, [playingNow, loopActive]);
 
   const lineRef = useRef(null);
 
   useEffect(() => {
-    console.log(
-      "spotify.onUpdatePlaybackState: ",
-      spotify.onUpdatePlaybackState
-    );
     spotify.onUpdatePlaybackState = (playbackState) => {
-      console.log("playbackState: ", playbackState);
+      
       if (!playbackState) {
         setPlayingNow(null);
+        return
+      }
+
+      console.log(
+        "playbackState.progress_ms < clip.to: ",
+        playbackState.progress_ms,
+        clip.to
+      );
+      if (loopActive && playbackState.progress_ms < clip.to) {
+        setLastPeek({
+          timeLeft: clip.to - playbackState.progress_ms,
+          atTime: new Date(),
+        });
+      } else {
+        setLastPeek({
+          timeLeft: null,
+          atTime: new Date(),
+        });
       }
 
       setPlayingNow((playingNow) => ({
@@ -45,11 +66,22 @@ export default function SpotifyABLooper() {
         state: playbackState?.is_playing ? "playing" : "paused",
       }));
     };
-  }, [spotify]);
+  }, [spotify, clip]);
+
+  const goToBeginning = () => {
+    spotify.api.seek(clip.from);
+  };
+
+  useEffect(() => {
+    if (playingNow?.state == "playing" && lastPeek.timeLeft > 0) {
+      const timeout = setTimeout(goToBeginning, lastPeek.timeLeft);
+      return () => clearTimeout(timeout);
+    }
+  }, [lastPeek.timeLeft, playingNow]);
 
   return (
     <div className="bg-yellow-50 min-h-screen flex justify-center">
-      <div className="max-w-2xl pt-12">
+      <div className="max-w-lg w-full px-4 pt-12">
         <div className="text-center uppercase font-light my-8">Slapper.io</div>
         <Helmet>
           <title>Spotify AB-looper online</title>
@@ -67,7 +99,7 @@ export default function SpotifyABLooper() {
         <div className="text-sm font-bold my-4">
           Control playback in your Spotify app.
         </div>
-        {playingNow && (
+        {playingNow ? (
           <div>
             <div className="text-xs uppercase mb-4">
               Currently {playingNow.state == "playing" ? "playing" : "paused"}:
@@ -91,52 +123,73 @@ export default function SpotifyABLooper() {
               </div>
             </div>
           </div>
-        )}
+        ): (
+          <div className="text-sm">Play a song in your favorite Spotify app to make the looper appear!</div>
+        )
+      
+      }
 
         {playingNow && (
           <div className="text-sm my-8">
-            <div>
-              Current time:{" "}
-              <Time
-                playing={playingNow.state == "playing"}
-                position={playingNow.position}
-              />
+            <div className="flex">
+              <div className="w-12 text-xs flex justify-center text-gray-500 font-light pt-2">
+                <Time
+                  playing={playingNow?.state == "playing"}
+                  position={playingNow.position}
+                />
+              </div>
+              <div ref={lineRef} className="relative flex-grow h-20">
+                {lineRef?.current && (
+                  <>
+                    <ClipSimpleForLooper
+                      active={loopActive}
+                      clip={clip}
+                      isHovering={true}
+                      duration={playingNow.playbackState?.item?.duration_ms}
+                      parent={lineRef.current}
+                      onUpdateClip={setClip}
+                    />
+                    <Bar
+                      parent={lineRef.current}
+                      duration={playingNow.playbackState?.item?.duration_ms}
+                      value={playingNow.position?.ms || 0}
+                      onUp={(ms) => spotify?.api?.seek(ms)}
+                      isPlaying={playingNow.state == "playing"}
+                    />
+                  </>
+                )}
+              </div>
+              <div className="w-12 text-xs flex justify-center text-gray-500 font-light pt-2">
+                {msToTime(playingNow.playbackState?.item?.duration_ms)}
+              </div>
             </div>
+
             <div>
-              Song duration:{" "}
-              {msToTime(playingNow.playbackState?.item?.duration_ms)}
-            </div>
-            <div>
-              Loop active:{" "}
-              <input
-                type="checkbox"
-                checked={loopActive}
-                onChange={(e) => {
-                  setLoopActive(e.target.checked);
-                }}
-              />
-            </div>
-            <div>
-              Loop from:{" "}
-              <input
-                className="border p-1 m-1"
-                type="text"
-                value={loopFrom}
-                onChange={(e) => {
-                  setLoopFrom(e.target.value);
-                }}
-              />
-            </div>
-            <div>
-              Loop to:{" "}
-              <input
-                className="border p-1 m-1"
-                type="text"
-                value={loopTo}
-                onChange={(e) => {
-                  setLoopTo(e.target.value);
-                }}
-              />
+              <button
+                onClick={goToBeginning}
+                className=" border px-2 py-1 text-sm border-gray-700 bg-white shadow mt-2"
+              >
+                Go to loop start
+              </button>
+              <div className="my-2">
+                Loop active:{" "}
+                <input
+                  type="checkbox"
+                  checked={loopActive}
+                  onChange={(e) => {
+                    setLoopActive(e.target.checked);
+                  }}
+                />
+              </div>
+              {loopActive && (
+                <div className="my-2">
+                  Looping in:{" "}
+                  <CountDown
+                    playing={playingNow?.state == "playing"}
+                    lastPeek={lastPeek}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -175,6 +228,23 @@ const Time = ({ position, playing }) => {
       return () => clearInterval(interval);
     }
   }, [position, playing]);
+
+  return <>{time}</>;
+};
+
+const CountDown = ({ lastPeek, playing }) => {
+  const [time, setTime] = useState(lastPeek.timeLeft);
+
+  useEffect(() => {
+    setTime(lastPeek.timeLeft);
+    if (playing) {
+      const interval = setInterval(() => {
+        const timeSinceSampling = Date.now() - lastPeek.atTime;
+        setTime(lastPeek.timeLeft - timeSinceSampling);
+      }, 60);
+      return () => clearInterval(interval);
+    }
+  }, [lastPeek.timeLeft, playing]);
 
   return <>{time}</>;
 };

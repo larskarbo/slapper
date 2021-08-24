@@ -69,7 +69,7 @@ function useDragElement(parent) {
   return { elementProps, backgroundHitterProps, isDragging, isReleased, dragPercentage, hoverPercentage }
 }
 
-function Handle({ value, duration, parent, onUp, isPlaying }) {
+function Bar({ value, duration, parent, onUp, isPlaying }) {
   const [pointerAtRolling, setPointerAtRolling] = useState(0);
   const { elementProps, backgroundHitterProps, isDragging, isReleased, dragPercentage,
     hoverPercentage
@@ -115,14 +115,13 @@ function Handle({ value, duration, parent, onUp, isPlaying }) {
   const val = isUsingDragValue ? draggingPointerValue : pointerAtRolling
   return (
     <div {...backgroundHitterProps} className="cursor-pointer group flex items-center h-8 w-full">
-      asdf
       <div className="bg-gray-500 absolute w-full h-xs h-0.5 group-hover:h-1"></div>
-      <div className={" absolute h-0.5 group-hover:h-1 " + (isUsingDragValue ? "bg-green-300" : "bg-red-300")} style={{
+      <div className={" absolute h-0.5 group-hover:h-1 " + (isUsingDragValue ? "bg-green-300" : "bg-black")} style={{
         width: (val / duration) * 100 + "%"
       }}></div>
       <div
         // {...elementProps}
-        className={"rounded-full absolute h-3 w-3 opacity-0 group-hover:opacity-100 " + (isUsingDragValue ? "bg-green-300" : "bg-red-300")} style={{
+        className={"rounded-full absolute h-3 w-3 opacity-0 group-hover:opacity-100 " + (isUsingDragValue ? "bg-green-300" : "bg-black")} style={{
           marginLeft: `calc(${(val / duration) * 100}% - ${14 / 2}px`
         }}
       >
@@ -137,7 +136,7 @@ function Handle({ value, duration, parent, onUp, isPlaying }) {
   );
 }
 
-export default Handle;
+export default Bar;
 
 
 export function getPosition(e) {

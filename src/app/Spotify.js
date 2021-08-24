@@ -167,7 +167,8 @@ export default class Spotify {
 
     initPlayer();
     await poll();
-    setInterval(poll, 1500);
+    clearInterval(window.pollinterval)
+    window.pollinterval = setInterval(poll, 1500);
     await this.pollDevices();
     // setInterval(pollDevices, 10000);
 

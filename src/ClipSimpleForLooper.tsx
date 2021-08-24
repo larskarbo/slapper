@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
-import Handle from "./app/Timeline/Bar";
+import Handle from "./app/Timeline/Handle";
 import Segment from "./app/Timeline/Segment";
-
-export const ClipSimpleForLooper = ({ isHovering, duration, parent, clip }) => {
-  // const { clipNow } = useClip();
-  // const { editClip } = useSlapData();
-
+import clsx from "clsx";
+export const ClipSimpleForLooper = ({
+  isHovering,
+  active,
+  duration,
+  parent,
+  clip,
+  onUpdateClip,
+}) => {
   const [localFrom, setLocalFrom] = useState(clip?.from);
   const [localTo, setLocalTo] = useState(clip?.to);
 
@@ -24,62 +28,53 @@ export const ClipSimpleForLooper = ({ isHovering, duration, parent, clip }) => {
   return (
     <>
       <Segment
-        style={
-          {
-            // opacity: isHovering ? 0.5 : 0.2,
-            // borderRadius: 3,
-          }
-        }
         duration={duration}
         parent={parent}
         from={localFrom}
         to={localTo}
       >
-        <div className="flex items-center">
-          <div className="text-xs whitespace-nowrap">{clip.title}</div>
-        </div>
         <div
-          style={{
-            height: 60,
-            background: "rgba(196,196,196,0.31)",
-            border: "1px solid black",
-          }}
-        ></div>
-        <div
-          style={{
-            height: 20,
-          }}
+          className={clsx(
+            "h-16 border bg-opacity-20",
+            active
+              ? "border-red-500 bg-red-500"
+              : "border-gray-900 bg-gray-500 "
+          )}
         ></div>
       </Segment>
       <Handle
+        color={active ? "red" : "gray"}
         duration={duration}
         value={localFrom}
         parent={parent}
         updateValue={(a) => {
           setLocalFrom(a);
         }}
-        onUp={(a) => {
-          // editClip(clipNow.slap.id, clipNow.item.id, clipNow.clip.id, {
-          //   from: localFrom,
-          // });
+        onUp={() => {
+          onUpdateClip({
+            from: localFrom,
+            to: localTo,
+          });
         }}
-        bottomMargin={20}
+        bottomMargin={16}
         isHovering={isHovering}
       />
 
       <Handle
+        color={active ? "red" : "gray"}
         duration={duration}
         value={localTo}
         parent={parent}
         updateValue={(a) => {
           setLocalTo(a);
         }}
-        onUp={(a) => {
-          // editClip(clipNow.slap.id, clipNow.item.id, clipNow.clip.id, {
-          //   to: localTo,
-          // });
+        onUp={() => {
+          onUpdateClip({
+            to: localTo,
+            from: localFrom,
+          });
         }}
-        bottomMargin={20}
+        bottomMargin={16}
         isHovering={isHovering}
       />
     </>

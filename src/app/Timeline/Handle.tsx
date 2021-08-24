@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { PADDING_SV } from "../SegmentViewf/SegmentView";
 import { getCoordinates, getPosition, xToMS } from "./util";
 
 
